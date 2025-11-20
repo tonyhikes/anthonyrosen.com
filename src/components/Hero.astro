@@ -25,5 +25,30 @@ import ThreeScene from './ThreeScene.astro';
         width: 100%;
         z-index: 0;
         height: 100vh;
+        will-change: transform; /* Optimize for scrolling/compositing */
+    }
+
+    .sticky-hero.scrolled-past {
+        position: absolute;
+        top: 0;
+        bottom: auto;
     }
 </style>
+
+<script>
+    const hero = document.querySelector('.sticky-hero');
+    
+    if (hero) {
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const windowHeight = window.innerHeight;
+            
+            // If we have scrolled past the hero section (plus a buffer if needed)
+            if (scrollY > windowHeight) {
+                hero.classList.add('scrolled-past');
+            } else {
+                hero.classList.remove('scrolled-past');
+            }
+        }, { passive: true });
+    }
+</script>

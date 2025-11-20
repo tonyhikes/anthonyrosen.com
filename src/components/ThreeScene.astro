@@ -99,9 +99,10 @@
                 group.rotation.y += 0.05 * (targetRotY - group.rotation.y);
                 group.rotation.x += 0.05 * (targetRotX - group.rotation.x);
 
-                // 2. Position Movement (Parallax) - Retained as requested
-                const targetPosX = -mouseX * 0.5;
-                const targetPosY = mouseY * 0.5;
+                // 2. Position Movement (Parallax)
+                // Increased by 20% (0.5 * 1.2 = 0.6)
+                const targetPosX = -mouseX * 0.6;
+                const targetPosY = mouseY * 0.6;
 
                 group.position.x += 0.05 * (targetPosX - group.position.x);
                 group.position.y += 0.05 * (targetPosY - group.position.y);

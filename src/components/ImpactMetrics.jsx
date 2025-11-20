@@ -307,7 +307,7 @@ const ImpactMetrics = () => {
           }}
           className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors border-b border-transparent hover:border-slate-900 dark:hover:border-white pb-0.5"
         >
-          View detailed resume metrics <ArrowUpRight size={14} />
+          View full resume <ArrowUpRight size={14} />
         </a>
       </div>
 
