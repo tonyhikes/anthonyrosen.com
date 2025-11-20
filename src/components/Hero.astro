@@ -1,0 +1,29 @@
+---
+import ThreeScene from './ThreeScene.astro';
+---
+<div class="sticky-hero flex items-center justify-center bg-slate-900 text-white relative overflow-hidden">
+    <!-- 3D Background -->
+    <ThreeScene />
+
+    <!-- Content -->
+    <div class="text-center px-4 z-10 pointer-events-none">
+        <h1 class="text-5xl md:text-7xl font-black tracking-tighter mb-6 drop-shadow-lg">
+            Tired of the fluff?
+        </h1>
+        <div class="flex flex-col items-center gap-2 animate-pulse-slow drop-shadow-2xl">
+            <span class="text-base font-bold uppercase tracking-widest">Scroll</span>
+            <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
+    </div>
+</div>
+
+<style>
+    .sticky-hero {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 0;
+        height: 100vh;
+    }
+</style>

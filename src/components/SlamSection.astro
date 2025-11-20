@@ -1,0 +1,29 @@
+---
+---
+<div id="hire-section" class="min-h-screen flex flex-col items-center justify-center bg-blue-600 text-white overflow-hidden py-20 relative z-10">
+    <div class="relative">
+        <h2 id="slam-target" class="slam-text text-[18vw] md:text-[15vw] leading-[0.85] font-black uppercase text-center tracking-tighter drop-shadow-2xl select-none opacity-0">
+            Hire<br>Tony.
+        </h2>
+    </div>
+    <p class="mt-8 text-xl md:text-3xl font-medium max-w-2xl text-center px-6 opacity-0 transition-all duration-1000 delay-500 translate-y-8" id="subtitle">
+        Marketing Project Manager & Creative Ops Specialist
+    </p>
+</div>
+
+<script>
+    const observerOptions = { root: null, rootMargin: '0px', threshold: 0.4 };
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const title = document.getElementById('slam-target');
+                const subtitle = document.getElementById('subtitle');
+                if (title) title.classList.add('animate-slam');
+                if (subtitle) subtitle.classList.remove('opacity-0', 'translate-y-8');
+            }
+        });
+    }, observerOptions);
+
+    const target = document.getElementById('hire-section');
+    if (target) observer.observe(target);
+</script>

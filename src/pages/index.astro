@@ -1,0 +1,115 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import SlamSection from '../components/SlamSection.astro';
+import About from '../components/About.astro';
+import Services from '../components/Services.astro';
+import Experience from '../components/Experience.astro';
+import ImpactCharts from '../components/ImpactCharts.astro';
+import PhotoCollage from '../components/PhotoCollage.astro';
+import Resume from '../components/Resume.astro';
+import Portfolio from '../components/Portfolio.astro';
+import StyleGuide from '../components/StyleGuide.astro';
+import Colophon from '../components/Colophon.astro';
+---
+
+<Layout title="Tony Rosen | Marketing & Creative Project Manager">
+	<div id="home-view" class="block">
+		<Hero />
+		<main class="content-layer shadow-2xl bg-white dark:bg-slate-900 relative z-10">
+			<SlamSection />
+			<ImpactCharts />
+			<Experience />
+			<About />
+			<PhotoCollage />
+			<Services />
+		</main>
+	</div>
+	
+	<Resume />
+	<Portfolio />
+	<StyleGuide />
+	<Colophon />
+</Layout>
+
+<style>
+	.content-layer {
+		position: relative;
+		z-index: 10;
+		margin-top: 100vh; /* Push content down to reveal fixed hero */
+	}
+</style>
+
+<script>
+	// View Switching Logic
+	function navigateTo(viewId: string) {
+		const homeView = document.getElementById('home-view');
+		const resumeView = document.getElementById('resume-view');
+		const portfolioView = document.getElementById('portfolio-view');
+		const styleGuideView = document.getElementById('styleguide-view');
+		const colophonView = document.getElementById('colophon-view');
+		
+		const views = [homeView, resumeView, portfolioView, styleGuideView, colophonView];
+
+		// Hide all views first
+		views.forEach(view => {
+			if (view) {
+				view.classList.remove('block');
+				view.classList.add('hidden');
+			}
+		});
+
+		// Show the target view
+		if (viewId === 'resume' && resumeView) {
+			resumeView.classList.remove('hidden');
+			resumeView.classList.add('block');
+			window.scrollTo(0, 0);
+		} else if (viewId === 'portfolio' && portfolioView) {
+			portfolioView.classList.remove('hidden');
+			portfolioView.classList.add('block');
+			window.scrollTo(0, 0);
+		} else if (viewId === 'styleguide' && styleGuideView) {
+			styleGuideView.classList.remove('hidden');
+			styleGuideView.classList.add('block');
+			window.scrollTo(0, 0);
+		} else if (viewId === 'colophon' && colophonView) {
+			colophonView.classList.remove('hidden');
+			colophonView.classList.add('block');
+			window.scrollTo(0, 0);
+		} else if (homeView) {
+			// Default to home
+			homeView.classList.remove('hidden');
+			homeView.classList.add('block');
+			
+			// Only scroll to top if we are explicitly navigating to home from another view
+			// If it's initial load, we might want to preserve scroll or hash behavior
+			if (window.location.hash === '#home' || window.location.hash === '') {
+				// window.scrollTo(0, 0); // Optional: decide if home always scrolls to top
+			}
+		}
+	}
+
+	// Wait for DOM to be ready
+	function initViewSwitching() {
+		// Listen for custom event from Navbar
+		window.addEventListener('view-change', (e: Event) => {
+			const customEvent = e as CustomEvent;
+			navigateTo(customEvent.detail);
+		});
+
+		// Check initial hash
+		const hash = window.location.hash.replace('#', '');
+		if (['resume', 'portfolio', 'styleguide', 'colophon'].includes(hash)) {
+			navigateTo(hash);
+		} else {
+			navigateTo('home');
+		}
+	}
+
+	// Initialize when DOM is ready
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initViewSwitching);
+	} else {
+		initViewSwitching();
+	}
+</script>

@@ -1,0 +1,171 @@
+---
+---
+<div id="resume-view" class="hidden pt-24 pb-20 px-4 min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-300">
+    
+    <!-- Toolbar -->
+    <div class="max-w-4xl mx-auto mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Resume</h2>
+        
+        <!-- Download Dropdown -->
+        <div class="relative">
+            <button id="download-menu-btn" class="py-2.5 px-5 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none shadow-md">
+                Download Resume
+                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            
+            <div id="download-menu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 shadow-xl rounded-lg p-2 z-50 border border-gray-100 dark:border-gray-700">
+                <a href="#" class="flex items-center gap-x-3 py-2 px-3 rounded-md text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 focus:ring-2 focus:ring-blue-500">
+                    <!-- PDF Icon -->
+                    <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1 15.5v-4.5h-2.5l3.5-4.5 3.5 4.5h-2.5v4.5h-2z"/></svg>
+                    Download PDF
+                </a>
+                <a href="#" class="flex items-center gap-x-3 py-2 px-3 rounded-md text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 focus:ring-2 focus:ring-blue-500">
+                    <!-- Word Icon -->
+                    <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M22 22h-20v-20h14l6 6v14zm-5.4-10.4l-1.6 5.6-1.7-5.6h-1.5l-1.7 5.6-1.6-5.6h-1.9l2.4 8h1.9l1.7-5.3 1.7 5.3h1.9l2.4-8h-2z"/></svg>
+                    Download DOCX
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Resume "Paper" -->
+    <div class="resume-paper max-w-4xl mx-auto bg-white text-slate-900 p-8 md:p-12 rounded-sm">
+        <!-- Header -->
+        <header class="border-b border-gray-300 pb-6 mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+            <div>
+                <h1 class="text-4xl font-bold uppercase tracking-tight text-slate-900 mb-2">Anthony Rosen</h1>
+                <p class="text-lg text-slate-600 font-medium">Marketing & Creative Project Manager</p>
+            </div>
+            <div class="text-right md:text-right text-sm text-slate-600 leading-relaxed">
+                <p>Hopkins, MN • 612-281-2280</p>
+                <p><a href="mailto:anthonyrosen@gmail.com" class="text-blue-600 hover:underline">anthonyrosen@gmail.com</a></p>
+                <p><a href="https://linkedin.com/in/anthonyrosen" target="_blank" class="text-blue-600 hover:underline">linkedin.com/in/anthonyrosen</a></p>
+            </div>
+        </header>
+
+        <!-- Summary -->
+        <section class="mb-8">
+            <h3 class="text-sm font-bold uppercase text-slate-400 tracking-wider mb-3 border-b border-gray-100 pb-1">Professional Summary</h3>
+            <p class="text-sm leading-relaxed text-slate-700">
+                Creative and results-driven Marketing Project Manager with 3 years in marketing, 10+ years in creative operations, and 3 years in product management. Lead cross-functional teams, creative agencies, and freelance partners to deliver multi-channel campaigns (digital, email, print, in-store) on time, on budget, and on brand. Experienced managing projects in regulated and healthcare-adjacent environments, using structured processes to maintain compliance, accuracy, and brand consistency.
+            </p>
+        </section>
+
+        <!-- Skills -->
+        <section class="mb-8">
+            <h3 class="text-sm font-bold uppercase text-slate-400 tracking-wider mb-3 border-b border-gray-100 pb-1">Core Competencies</h3>
+            <div class="flex flex-wrap gap-2 text-sm text-slate-700 font-medium">
+                <span class="bg-slate-100 px-2 py-1 rounded">Creative Project Leadership</span>
+                <span class="bg-slate-100 px-2 py-1 rounded">Multi-Channel Campaigns</span>
+                <span class="bg-slate-100 px-2 py-1 rounded">Agency Management</span>
+                <span class="bg-slate-100 px-2 py-1 rounded">Budget Tracking</span>
+                <span class="bg-slate-100 px-2 py-1 rounded">Workflow Optimization</span>
+                <span class="bg-slate-100 px-2 py-1 rounded">Stakeholder Communication</span>
+                <span class="bg-slate-100 px-2 py-1 rounded">Workfront & Jira</span>
+            </div>
+        </section>
+
+        <!-- Experience -->
+        <section class="mb-8">
+            <h3 class="text-sm font-bold uppercase text-slate-400 tracking-wider mb-4 border-b border-gray-100 pb-1">Professional Experience</h3>
+            
+            <!-- Job 1 -->
+            <div class="mb-6">
+                <div class="flex justify-between items-baseline mb-1">
+                    <h4 class="text-lg font-bold text-slate-900">Product & Marketing Manager</h4>
+                    <span class="text-sm text-slate-500 font-medium">Jul 2021 - Feb 2025</span>
+                </div>
+                <div class="text-sm text-blue-700 font-semibold mb-2">ACR Electronics, Inc. (Remote)</div>
+                <ul class="list-disc list-outside ml-4 space-y-1.5 text-sm text-slate-700">
+                    <li>Promoted from Product Coordinator for consistent execution, leadership, and process innovation.</li>
+                    <li>Managed $250K annual marketing budget, optimizing spend across advertising, trade shows, and contractors.</li>
+                    <li>Directed certification and regulatory approval processes (FCC, CE), overseeing documentation and labeling compliance for global markets.</li>
+                    <li>Maintained vendor relationships across four time zones, reducing production costs by 8% and improving delivery accuracy.</li>
+                    <li>Led global localization initiatives for website, packaging, and mobile app in 20+ countries.</li>
+                </ul>
+            </div>
+
+            <!-- Job 2 -->
+            <div class="mb-6">
+                <div class="flex justify-between items-baseline mb-1">
+                    <h4 class="text-lg font-bold text-slate-900">Proposal & Marketing Coordinator</h4>
+                    <span class="text-sm text-slate-500 font-medium">Apr 2019 - Jun 2021</span>
+                </div>
+                <div class="text-sm text-blue-700 font-semibold mb-2">Kepro Healthcare CM & QIO (Remote)</div>
+                <ul class="list-disc list-outside ml-4 space-y-1.5 text-sm text-slate-700">
+                    <li>Directed marketing and creative production for 30+ healthcare proposals, including deliverables for Pfizer and State of Florida.</li>
+                    <li>Executed global localization for Pfizer campaigns in 25 languages across 88 countries.</li>
+                    <li>Maintained centralized content library and version-control system, reducing rework and supporting audits.</li>
+                </ul>
+            </div>
+
+                <!-- Job 3 -->
+                <div class="mb-6">
+                <div class="flex justify-between items-baseline mb-1">
+                    <h4 class="text-lg font-bold text-slate-900">Senior Content Specialist</h4>
+                    <span class="text-sm text-slate-500 font-medium">Jul 2008 - Aug 2018</span>
+                </div>
+                <div class="text-sm text-blue-700 font-semibold mb-2">AAAS / Science Magazine</div>
+                <ul class="list-disc list-outside ml-4 space-y-1.5 text-sm text-slate-700">
+                    <li>Created layout workflows that cut processing time and saved ~$50K annually in paper/print costs.</li>
+                    <li>Coordinated design and editorial teams to launch mobile-responsive app for 30,000+ readers.</li>
+                    <li>Implemented collaborative scheduling systems that eliminated publication delays.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Education & Tools -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <section>
+                <h3 class="text-sm font-bold uppercase text-slate-400 tracking-wider mb-3 border-b border-gray-100 pb-1">Education</h3>
+                <div class="mb-3">
+                    <h4 class="text-sm font-bold text-slate-900">Lake Forest College</h4>
+                    <p class="text-sm text-slate-600">B.A., Philosophy</p>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-slate-900">Brown College</h4>
+                    <p class="text-sm text-slate-600">A.A.S., Visual Communications</p>
+                </div>
+            </section>
+            <section>
+                <h3 class="text-sm font-bold uppercase text-slate-400 tracking-wider mb-3 border-b border-gray-100 pb-1">Tools</h3>
+                <p class="text-sm text-slate-700 leading-relaxed">
+                    Adobe Creative Suite (InDesign, Photoshop, Illustrator) • Figma • WordPress • GA4 • Workfront • Jira • Trello • HubSpot • Microsoft 365
+                </p>
+            </section>
+        </div>
+    </div>
+    
+    <!-- Back to Home Bottom Link -->
+    <div class="text-center mt-12">
+        <a href="#home" class="text-blue-600 hover:text-blue-800 text-sm font-medium nav-link" data-target="home">← Back to Home</a>
+    </div>
+
+</div>
+
+<style>
+    /* Resume Paper Styles */
+    .resume-paper {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    .dark .resume-paper {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+    }
+</style>
+
+<script>
+    const dropdownBtn = document.getElementById('download-menu-btn');
+    const dropdownMenu = document.getElementById('download-menu');
+
+    dropdownBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu?.classList.toggle('hidden');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (dropdownBtn && dropdownMenu && !dropdownBtn.contains(e.target as Node) && !dropdownMenu.contains(e.target as Node)) {
+            dropdownMenu.classList.add('hidden');
+        }
+    });
+</script>
