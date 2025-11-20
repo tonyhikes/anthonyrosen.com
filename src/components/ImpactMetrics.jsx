@@ -41,7 +41,7 @@ const AreaChart = ({ color = "text-blue-600", fill = "bg-blue-600" }) => (
 
 const BarChart = ({ color = "bg-blue-600" }) => (
   <div className="flex items-end justify-between gap-1 h-16 w-full pt-2 px-2">
-    {[40, 70, 50, 90, 60, 100].map((height, i) => (
+    {[48, 84, 60, 100, 72, 100].map((height, i) => (
       <div
         key={i}
         className={`w-1/6 rounded-t-sm opacity-80 hover:opacity-100 transition-opacity ${color}`}
@@ -73,7 +73,7 @@ const MixedChart = () => (
   <div className="relative h-16 w-full pt-2">
     {/* Bars */}
     <div className="absolute inset-0 flex items-end justify-between gap-2 px-2">
-      {[30, 45, 35, 60, 50, 70].map((h, i) => (
+      {[36, 54, 42, 72, 60, 84].map((h, i) => (
         <div key={i} className="w-2 bg-slate-200 rounded-t-sm" style={{ height: `${h}%` }} />
       ))}
     </div>
@@ -124,8 +124,8 @@ const RadialChart = ({ percentage, color = "text-blue-600" }) => (
 const MetricCard = ({ title, value, subtext, trend, trendLabel, ChartComponent, icon: Icon, accentColor }) => (
   <div className="flex flex-col justify-between p-6 bg-white rounded-2xl border border-slate-200 hover:border-blue-200 hover:shadow-lg transition-all duration-300 group h-full">
     <div className="flex justify-between items-start mb-4">
-      <div className={`p-2 rounded-lg ${accentColor} bg-opacity-10 text-opacity-100`}>
-        <Icon size={20} className={accentColor.replace('bg-', 'text-')} />
+      <div className={`p-2 rounded-lg ${accentColor}`}>
+        <Icon size={20} className="text-white" strokeWidth={2.5} />
       </div>
       {trend && (
         <div className={`flex items-center px-2 py-1 rounded-full text-xs font-medium ${trend === 'up' ? 'bg-slate-100 text-slate-700' : 'bg-slate-100 text-slate-700'
