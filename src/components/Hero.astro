@@ -1,12 +1,9 @@
 ---
 import ThreeScene from './ThreeScene.astro';
 ---
-<div class="sticky-hero flex items-center justify-center bg-slate-900 text-white relative overflow-hidden">
-    <!-- 3D Background -->
-    <ThreeScene />
-
+<div class="sticky-hero flex items-center justify-center text-white relative overflow-hidden z-30 pointer-events-none">
     <!-- Content -->
-    <div class="text-center px-4 z-10 pointer-events-none">
+    <div class="text-center px-4 z-30 pointer-events-none" id="hero-content">
         <h1 class="text-5xl md:text-7xl font-black tracking-wide mb-6 drop-shadow-lg text-blue-600">
             Tired of the fluff?
         </h1>
@@ -23,7 +20,6 @@ import ThreeScene from './ThreeScene.astro';
         top: 0;
         left: 0;
         width: 100%;
-        z-index: 0;
         height: 100vh;
         will-change: transform; /* Optimize for scrolling/compositing */
     }
@@ -37,12 +33,20 @@ import ThreeScene from './ThreeScene.astro';
 
 <script>
     const hero = document.querySelector('.sticky-hero');
+    const heroContent = document.getElementById('hero-content');
     
     if (hero) {
         window.addEventListener('scroll', () => {
             const scrollY = window.scrollY;
             const windowHeight = window.innerHeight;
             
+            // Fade out content based on scroll
+            // Fade out completely by 50% of viewport height
+            if (heroContent) {
+                const opacity = Math.max(0, 1 - (scrollY / (windowHeight * 0.5)));
+                heroContent.style.opacity = opacity.toString();
+            }
+
             // If we have scrolled past the hero section (plus a buffer if needed)
             if (scrollY > windowHeight) {
                 hero.classList.add('scrolled-past');
@@ -50,5 +54,15 @@ import ThreeScene from './ThreeScene.astro';
                 hero.classList.remove('scrolled-past');
             }
         }, { passive: true });
+
+        // Listen for slam impact to hide content
+        window.addEventListener('slam-impact', () => {
+            if (heroContent) heroContent.classList.add('opacity-0', 'transition-opacity', 'duration-200');
+        });
+
+        // Listen for slam reset to show content
+        window.addEventListener('slam-reset', () => {
+            if (heroContent) heroContent.classList.remove('opacity-0');
+        });
     }
 </script>
