@@ -1,27 +1,29 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Hero from '../components/Hero.astro';
-import ThreeScene from '../components/ThreeScene.astro';
-import SlamSection from '../components/SlamSection.astro';
-import Experience from '../components/Experience.astro';
-import ImpactCharts from '../components/ImpactCharts.astro';
-import Resume from '../components/Resume.astro';
-import Portfolio from '../components/Portfolio.astro';
-import StyleGuide from '../components/StyleGuide.astro';
-import Colophon from '../components/Colophon.astro';
+import Layout from "../layouts/Layout.astro";
+import Hero from "../components/Hero.astro";
+import ThreeScene from "../components/ThreeScene.astro";
+import SlamSection from "../components/SlamSection.astro";
+import Experience from "../components/Experience.astro";
+import ImpactCharts from "../components/ImpactCharts.astro";
+import Resume from "../components/Resume.astro";
+import Portfolio from "../components/Portfolio.astro";
+import StyleGuide from "../components/StyleGuide.astro";
+import Colophon from "../components/Colophon.astro";
 ---
 
 <Layout title="Tony Rosen | Marketing & Creative Project Manager">
 	<div id="home-view" class="block">
-        <ThreeScene />
+		<ThreeScene />
 		<Hero />
-		<main class="content-layer shadow-2xl bg-white dark:bg-slate-900 relative z-10">
+		<main
+			class="content-layer shadow-2xl bg-white dark:bg-slate-900 relative z-10"
+		>
 			<SlamSection />
 			<ImpactCharts />
 			<Experience />
 		</main>
 	</div>
-	
+
 	<Resume />
 	<Portfolio />
 	<StyleGuide />
@@ -38,49 +40,82 @@ import Colophon from '../components/Colophon.astro';
 
 <script>
 	// View Switching Logic
+
+	// Track virtual pageviews in Google Analytics
+	function trackPageView(viewId: string) {
+		// Map view IDs to readable page titles and paths
+		const viewMeta: Record<string, { title: string; path: string }> = {
+			home: { title: "Home", path: "/" },
+			resume: { title: "Resume", path: "/resume" },
+			portfolio: { title: "Portfolio", path: "/portfolio" },
+			styleguide: { title: "Style Guide", path: "/styleguide" },
+			colophon: { title: "Colophon", path: "/colophon" },
+		};
+
+		const meta = viewMeta[viewId] || { title: viewId, path: `/${viewId}` };
+
+		// Send to Google Analytics (gtag.js)
+		if (typeof window !== "undefined" && (window as any).gtag) {
+			(window as any).gtag("config", "G-7LRLJTJG4L", {
+				page_path: meta.path,
+				page_title: `${meta.title} | Tony Rosen`,
+			});
+			console.log(`📊 GA: Tracked pageview for ${meta.path}`);
+		}
+	}
+
 	function navigateTo(viewId: string) {
-		const homeView = document.getElementById('home-view');
-		const resumeView = document.getElementById('resume-view');
-		const portfolioView = document.getElementById('portfolio-view');
-		const styleGuideView = document.getElementById('styleguide-view');
-		const colophonView = document.getElementById('colophon-view');
-		
-		const views = [homeView, resumeView, portfolioView, styleGuideView, colophonView];
+		const homeView = document.getElementById("home-view");
+		const resumeView = document.getElementById("resume-view");
+		const portfolioView = document.getElementById("portfolio-view");
+		const styleGuideView = document.getElementById("styleguide-view");
+		const colophonView = document.getElementById("colophon-view");
+
+		const views = [
+			homeView,
+			resumeView,
+			portfolioView,
+			styleGuideView,
+			colophonView,
+		];
 
 		// Hide all views first
-		views.forEach(view => {
+		views.forEach((view) => {
 			if (view) {
-				view.classList.remove('block');
-				view.classList.add('hidden');
+				view.classList.remove("block");
+				view.classList.add("hidden");
 			}
 		});
 
 		// Show the target view
-		if (viewId === 'resume' && resumeView) {
-			resumeView.classList.remove('hidden');
-			resumeView.classList.add('block');
+		if (viewId === "resume" && resumeView) {
+			resumeView.classList.remove("hidden");
+			resumeView.classList.add("block");
 			window.scrollTo(0, 0);
-		} else if (viewId === 'portfolio' && portfolioView) {
-			portfolioView.classList.remove('hidden');
-			portfolioView.classList.add('block');
+			trackPageView("resume");
+		} else if (viewId === "portfolio" && portfolioView) {
+			portfolioView.classList.remove("hidden");
+			portfolioView.classList.add("block");
 			window.scrollTo(0, 0);
-		} else if (viewId === 'styleguide' && styleGuideView) {
-			styleGuideView.classList.remove('hidden');
-			styleGuideView.classList.add('block');
+			trackPageView("portfolio");
+		} else if (viewId === "styleguide" && styleGuideView) {
+			styleGuideView.classList.remove("hidden");
+			styleGuideView.classList.add("block");
 			window.scrollTo(0, 0);
-		} else if (viewId === 'colophon' && colophonView) {
-			colophonView.classList.remove('hidden');
-			colophonView.classList.add('block');
+			trackPageView("styleguide");
+		} else if (viewId === "colophon" && colophonView) {
+			colophonView.classList.remove("hidden");
+			colophonView.classList.add("block");
 			window.scrollTo(0, 0);
+			trackPageView("colophon");
 		} else if (homeView) {
 			// Default to home
-			homeView.classList.remove('hidden');
-			homeView.classList.add('block');
-			
-			// Only scroll to top if we are explicitly navigating to home from another view
-			// If it's initial load, we might want to preserve scroll or hash behavior
-			if (window.location.hash === '#home' || window.location.hash === '') {
-				// window.scrollTo(0, 0); // Optional: decide if home always scrolls to top
+			homeView.classList.remove("hidden");
+			homeView.classList.add("block");
+
+			// Track home view (but not on initial page load - that's automatic)
+			if (window.location.hash === "#home") {
+				trackPageView("home");
 			}
 		}
 	}
@@ -88,23 +123,23 @@ import Colophon from '../components/Colophon.astro';
 	// Wait for DOM to be ready
 	function initViewSwitching() {
 		// Listen for custom event from Navbar
-		window.addEventListener('view-change', (e: Event) => {
+		window.addEventListener("view-change", (e: Event) => {
 			const customEvent = e as CustomEvent;
 			navigateTo(customEvent.detail);
 		});
 
 		// Check initial hash
-		const hash = window.location.hash.replace('#', '');
-		if (['resume', 'portfolio', 'styleguide', 'colophon'].includes(hash)) {
+		const hash = window.location.hash.replace("#", "");
+		if (["resume", "portfolio", "styleguide", "colophon"].includes(hash)) {
 			navigateTo(hash);
 		} else {
-			navigateTo('home');
+			navigateTo("home");
 		}
 	}
 
 	// Initialize when DOM is ready
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initViewSwitching);
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initViewSwitching);
 	} else {
 		initViewSwitching();
 	}
