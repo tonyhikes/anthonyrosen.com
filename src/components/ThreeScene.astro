@@ -224,6 +224,27 @@
             }
         });
 
+        // Handle View Changes - PAUSE RENDERING WHEN NOT ON HOME VIEW
+        window.addEventListener("view-change", (e: Event) => {
+            const customEvent = e as CustomEvent;
+            const viewId = customEvent.detail;
+
+            if (viewId === "home") {
+                // Returning to home view - restart animation if appropriate
+                if (
+                    !container.classList.contains("opacity-0") &&
+                    !document.hidden
+                ) {
+                    isVisible = true;
+                    startAnimation();
+                }
+            } else {
+                // Navigating away from home - stop animation
+                isVisible = false;
+                stopAnimation();
+            }
+        });
+
         // SCROLL-BASED VISIBILITY: Stop rendering when scrolled past hero
         let lastScrollCheck = 0;
         const SCROLL_CHECK_INTERVAL = 100; // Check every 100ms max
