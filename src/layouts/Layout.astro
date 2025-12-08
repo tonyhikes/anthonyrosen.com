@@ -82,12 +82,37 @@ const { title } = Astro.props;
 			// Expose lenis globally for other components to use
 			window.lenis = lenis;
 
-			function raf(time) {
+			let lenisRafId: number | null = null;
+
+			function raf(time: number) {
 				lenis.raf(time);
-				requestAnimationFrame(raf);
+				lenisRafId = requestAnimationFrame(raf);
 			}
 
-			requestAnimationFrame(raf);
+			function startLenisLoop() {
+				if (lenisRafId === null) {
+					lenisRafId = requestAnimationFrame(raf);
+				}
+			}
+
+			function stopLenisLoop() {
+				if (lenisRafId !== null) {
+					cancelAnimationFrame(lenisRafId);
+					lenisRafId = null;
+				}
+			}
+
+			// Start on load
+			startLenisLoop();
+
+			// Pause Lenis when tab is hidden to save CPU
+			document.addEventListener("visibilitychange", () => {
+				if (document.hidden) {
+					stopLenisLoop();
+				} else {
+					startLenisLoop();
+				}
+			});
 		</script>
 	</body>
 </html>
