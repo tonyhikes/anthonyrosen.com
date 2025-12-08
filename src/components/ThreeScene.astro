@@ -247,8 +247,9 @@
 
         // SCROLL-BASED VISIBILITY: Stop rendering when scrolled past hero
         let lastScrollCheck = 0;
-        const SCROLL_CHECK_INTERVAL = 100; // Check every 100ms max
+        const SCROLL_CHECK_INTERVAL = 150; // Check every 150ms max (was 100)
         let hasPassedHero = false;
+        let restartDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
         window.addEventListener(
             "scroll",
@@ -260,22 +261,49 @@
                 const scrollY = window.scrollY;
                 const viewportHeight = window.innerHeight;
 
-                // If scrolled past the hero section (100vh)
-                if (scrollY > viewportHeight * 0.8 && !hasPassedHero) {
+                // If scrolled past the hero section (use 90% for stop)
+                if (scrollY > viewportHeight * 0.9 && !hasPassedHero) {
                     hasPassedHero = true;
                     isVisible = false;
                     stopAnimation();
-                } else if (scrollY <= viewportHeight * 0.5 && hasPassedHero) {
-                    // Scrolled back up into hero section
-                    hasPassedHero = false;
-                    // Only restart if not hidden by slam
-                    if (
-                        !container.classList.contains("opacity-0") &&
-                        !document.hidden
-                    ) {
-                        isVisible = true;
-                        startAnimation();
+
+                    // Clear any pending restart
+                    if (restartDebounceTimer) {
+                        clearTimeout(restartDebounceTimer);
+                        restartDebounceTimer = null;
                     }
+                } else if (scrollY <= viewportHeight * 0.3 && hasPassedHero) {
+                    // Scrolled back up into hero section (use 30% for restart - wider gap)
+                    hasPassedHero = false;
+
+                    // Debounce the restart to avoid rapid on/off
+                    if (restartDebounceTimer) {
+                        clearTimeout(restartDebounceTimer);
+                    }
+
+                    restartDebounceTimer = setTimeout(() => {
+                        // Only restart if conditions are still valid
+                        if (
+                            !container.classList.contains("opacity-0") &&
+                            !document.hidden &&
+                            window.scrollY <= viewportHeight * 0.4 // Double-check position
+                        ) {
+                            // Use requestIdleCallback for non-blocking restart if available
+                            if ("requestIdleCallback" in window) {
+                                (window as any).requestIdleCallback(
+                                    () => {
+                                        isVisible = true;
+                                        startAnimation();
+                                    },
+                                    { timeout: 100 },
+                                );
+                            } else {
+                                isVisible = true;
+                                startAnimation();
+                            }
+                        }
+                        restartDebounceTimer = null;
+                    }, 100); // 100ms debounce
                 }
             },
             { passive: true },

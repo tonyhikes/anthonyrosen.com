@@ -1,172 +1,229 @@
 ---
+
 ---
-<div id="hire-section" class="h-screen bg-blue-600 text-white overflow-hidden relative z-10 flex flex-col justify-center items-center py-20 px-6">
-    <div class="flex flex-col items-center justify-center w-full max-w-7xl mx-auto gap-8 md:gap-12">
-        <h2 id="slam-target" class="slam-text text-[min(15vw,20vh)] leading-[0.85] font-black uppercase text-center tracking-tighter drop-shadow-2xl select-none" style="opacity: 0; transform: scale(8);">
-            Hire<br>Tony.
+
+<div
+    id="hire-section"
+    class="h-screen bg-blue-600 text-white overflow-hidden relative z-10 flex flex-col justify-center items-center py-20 px-6"
+>
+    <div
+        class="flex flex-col items-center justify-center w-full max-w-7xl mx-auto gap-8 md:gap-12"
+    >
+        <h2
+            id="slam-target"
+            class="slam-text text-[min(15vw,20vh)] leading-[0.85] font-black uppercase text-center tracking-tighter drop-shadow-2xl select-none"
+            style="opacity: 0; transform: scale(8);"
+        >
+            Hire<br />Tony.
         </h2>
-        <p class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium max-w-2xl text-center" id="subtitle" style="opacity: 0;">
-            I hit deadlines, protect your budget, and cut the fluff without cutting corners.
+        <p
+            class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium max-w-2xl text-center"
+            id="subtitle"
+            style="opacity: 0;"
+        >
+            I hit deadlines, protect your budget, and cut the fluff without
+            cutting corners.
         </p>
     </div>
 </div>
 
 <script is:inline>
     // Import anime.js dynamically to avoid build issues
-    import('https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.es.js').then(({ default: anime }) => {
-        function initSlamAnimation() {
-            console.log('SlamSection script loaded with anime:', anime);
+    import("https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.es.js").then(
+        ({ default: anime }) => {
+            function initSlamAnimation() {
+                console.log("SlamSection script loaded with anime:", anime);
 
-            let hasSlammed = false;
-            let isAnimating = false;
+                let hasSlammed = false;
+                let isAnimating = false;
 
-            function checkScroll() {
-                // If currently animating, don't check scroll triggers
-                if (isAnimating) return;
+                function checkScroll() {
+                    // If currently animating, don't check scroll triggers
+                    if (isAnimating) return;
 
-                const scrollY = window.scrollY;
-                const windowHeight = window.innerHeight;
+                    const scrollY = window.scrollY;
+                    const windowHeight = window.innerHeight;
 
-                const container = document.getElementById('hire-section');
-                const title = document.getElementById('slam-target');
-                const subtitle = document.getElementById('subtitle');
-                const heroContent = document.getElementById('hero-content');
-                const canvasContainer = document.getElementById('canvas-container');
+                    const container = document.getElementById("hire-section");
+                    const title = document.getElementById("slam-target");
+                    const subtitle = document.getElementById("subtitle");
+                    const heroContent = document.getElementById("hero-content");
+                    const canvasContainer =
+                        document.getElementById("canvas-container");
 
-                if (!container) { console.log('Debug: Missing container'); return; }
-                if (!title) { console.log('Debug: Missing title'); return; }
-                if (!heroContent) { console.log('Debug: Missing heroContent'); return; }
-                if (!canvasContainer) { console.log('Debug: Missing canvasContainer'); return; }
-
-                const rect = container.getBoundingClientRect();
-
-                // Trigger when the top of the section hits the top of the viewport (or very close)
-                const shouldTrigger = rect.top <= 10; 
-
-                if (shouldTrigger && !hasSlammed) {
-                    console.log('SLAM TRIGGERED (Scroll) - Starting Animation');
-                    hasSlammed = true;
-                    isAnimating = true;
-                    
-                    // Lock scrolling
-                    if (window.lenis) {
-                        window.lenis.stop();
-                        console.log('Scroll Locked');
+                    if (!container) {
+                        console.log("Debug: Missing container");
+                        return;
                     }
-                    
-                    try {
-                        // SLAM SEQUENCE
-                        const timeline = anime.timeline({
-                            easing: 'easeOutExpo',
-                            duration: 600,
-                            complete: () => {
-                                isAnimating = false;
-                                if (window.lenis) {
-                                    window.lenis.start();
-                                    console.log('Scroll Unlocked');
-                                }
-                            }
+                    if (!title) {
+                        console.log("Debug: Missing title");
+                        return;
+                    }
+                    if (!heroContent) {
+                        console.log("Debug: Missing heroContent");
+                        return;
+                    }
+                    if (!canvasContainer) {
+                        console.log("Debug: Missing canvasContainer");
+                        return;
+                    }
+
+                    const rect = container.getBoundingClientRect();
+
+                    // Trigger when the top of the section hits the top of the viewport (or very close)
+                    const shouldTrigger = rect.top <= 10;
+
+                    if (shouldTrigger && !hasSlammed) {
+                        console.log(
+                            "SLAM TRIGGERED (Scroll) - Starting Animation",
+                        );
+                        hasSlammed = true;
+                        isAnimating = true;
+
+                        // Lock scrolling
+                        if (window.lenis) {
+                            window.lenis.stop();
+                            console.log("Scroll Locked");
+                        }
+
+                        try {
+                            // SLAM SEQUENCE
+                            const timeline = anime.timeline({
+                                easing: "easeOutExpo",
+                                duration: 600,
+                                complete: () => {
+                                    isAnimating = false;
+                                    if (window.lenis) {
+                                        window.lenis.start();
+                                        console.log("Scroll Unlocked");
+                                    }
+                                },
+                            });
+
+                            console.log("Debug: Timeline created");
+
+                            // 1. Hide Hero Content & Cotton Ball instantly
+                            timeline
+                                .add({
+                                    targets: [heroContent, canvasContainer],
+                                    opacity: 0,
+                                    duration: 100,
+                                    easing: "linear",
+                                    begin: () =>
+                                        console.log(
+                                            "Debug: Hiding hero content",
+                                        ),
+                                })
+                                // 2. Slam Text In
+                                .add(
+                                    {
+                                        targets: title,
+                                        scale: [8, 1],
+                                        opacity: [0, 1],
+                                        duration: 600,
+                                        begin: () =>
+                                            console.log("Debug: Slamming text"),
+                                    },
+                                    "-=50",
+                                )
+                                // 3. Shake Background
+                                .add(
+                                    {
+                                        targets: container,
+                                        translateX: [
+                                            { value: -10, duration: 50 },
+                                            { value: 10, duration: 50 },
+                                            { value: -10, duration: 50 },
+                                            { value: 10, duration: 50 },
+                                            { value: -5, duration: 50 },
+                                            { value: 5, duration: 50 },
+                                            { value: 0, duration: 50 },
+                                        ],
+                                        translateY: [
+                                            { value: -10, duration: 50 },
+                                            { value: 10, duration: 50 },
+                                            { value: -10, duration: 50 },
+                                            { value: 10, duration: 50 },
+                                            { value: -5, duration: 50 },
+                                            { value: 5, duration: 50 },
+                                            { value: 0, duration: 50 },
+                                        ],
+                                        duration: 400,
+                                        easing: "linear",
+                                    },
+                                    "-=400",
+                                )
+                                // 4. Show Subtitle
+                                .add(
+                                    {
+                                        targets: subtitle,
+                                        opacity: [0, 1],
+                                        translateY: [20, 0],
+                                        duration: 600,
+                                    },
+                                    "-=200",
+                                );
+                        } catch (e) {
+                            console.error("Debug: Animation Error", e);
+                            isAnimating = false;
+                            if (window.lenis) window.lenis.start();
+                        }
+                    } else if (
+                        !shouldTrigger &&
+                        hasSlammed &&
+                        rect.top > windowHeight * 0.9
+                    ) {
+                        // RESET SEQUENCE (When scrolling back up significantly - increased threshold)
+                        console.log("RESET TRIGGERED (Scroll)");
+                        hasSlammed = false;
+
+                        // Batch all resets in a single animation frame to prevent layout thrashing
+                        requestAnimationFrame(() => {
+                            // Reset Hero Content & Cotton Ball
+                            anime.set([heroContent, canvasContainer], {
+                                opacity: 1,
+                            });
+
+                            // Reset Slam Text
+                            anime.set(title, {
+                                scale: 8,
+                                opacity: 0,
+                            });
+
+                            // Reset Background
+                            anime.set(container, {
+                                translateX: 0,
+                                translateY: 0,
+                            });
+
+                            // Reset Subtitle
+                            anime.set(subtitle, {
+                                opacity: 0,
+                                translateY: 20,
+                            });
                         });
-
-                        console.log('Debug: Timeline created');
-
-                        // 1. Hide Hero Content & Cotton Ball instantly
-                        timeline.add({
-                            targets: [heroContent, canvasContainer],
-                            opacity: 0,
-                            duration: 100,
-                            easing: 'linear',
-                            begin: () => console.log('Debug: Hiding hero content')
-                        })
-                        // 2. Slam Text In
-                        .add({
-                            targets: title,
-                            scale: [8, 1],
-                            opacity: [0, 1],
-                            duration: 600,
-                            begin: () => console.log('Debug: Slamming text')
-                        }, '-=50')
-                        // 3. Shake Background
-                        .add({
-                            targets: container,
-                            translateX: [
-                                { value: -10, duration: 50 },
-                                { value: 10, duration: 50 },
-                                { value: -10, duration: 50 },
-                                { value: 10, duration: 50 },
-                                { value: -5, duration: 50 },
-                                { value: 5, duration: 50 },
-                                { value: 0, duration: 50 }
-                            ],
-                            translateY: [
-                                { value: -10, duration: 50 },
-                                { value: 10, duration: 50 },
-                                { value: -10, duration: 50 },
-                                { value: 10, duration: 50 },
-                                { value: -5, duration: 50 },
-                                { value: 5, duration: 50 },
-                                { value: 0, duration: 50 }
-                            ],
-                            duration: 400,
-                            easing: 'linear'
-                        }, '-=400')
-                        // 4. Show Subtitle
-                        .add({
-                            targets: subtitle,
-                            opacity: [0, 1],
-                            translateY: [20, 0],
-                            duration: 600
-                        }, '-=200');
-
-                    } catch (e) {
-                        console.error('Debug: Animation Error', e);
-                        isAnimating = false;
-                        if (window.lenis) window.lenis.start();
                     }
-
-                } else if (!shouldTrigger && hasSlammed && rect.top > (windowHeight * 0.8)) {
-                    // RESET SEQUENCE (When scrolling back up significantly)
-                    console.log('RESET TRIGGERED (Scroll)');
-                    hasSlammed = false;
-
-                    // Reset Hero Content & Cotton Ball
-                    anime.set([heroContent, canvasContainer], {
-                        opacity: 1
-                    });
-
-                    // Reset Slam Text
-                    anime.set(title, {
-                        scale: 8,
-                        opacity: 0
-                    });
-
-                    // Reset Background
-                    anime.set(container, {
-                        translateX: 0,
-                        translateY: 0
-                    });
-
-                    // Reset Subtitle
-                    anime.set(subtitle, {
-                        opacity: 0,
-                        translateY: 20
-                    });
                 }
+
+                window.addEventListener("scroll", checkScroll, {
+                    passive: true,
+                });
+                // Check once on load
+                setTimeout(() => checkScroll(), 100);
             }
 
-            window.addEventListener('scroll', checkScroll, { passive: true });
-            // Check once on load
-            setTimeout(() => checkScroll(), 100);
-        }
+            // Wait for DOM to be ready
+            if (document.readyState === "loading") {
+                document.addEventListener(
+                    "DOMContentLoaded",
+                    initSlamAnimation,
+                );
+            } else {
+                initSlamAnimation();
+            }
 
-        // Wait for DOM to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initSlamAnimation);
-        } else {
-            initSlamAnimation();
-        }
-
-        // Also listen for Astro page loads (for client-side navigation)
-        document.addEventListener('astro:page-load', initSlamAnimation);
-    });
+            // Also listen for Astro page loads (for client-side navigation)
+            document.addEventListener("astro:page-load", initSlamAnimation);
+        },
+    );
 </script>
