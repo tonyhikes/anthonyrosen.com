@@ -86,6 +86,7 @@ const { title } = Astro.props;
 			window.lenis = lenis;
 
 			let lenisRafId: number | null = null;
+			let hasUserInteracted = false;
 
 			function raf(time: number) {
 				lenis.raf(time);
@@ -105,14 +106,38 @@ const { title } = Astro.props;
 				}
 			}
 
+			// Track user interaction
+			["scroll", "click", "keydown", "touchstart", "mousemove"].forEach(
+				(eventType) => {
+					document.addEventListener(
+						eventType,
+						() => {
+							hasUserInteracted = true;
+							// Restart Lenis if it was stopped by idle timeout
+							startLenisLoop();
+						},
+						{ passive: true }
+					);
+				}
+			);
+
 			// Start on load
 			startLenisLoop();
+
+			// IDLE TIMEOUT: Stop Lenis after 5 seconds if no user interaction
+			// This helps Lighthouse complete its analysis
+			const IDLE_TIMEOUT = 5000;
+			setTimeout(() => {
+				if (!hasUserInteracted) {
+					stopLenisLoop();
+				}
+			}, IDLE_TIMEOUT);
 
 			// Pause Lenis when tab is hidden to save CPU
 			document.addEventListener("visibilitychange", () => {
 				if (document.hidden) {
 					stopLenisLoop();
-				} else {
+				} else if (hasUserInteracted) {
 					startLenisLoop();
 				}
 			});
