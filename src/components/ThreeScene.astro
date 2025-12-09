@@ -266,11 +266,7 @@
 		});
 	}
 
-	// Use requestIdleCallback to defer loading until browser is idle
-	// Falls back to setTimeout for browsers without support
-	if ("requestIdleCallback" in window) {
-		(window as Window & { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(initThreeScene);
-	} else {
-		setTimeout(initThreeScene, 100);
-	}
+	// Use a short delay to allow initial page paint, then load Three.js
+	// 200ms is enough to not block FCP/LCP but fast enough for good UX
+	setTimeout(initThreeScene, 200);
 </script>
