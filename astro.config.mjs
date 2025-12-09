@@ -18,7 +18,7 @@ export default defineConfig({
 
     integrations: [react(), partytown({
       config: {
-        forward: ["dataLayer.push"],
+        forward: ["dataLayer.push", "posthog.init", "posthog.capture", "posthog.identify", "posthog.on"],
       },
     }), sitemap()],
 });
