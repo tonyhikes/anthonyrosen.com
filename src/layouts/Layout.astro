@@ -45,6 +45,14 @@ const { title } = Astro.props;
 			rel="modulepreload"
 			href="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.es.js"
 		/>
+		<!-- Preload the 3D model so it starts downloading immediately -->
+		<link
+			rel="preload"
+			href="/cotton_ball.glb"
+			as="fetch"
+			type="model/gltf-binary"
+			crossorigin
+		/>
 		<script is:inline>
 			// Initialize Theme
 			if (
