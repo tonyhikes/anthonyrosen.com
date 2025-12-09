@@ -1,136 +1,153 @@
 ---
 const experiences = [
-  {
-    period: "2021 - 2025",
-    title: "Product & Marketing Manager",
-    company: "ACR Electronics, Inc.",
-    description: "Managed marketing for Bivy (satellite comms). Oversaw FCC/CE regulatory compliance, localization for 20+ countries, and reduced production costs by 8%."
-  },
-  {
-    period: "2019 - 2021",
-    title: "Proposal & Marketing Coordinator",
-    company: "Kepro Healthcare CM & QIO",
-    description: "Directed creative production for 30+ healthcare proposals. Managed global localization for Pfizer campaigns across 88 countries."
-  },
-  {
-    period: "2008 - 2018",
-    title: "Senior Content Specialist",
-    company: "AAAS (Science Magazine)",
-    description: "Saved ~$50K annually in print costs. Coordinated design/editorial teams for mobile app launch to 30,000+ readers."
-  }
+	{
+		period: "2021 - 2025",
+		title: "Product & Marketing Manager",
+		company: "ACR Electronics, Inc.",
+		description:
+			"Managed marketing for Bivy (satellite comms). Oversaw FCC/CE regulatory compliance, localization for 20+ countries, and reduced production costs by 8%.",
+	},
+	{
+		period: "2019 - 2021",
+		title: "Proposal & Marketing Coordinator",
+		company: "Kepro Healthcare CM & QIO",
+		description:
+			"Directed creative production for 30+ healthcare proposals. Managed global localization for Pfizer campaigns across 88 countries.",
+	},
+	{
+		period: "2008 - 2018",
+		title: "Senior Content Specialist",
+		company: "AAAS (Science Magazine)",
+		description:
+			"Saved ~$50K annually in print costs. Coordinated design/editorial teams for mobile app launch to 30,000+ readers.",
+	},
 ];
 ---
 
-<section id="experience" class="py-24 bg-slate-50 dark:bg-[#0B1120] transition-colors duration-300">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 class="text-4xl md:text-5xl font-bold text-center text-slate-900 dark:text-white mb-20 tracking-tight">
-      Proven Experience
-    </h2>
+<section
+	id="experience"
+	class="bg-slate-50 py-24 transition-colors duration-300 dark:bg-[#0B1120]"
+>
+	<div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+		<h2
+			class="mb-20 text-center text-4xl font-bold tracking-tight text-slate-900 md:text-5xl dark:text-white"
+		>
+			Proven Experience
+		</h2>
 
-    <div class="relative">
-      <!-- Vertical Line -->
-      <div class="absolute left-[19px] md:left-1/4 top-2 bottom-2 w-px bg-slate-200 dark:bg-slate-800"></div>
+		<div class="relative">
+			<!-- Vertical Line -->
+			<div
+				class="absolute top-2 bottom-2 left-[19px] w-px bg-slate-200 md:left-1/4 dark:bg-slate-800"
+			>
+			</div>
 
-      <div class="space-y-8">
-        {experiences.map((exp, index) => (
-          <div class="relative flex flex-col md:flex-row group cursor-pointer experience-item" data-index={index}>
-            <!-- Date (Left side on desktop) -->
-            <div class="md:w-1/4 md:pr-16 mb-2 md:mb-0 flex items-start md:justify-end pt-1">
-              <span class="text-slate-500 dark:text-slate-400 font-medium pl-12 md:pl-0 text-lg font-mono tracking-tight opacity-80 group-hover:opacity-100 transition-opacity">
-                {exp.period}
-              </span>
-            </div>
+			<div class="space-y-8">
+				{
+					experiences.map((exp, index) => (
+						<div
+							class="group experience-item relative flex cursor-pointer flex-col md:flex-row"
+							data-index={index}
+						>
+							{/* Date (Left side on desktop) */}
+							<div class="mb-2 flex items-start pt-1 md:mb-0 md:w-1/4 md:justify-end md:pr-16">
+								<span class="pl-12 font-mono text-lg font-medium tracking-tight text-slate-500 opacity-80 transition-opacity group-hover:opacity-100 md:pl-0 dark:text-slate-400">
+									{exp.period}
+								</span>
+							</div>
 
-            <!-- Dot -->
-            <div class="absolute left-[13px] md:left-[calc(25%-6px)] w-3 h-3 bg-slate-300 dark:bg-slate-700 rounded-full mt-2.5 border-2 border-slate-50 dark:border-[#0B1120] z-10 transition-all duration-300 group-hover:scale-125 group-hover:bg-blue-500 group-hover:shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
+							{/* Dot */}
+							<div class="absolute left-[13px] z-10 mt-2.5 h-3 w-3 rounded-full border-2 border-slate-50 bg-slate-300 transition-all duration-300 group-hover:scale-125 group-hover:bg-blue-500 group-hover:shadow-[0_0_10px_rgba(59,130,246,0.5)] md:left-[calc(25%-6px)] dark:border-[#0B1120] dark:bg-slate-700" />
 
-            <!-- Content (Right side) -->
-            <div class="md:w-3/4 md:pl-16 pl-12">
-              <div class="flex flex-col items-start">
-                <h3 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-                  {exp.title}
-                </h3>
-                <p class="text-blue-600 dark:text-blue-400 font-medium text-lg mb-1">
-                  {exp.company}
-                </p>
-                
-                <!-- Expandable Details -->
-                <div class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-out experience-details w-full">
-                  <div class="overflow-hidden">
-                    <p class="text-slate-600 dark:text-slate-300 pt-1 pb-6 text-lg leading-relaxed">
-                      {exp.description}
-                    </p>
-                  </div>
-                </div>
-                
-                <!-- Expand hint (optional, visible when collapsed) -->
-                <div class="text-slate-400 text-sm mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 expand-hint">
-                  Click to expand all
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
+							{/* Content (Right side) */}
+							<div class="pl-12 md:w-3/4 md:pl-16">
+								<div class="flex flex-col items-start">
+									<h3 class="text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-blue-600 md:text-2xl dark:text-white dark:group-hover:text-blue-400">
+										{exp.title}
+									</h3>
+									<p class="mb-1 text-lg font-medium text-blue-600 dark:text-blue-400">
+										{exp.company}
+									</p>
+
+									{/* Expandable Details */}
+									<div class="experience-details grid w-full grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-out">
+										<div class="overflow-hidden">
+											<p class="pt-1 pb-6 text-lg leading-relaxed text-slate-600 dark:text-slate-300">
+												{exp.description}
+											</p>
+										</div>
+									</div>
+
+									{/* Expand hint (optional, visible when collapsed) */}
+									<div class="expand-hint mt-1 text-sm text-slate-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+										Click to expand all
+									</div>
+								</div>
+							</div>
+						</div>
+					))
+				}
+			</div>
+		</div>
+	</div>
 </section>
 
 <script>
-  function initExperience() {
-    const items = document.querySelectorAll('.experience-item');
-    
-    items.forEach(item => {
-      // Remove old listeners to prevent duplicates if re-initialized
-      const newItem = item.cloneNode(true);
-      item.parentNode?.replaceChild(newItem, item);
-    });
+	function initExperience() {
+		const items = document.querySelectorAll(".experience-item");
 
-    const newItems = document.querySelectorAll('.experience-item');
-    
-    // Helper to toggle a specific item
-    const toggleItem = (item, expand) => {
-      const details = item.querySelector('.experience-details');
-      const hint = item.querySelector('.expand-hint');
-      const dot = item.querySelector('.absolute.w-3.h-3');
-      
-      if (!expand) {
-        details?.classList.remove('grid-rows-[1fr]');
-        details?.classList.add('grid-rows-[0fr]');
-        hint?.classList.remove('hidden');
-        hint.textContent = 'Click to expand all';
-        dot?.classList.remove('bg-blue-500', 'scale-125');
-        dot?.classList.add('bg-slate-300', 'dark:bg-slate-700');
-      } else {
-        details?.classList.remove('grid-rows-[0fr]');
-        details?.classList.add('grid-rows-[1fr]');
-        hint?.classList.add('hidden');
-        hint.textContent = 'Click to collapse all';
-        dot?.classList.add('bg-blue-500', 'scale-125');
-        dot?.classList.remove('bg-slate-300', 'dark:bg-slate-700');
-      }
-    };
+		items.forEach((item) => {
+			// Remove old listeners to prevent duplicates if re-initialized
+			const newItem = item.cloneNode(true);
+			item.parentNode?.replaceChild(newItem, item);
+		});
 
-    newItems.forEach(item => {
-      item.addEventListener('click', (e) => {
-        // Determine desired state based on the clicked item's current state
-        // If the clicked item is expanded, we want to collapse ALL.
-        // If the clicked item is collapsed, we want to expand ALL.
-        const details = item.querySelector('.experience-details');
-        const isCurrentlyExpanded = details?.classList.contains('grid-rows-[1fr]');
-        const shouldExpand = !isCurrentlyExpanded;
+		const newItems = document.querySelectorAll(".experience-item");
 
-        // Apply to ALL items
-        newItems.forEach(otherItem => {
-          toggleItem(otherItem, shouldExpand);
-        });
-      });
-    });
-  }
+		// Helper to toggle a specific item
+		const toggleItem = (item: Element, expand: boolean) => {
+			const details = item.querySelector(".experience-details");
+			const hint = item.querySelector(".expand-hint");
+			const dot = item.querySelector(".absolute.w-3.h-3");
 
-  // Initialize on load
-  initExperience();
+			if (!expand) {
+				details?.classList.remove("grid-rows-[1fr]");
+				details?.classList.add("grid-rows-[0fr]");
+				hint?.classList.remove("hidden");
+				if (hint) hint.textContent = "Click to expand all";
+				dot?.classList.remove("bg-blue-500", "scale-125");
+				dot?.classList.add("bg-slate-300", "dark:bg-slate-700");
+			} else {
+				details?.classList.remove("grid-rows-[0fr]");
+				details?.classList.add("grid-rows-[1fr]");
+				hint?.classList.add("hidden");
+				if (hint) hint.textContent = "Click to collapse all";
+				dot?.classList.add("bg-blue-500", "scale-125");
+				dot?.classList.remove("bg-slate-300", "dark:bg-slate-700");
+			}
+		};
 
-  // Re-initialize on view transitions if needed
-  document.addEventListener('astro:page-load', initExperience);
+		newItems.forEach((item) => {
+			item.addEventListener("click", () => {
+				// Determine desired state based on the clicked item's current state
+				// If the clicked item is expanded, we want to collapse ALL.
+				// If the clicked item is collapsed, we want to expand ALL.
+				const details = item.querySelector(".experience-details");
+				const isCurrentlyExpanded =
+					details?.classList.contains("grid-rows-[1fr]");
+				const shouldExpand = !isCurrentlyExpanded;
+
+				// Apply to ALL items
+				newItems.forEach((otherItem) => {
+					toggleItem(otherItem, shouldExpand);
+				});
+			});
+		});
+	}
+
+	// Initialize on load
+	initExperience();
+
+	// Re-initialize on view transitions if needed
+	document.addEventListener("astro:page-load", initExperience);
 </script>

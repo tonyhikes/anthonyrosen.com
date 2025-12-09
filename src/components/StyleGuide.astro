@@ -1,104 +1,196 @@
 ---
+
 ---
-<div id="styleguide-view" class="hidden pt-24 pb-20 px-4 min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
-    <div class="max-w-4xl mx-auto">
-        <div class="mb-10 border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Style Guide</h1>
-            <p class="text-lg text-slate-600 dark:text-slate-400">The visual design system for tonyrosen.com</p>
-        </div>
 
-        <!-- Colors -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Color Palette</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="space-y-2">
-                    <div class="h-20 bg-blue-600 rounded-lg shadow-sm"></div>
-                    <p class="font-mono text-xs text-slate-500">Blue-600 #2563eb<br><span class="text-slate-400">Primary Action</span></p>
-                </div>
-                <div class="space-y-2">
-                    <div class="h-20 bg-slate-900 rounded-lg shadow-sm"></div>
-                    <p class="font-mono text-xs text-slate-500">Slate-900 #0f172a<br><span class="text-slate-400">Primary Dark</span></p>
-                </div>
-                <div class="space-y-2">
-                    <div class="h-20 bg-slate-800 rounded-lg shadow-sm"></div>
-                    <p class="font-mono text-xs text-slate-500">Slate-800 #1e293b<br><span class="text-slate-400">Surface Dark</span></p>
-                </div>
-                <div class="space-y-2">
-                    <div class="h-20 bg-slate-50 border border-slate-200 rounded-lg shadow-sm"></div>
-                    <p class="font-mono text-xs text-slate-500">Slate-50 #f8fafc<br><span class="text-slate-400">Background Light</span></p>
-                </div>
-            </div>
-        </section>
+<div
+	id="styleguide-view"
+	class="hidden min-h-screen bg-white px-4 pt-24 pb-20 transition-colors duration-300 dark:bg-slate-900"
+>
+	<div class="mx-auto max-w-4xl">
+		<div class="mb-10 border-b border-gray-200 pb-6 dark:border-gray-700">
+			<h1
+				class="mb-2 text-4xl font-black tracking-tight text-slate-900 dark:text-white"
+			>
+				Style Guide
+			</h1>
+			<p class="text-lg text-slate-600 dark:text-slate-400">
+				The visual design system for tonyrosen.com
+			</p>
+		</div>
 
-        <!-- Typography -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Typography</h2>
-            <div class="space-y-8 p-8 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                <div>
-                    <span class="text-xs font-mono text-slate-400 mb-1 block">Display (Hero)</span>
-                    <h1 class="text-5xl font-black tracking-tighter text-slate-900 dark:text-white">Tired of the fluff?</h1>
-                </div>
-                <div>
-                    <span class="text-xs font-mono text-slate-400 mb-1 block">Heading 1</span>
-                    <h1 class="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">I bring order to creative chaos.</h1>
-                </div>
-                <div>
-                    <span class="text-xs font-mono text-slate-400 mb-1 block">Heading 2</span>
-                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Professional Experience</h2>
-                </div>
-                <div>
-                    <span class="text-xs font-mono text-slate-400 mb-1 block">Body Text</span>
-                    <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
-                        Creative and results-driven Marketing Project Manager with 10+ years in creative operations. I lead cross-functional teams to deliver multi-channel campaigns on time, on budget, and on brand.
-                    </p>
-                </div>
-            </div>
-        </section>
+		<!-- Colors -->
+		<section class="mb-16">
+			<h2 class="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+				Color Palette
+			</h2>
+			<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+				<div class="space-y-2">
+					<div class="h-20 rounded-lg bg-blue-600 shadow-sm"></div>
+					<p class="font-mono text-xs text-slate-500">
+						Blue-600 #2563eb<br /><span class="text-slate-400"
+							>Primary Action</span
+						>
+					</p>
+				</div>
+				<div class="space-y-2">
+					<div class="h-20 rounded-lg bg-slate-900 shadow-sm"></div>
+					<p class="font-mono text-xs text-slate-500">
+						Slate-900 #0f172a<br /><span class="text-slate-400"
+							>Primary Dark</span
+						>
+					</p>
+				</div>
+				<div class="space-y-2">
+					<div class="h-20 rounded-lg bg-slate-800 shadow-sm"></div>
+					<p class="font-mono text-xs text-slate-500">
+						Slate-800 #1e293b<br /><span class="text-slate-400"
+							>Surface Dark</span
+						>
+					</p>
+				</div>
+				<div class="space-y-2">
+					<div
+						class="h-20 rounded-lg border border-slate-200 bg-slate-50 shadow-sm"
+					>
+					</div>
+					<p class="font-mono text-xs text-slate-500">
+						Slate-50 #f8fafc<br /><span class="text-slate-400"
+							>Background Light</span
+						>
+					</p>
+				</div>
+			</div>
+		</section>
 
-        <!-- Components -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Components</h2>
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- Buttons -->
-                <div class="p-6 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Buttons</h3>
-                    <div class="flex flex-wrap gap-4">
-                        <button class="py-3 px-6 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-full border border-transparent bg-blue-600 text-white hover:bg-blue-700">
-                            Primary Button
-                        </button>
-                        <button class="py-3 px-6 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-full border border-white/20 bg-white/5 text-white hover:bg-white/10 dark:bg-slate-700 dark:hover:bg-slate-600">
-                            Secondary Button
-                        </button>
-                    </div>
-                </div>
+		<!-- Typography -->
+		<section class="mb-16">
+			<h2 class="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+				Typography
+			</h2>
+			<div
+				class="space-y-8 rounded-xl border border-slate-200 bg-slate-50 p-8 dark:border-slate-700 dark:bg-slate-800"
+			>
+				<div>
+					<span class="mb-1 block font-mono text-xs text-slate-400"
+						>Display (Hero)</span
+					>
+					<h1
+						class="text-5xl font-black tracking-tighter text-slate-900 dark:text-white"
+					>
+						Tired of the fluff?
+					</h1>
+				</div>
+				<div>
+					<span class="mb-1 block font-mono text-xs text-slate-400"
+						>Heading 1</span
+					>
+					<h1
+						class="text-4xl font-bold tracking-tight text-slate-900 dark:text-white"
+					>
+						I bring order to creative chaos.
+					</h1>
+				</div>
+				<div>
+					<span class="mb-1 block font-mono text-xs text-slate-400"
+						>Heading 2</span
+					>
+					<h2 class="text-2xl font-bold text-slate-900 dark:text-white">
+						Professional Experience
+					</h2>
+				</div>
+				<div>
+					<span class="mb-1 block font-mono text-xs text-slate-400"
+						>Body Text</span
+					>
+					<p
+						class="max-w-2xl text-lg leading-relaxed text-slate-600 dark:text-slate-400"
+					>
+						Creative and results-driven Marketing Project Manager with 10+ years
+						in creative operations. I lead cross-functional teams to deliver
+						multi-channel campaigns on time, on budget, and on brand.
+					</p>
+				</div>
+			</div>
+		</section>
 
-                <!-- Tags -->
-                <div class="p-6 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Skill Tags</h3>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-4 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 shadow-sm">Project Management</span>
-                        <span class="px-4 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 shadow-sm">Jira</span>
-                        <span class="px-4 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 shadow-sm">Workfront</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+		<!-- Components -->
+		<section class="mb-16">
+			<h2 class="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+				Components
+			</h2>
+			<div class="grid gap-8 md:grid-cols-2">
+				<!-- Buttons -->
+				<div
+					class="rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800"
+				>
+					<h3
+						class="mb-4 text-sm font-semibold tracking-wider text-slate-500 uppercase"
+					>
+						Buttons
+					</h3>
+					<div class="flex flex-wrap gap-4">
+						<button
+							class="inline-flex items-center justify-center gap-x-2 rounded-full border border-transparent bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+						>
+							Primary Button
+						</button>
+						<button
+							class="inline-flex items-center justify-center gap-x-2 rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 dark:bg-slate-700 dark:hover:bg-slate-600"
+						>
+							Secondary Button
+						</button>
+					</div>
+				</div>
 
-        <div class="text-center mt-12">
-            <a href="#home" data-target="home" class="back-link text-blue-600 hover:text-blue-800 text-sm font-medium cursor-pointer">← Back to Home</a>
-        </div>
-    </div>
+				<!-- Tags -->
+				<div
+					class="rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800"
+				>
+					<h3
+						class="mb-4 text-sm font-semibold tracking-wider text-slate-500 uppercase"
+					>
+						Skill Tags
+					</h3>
+					<div class="flex flex-wrap gap-2">
+						<span
+							class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+							>Project Management</span
+						>
+						<span
+							class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+							>Jira</span
+						>
+						<span
+							class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+							>Workfront</span
+						>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<div class="mt-12 text-center">
+			<a
+				href="#home"
+				data-target="home"
+				class="back-link cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800"
+				>← Back to Home</a
+			>
+		</div>
+	</div>
 </div>
 
 <script>
-    const backLinks = document.querySelectorAll('.back-link');
-    backLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const target = (e.currentTarget as HTMLElement).dataset.target;
-            if (target) {
-                window.dispatchEvent(new CustomEvent('view-change', { detail: target }));
-            }
-        });
-    });
+	const backLinks = document.querySelectorAll(".back-link");
+	backLinks.forEach((link) => {
+		link.addEventListener("click", (e) => {
+			e.preventDefault();
+			const target = (e.currentTarget as HTMLElement).dataset.target;
+			if (target) {
+				window.dispatchEvent(
+					new CustomEvent("view-change", { detail: target })
+				);
+			}
+		});
+	});
 </script>

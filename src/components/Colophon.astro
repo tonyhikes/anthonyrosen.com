@@ -1,81 +1,169 @@
 ---
+
 ---
-<div id="colophon-view" class="hidden pt-24 pb-20 px-4 min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
-    <div class="max-w-3xl mx-auto">
-        <div class="mb-10 border-b border-gray-200 dark:border-gray-700 pb-6">
-            <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Colophon</h1>
-            <p class="text-lg text-slate-600 dark:text-slate-400">Technical details and credits for this website.</p>
-        </div>
 
-        <!-- Tech Stack -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                Tech Stack
-            </h2>
-            <div class="bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-                <div class="divide-y divide-slate-200 dark:divide-slate-700">
-                    <div class="p-4 flex justify-between items-center">
-                        <span class="font-medium text-slate-900 dark:text-white">Framework</span>
-                        <span class="text-slate-600 dark:text-slate-400 text-sm">Vanilla HTML5 (SPA Architecture)</span>
-                    </div>
-                    <div class="p-4 flex justify-between items-center">
-                        <span class="font-medium text-slate-900 dark:text-white">Styling</span>
-                        <span class="text-slate-600 dark:text-slate-400 text-sm">Tailwind CSS (CDN)</span>
-                    </div>
-                    <div class="p-4 flex justify-between items-center">
-                        <span class="font-medium text-slate-900 dark:text-white">3D Engine</span>
-                        <span class="text-slate-600 dark:text-slate-400 text-sm">Three.js + WebGL</span>
-                    </div>
-                    <div class="p-4 flex justify-between items-center">
-                        <span class="font-medium text-slate-900 dark:text-white">Icons</span>
-                        <span class="text-slate-600 dark:text-slate-400 text-sm">Heroicons (SVG)</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+<div
+	id="colophon-view"
+	class="hidden min-h-screen bg-white px-4 pt-24 pb-20 transition-colors duration-300 dark:bg-slate-900"
+>
+	<div class="mx-auto max-w-3xl">
+		<div class="mb-10 border-b border-gray-200 pb-6 dark:border-gray-700">
+			<h1
+				class="mb-2 text-4xl font-black tracking-tight text-slate-900 dark:text-white"
+			>
+				Colophon
+			</h1>
+			<p class="text-lg text-slate-600 dark:text-slate-400">
+				Technical details and credits for this website.
+			</p>
+		</div>
 
-        <!-- Typography -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                Typography
-            </h2>
-            <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
-                The primary typeface used throughout the site is <strong class="text-slate-900 dark:text-white">Inter</strong>, designed by Rasmus Andersson. It was selected for its high legibility on computer screens and its clean, modern aesthetic that aligns with the "no fluff" personal brand.
-            </p>
-            <a href="https://fonts.google.com/specimen/Inter" target="_blank" class="text-blue-600 hover:underline text-sm">View on Google Fonts &rarr;</a>
-        </section>
+		<!-- Tech Stack -->
+		<section class="mb-12">
+			<h2
+				class="mb-6 flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white"
+			>
+				<svg
+					class="h-6 w-6 text-blue-600"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg
+				>
+				Tech Stack
+			</h2>
+			<div
+				class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800"
+			>
+				<div class="divide-y divide-slate-200 dark:divide-slate-700">
+					<div class="flex items-center justify-between p-4">
+						<span class="font-medium text-slate-900 dark:text-white"
+							>Framework</span
+						>
+						<span class="text-sm text-slate-600 dark:text-slate-400"
+							>Vanilla HTML5 (SPA Architecture)</span
+						>
+					</div>
+					<div class="flex items-center justify-between p-4">
+						<span class="font-medium text-slate-900 dark:text-white"
+							>Styling</span
+						>
+						<span class="text-sm text-slate-600 dark:text-slate-400"
+							>Tailwind CSS (CDN)</span
+						>
+					</div>
+					<div class="flex items-center justify-between p-4">
+						<span class="font-medium text-slate-900 dark:text-white"
+							>3D Engine</span
+						>
+						<span class="text-sm text-slate-600 dark:text-slate-400"
+							>Three.js + WebGL</span
+						>
+					</div>
+					<div class="flex items-center justify-between p-4">
+						<span class="font-medium text-slate-900 dark:text-white">Icons</span
+						>
+						<span class="text-sm text-slate-600 dark:text-slate-400"
+							>Heroicons (SVG)</span
+						>
+					</div>
+				</div>
+			</div>
+		</section>
 
-        <!-- Assets & Credits -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                Assets & Credits
-            </h2>
-            <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
-                <h3 class="font-bold text-slate-900 dark:text-white mb-2">Procedural 3D Elements</h3>
-                <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                    The 3D cotton ball effect is generated procedurally using Three.js geometries and noise algorithms, ensuring fast loading times without external dependencies.
-                </p>
-            </div>
-        </section>
+		<!-- Typography -->
+		<section class="mb-12">
+			<h2
+				class="mb-6 flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white"
+			>
+				<svg
+					class="h-6 w-6 text-blue-600"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M3 4h13M3 8h9m-9 4h6m4 0l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+					></path></svg
+				>
+				Typography
+			</h2>
+			<p class="mb-4 leading-relaxed text-slate-600 dark:text-slate-400">
+				The primary typeface used throughout the site is <strong
+					class="text-slate-900 dark:text-white">Inter</strong
+				>, designed by Rasmus Andersson. It was selected for its high legibility
+				on computer screens and its clean, modern aesthetic that aligns with the
+				"no fluff" personal brand.
+			</p>
+			<a
+				href="https://fonts.google.com/specimen/Inter"
+				target="_blank"
+				class="text-sm text-blue-600 hover:underline"
+				>View on Google Fonts &rarr;</a
+			>
+		</section>
 
-        <div class="text-center mt-12">
-            <a href="#home" data-target="home" class="back-link text-blue-600 hover:text-blue-800 text-sm font-medium cursor-pointer">← Back to Home</a>
-        </div>
-    </div>
+		<!-- Assets & Credits -->
+		<section class="mb-12">
+			<h2
+				class="mb-6 flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white"
+			>
+				<svg
+					class="h-6 w-6 text-blue-600"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+					></path></svg
+				>
+				Assets & Credits
+			</h2>
+			<div
+				class="rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800"
+			>
+				<h3 class="mb-2 font-bold text-slate-900 dark:text-white">
+					Procedural 3D Elements
+				</h3>
+				<p class="mb-4 text-sm text-slate-600 dark:text-slate-400">
+					The 3D cotton ball effect is generated procedurally using Three.js
+					geometries and noise algorithms, ensuring fast loading times without
+					external dependencies.
+				</p>
+			</div>
+		</section>
+
+		<div class="mt-12 text-center">
+			<a
+				href="#home"
+				data-target="home"
+				class="back-link cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800"
+				>← Back to Home</a
+			>
+		</div>
+	</div>
 </div>
 
 <script>
-    const backLinks = document.querySelectorAll('.back-link');
-    backLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const target = (e.currentTarget as HTMLElement).dataset.target;
-            if (target) {
-                window.dispatchEvent(new CustomEvent('view-change', { detail: target }));
-            }
-        });
-    });
+	const backLinks = document.querySelectorAll(".back-link");
+	backLinks.forEach((link) => {
+		link.addEventListener("click", (e) => {
+			e.preventDefault();
+			const target = (e.currentTarget as HTMLElement).dataset.target;
+			if (target) {
+				window.dispatchEvent(
+					new CustomEvent("view-change", { detail: target })
+				);
+			}
+		});
+	});
 </script>

@@ -3,71 +3,71 @@
 ---
 
 <div
-    id="portfolio-view"
-    class="hidden pt-16 min-h-screen bg-white flex flex-col"
+	id="portfolio-view"
+	class="flex hidden min-h-screen flex-col bg-white pt-16"
 >
-    <!-- Iframe Container -->
-    <div class="flex-grow w-full h-full relative">
-        <!-- Loading Indicator -->
-        <div
-            id="portfolio-loading"
-            class="absolute inset-0 flex items-center justify-center bg-gray-50"
-        >
-            <div class="flex flex-col items-center gap-4">
-                <div
-                    class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"
-                >
-                </div>
-                <p class="text-slate-600 font-medium">Loading Portfolio...</p>
-            </div>
-        </div>
-        <iframe
-            id="portfolio-iframe"
-            data-src="https://anthonyrosen.myportfolio.com"
-            class="w-full h-[calc(100vh-64px)] border-0"
-            title="Tony Rosen Portfolio"></iframe>
-    </div>
+	<!-- Iframe Container -->
+	<div class="relative h-full w-full flex-grow">
+		<!-- Loading Indicator -->
+		<div
+			id="portfolio-loading"
+			class="absolute inset-0 flex items-center justify-center bg-gray-50"
+		>
+			<div class="flex flex-col items-center gap-4">
+				<div
+					class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
+				>
+				</div>
+				<p class="font-medium text-slate-600">Loading Portfolio...</p>
+			</div>
+		</div>
+		<iframe
+			id="portfolio-iframe"
+			data-src="https://anthonyrosen.myportfolio.com"
+			class="h-[calc(100vh-64px)] w-full border-0"
+			title="Tony Rosen Portfolio"></iframe>
+	</div>
 </div>
 
 <script>
-    // Defer loading the Portfolio iframe until the view is actually shown
-    const portfolioIframe = document.getElementById(
-        "portfolio-iframe",
-    ) as HTMLIFrameElement | null;
-    const portfolioLoading = document.getElementById("portfolio-loading");
-    let iframeLoaded = false;
+	// Defer loading the Portfolio iframe until the view is actually shown
+	const portfolioIframe = document.getElementById(
+		"portfolio-iframe"
+	) as HTMLIFrameElement | null;
+	const portfolioLoading = document.getElementById("portfolio-loading");
+	let iframeLoaded = false;
 
-    function loadPortfolioIframe() {
-        if (portfolioIframe && !iframeLoaded) {
-            const src = portfolioIframe.dataset.src;
-            if (src) {
-                portfolioIframe.src = src;
-                iframeLoaded = true;
+	function loadPortfolioIframe() {
+		if (portfolioIframe && !iframeLoaded) {
+			const src = portfolioIframe.dataset.src;
+			if (src) {
+				portfolioIframe.src = src;
+				iframeLoaded = true;
 
-                // Hide loading indicator when iframe loads
-                portfolioIframe.addEventListener(
-                    "load",
-                    () => {
-                        if (portfolioLoading) {
-                            portfolioLoading.classList.add("hidden");
-                        }
-                    },
-                    { once: true },
-                );
-            }
-        }
-    }
+				// Hide loading indicator when iframe loads
+				portfolioIframe.addEventListener(
+					"load",
+					() => {
+						if (portfolioLoading) {
+							portfolioLoading.classList.add("hidden");
+						}
+					},
+					{ once: true }
+				);
+			}
+		}
+	}
 
-    // Listen for view change events
-    window.addEventListener("view-change", (e: Event) => {
-        const customEvent = e as CustomEvent;
-        if (customEvent.detail === "portfolio") {
-            loadPortfolioIframe();
-        }
-    });
+	// Listen for view change events
+	window.addEventListener("view-change", (e: Event) => {
+		const customEvent = e as CustomEvent;
+		if (customEvent.detail === "portfolio") {
+			loadPortfolioIframe();
+		}
+	});
 
-    // Also check if we're starting on the portfolio view
-    if (window.location.hash === "#portfolio") {
-        loadPortfolioIframe();
-    }
+	// Also check if we're starting on the portfolio view
+	if (window.location.hash === "#portfolio") {
+		loadPortfolioIframe();
+	}
 </script>

@@ -3,310 +3,274 @@
 ---
 
 <div
-    id="canvas-container"
-    class="fixed inset-0 z-20 pointer-events-none transition-opacity duration-200"
+	id="canvas-container"
+	class="pointer-events-none fixed inset-0 z-20 transition-opacity duration-200"
 >
 </div>
 
 <script>
-    import * as THREE from "three";
-    import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-    import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+	import * as THREE from "three";
+	import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+	import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 
-    const container = document.getElementById("canvas-container");
+	const container = document.getElementById("canvas-container");
 
-    if (container) {
-        // Track visibility state for performance
-        let isVisible = true;
-        let animationFrameId: number | null = null;
+	if (container) {
+		// Track visibility state for performance
+		let isVisible = true;
+		let animationFrameId: number | null = null;
 
-        // Scene setup
-        const scene = new THREE.Scene();
+		// Scene setup
+		const scene = new THREE.Scene();
 
-        // Camera
-        const camera = new THREE.PerspectiveCamera(
-            75,
-            window.innerWidth / window.innerHeight,
-            0.1,
-            1000,
-        );
-        camera.position.z = 5;
+		// Camera
+		const camera = new THREE.PerspectiveCamera(
+			75,
+			window.innerWidth / window.innerHeight,
+			0.1,
+			1000
+		);
+		camera.position.z = 5;
 
-        // Renderer - CAP PIXEL RATIO AT 2 FOR PERFORMANCE
-        const renderer = new THREE.WebGLRenderer({
-            alpha: true,
-            antialias: true,
-        });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap at 2x for performance
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.0;
-        container.appendChild(renderer.domElement);
+		// Renderer - CAP PIXEL RATIO AT 2 FOR PERFORMANCE
+		const renderer = new THREE.WebGLRenderer({
+			alpha: true,
+			antialias: true,
+		});
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap at 2x for performance
+		renderer.toneMapping = THREE.ACESFilmicToneMapping;
+		renderer.toneMappingExposure = 1.0;
+		container.appendChild(renderer.domElement);
 
-        // Environment (Studio Lighting like Sketchfab)
-        const pmremGenerator = new THREE.PMREMGenerator(renderer);
-        const roomEnv = new RoomEnvironment();
-        scene.environment = pmremGenerator.fromScene(roomEnv, 0.04).texture;
-        // Dispose PMREMGenerator after use to free GPU memory
-        pmremGenerator.dispose();
+		// Environment (Studio Lighting like Sketchfab)
+		const pmremGenerator = new THREE.PMREMGenerator(renderer);
+		const roomEnv = new RoomEnvironment();
+		scene.environment = pmremGenerator.fromScene(roomEnv, 0.04).texture;
+		// Dispose PMREMGenerator after use to free GPU memory
+		pmremGenerator.dispose();
 
-        // Lights (Subtle helpers, main lighting comes from Environment)
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(5, 5, 5);
-        scene.add(directionalLight);
+		// Lights (Subtle helpers, main lighting comes from Environment)
+		const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+		directionalLight.position.set(5, 5, 5);
+		scene.add(directionalLight);
 
-        const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
-        backLight.position.set(-5, -5, -5);
-        scene.add(backLight);
+		const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
+		backLight.position.set(-5, -5, -5);
+		scene.add(backLight);
 
-        // Model
-        let model: THREE.Group;
-        const loader = new GLTFLoader();
+		// Model
+		let model: THREE.Group;
+		const loader = new GLTFLoader();
 
-        loader.load(
-            "/cotton_ball.glb",
-            (gltf) => {
-                model = gltf.scene;
+		loader.load(
+			"/cotton_ball.glb",
+			(gltf) => {
+				model = gltf.scene;
 
-                // Center and scale model
-                const box = new THREE.Box3().setFromObject(model);
-                const center = box.getCenter(new THREE.Vector3());
-                const size = box.getSize(new THREE.Vector3());
+				// Center and scale model
+				const box = new THREE.Box3().setFromObject(model);
+				const center = box.getCenter(new THREE.Vector3());
+				const size = box.getSize(new THREE.Vector3());
 
-                const maxDim = Math.max(size.x, size.y, size.z);
-                // Increased scale by ~30% (was 3)
-                const scale = 4.0 / maxDim;
-                model.scale.setScalar(scale);
+				const maxDim = Math.max(size.x, size.y, size.z);
+				// Increased scale by ~30% (was 3)
+				const scale = 4.0 / maxDim;
+				model.scale.setScalar(scale);
 
-                // Center the geometry
-                model.position.sub(center.multiplyScalar(scale));
+				// Center the geometry
+				model.position.sub(center.multiplyScalar(scale));
 
-                // Create a group to handle rotation/position separately
-                const group = new THREE.Group();
-                group.add(model);
-                scene.add(group);
+				// Create a group to handle rotation/position separately
+				const group = new THREE.Group();
+				group.add(model);
+				scene.add(group);
 
-                // Assign to global variable for animation
-                // Store reference for animation loop
-                (
-                    window as typeof window & { heroModel?: THREE.Group }
-                ).heroModel = group;
-            },
-            undefined,
-            (error) => {
-                console.error("An error happened loading the model:", error);
-            },
-        );
+				// Assign to global variable for animation
+				// Store reference for animation loop
+				(window as typeof window & { heroModel?: THREE.Group }).heroModel =
+					group;
+			},
+			undefined,
+			(error) => {
+				console.error("An error happened loading the model:", error);
+			}
+		);
 
-        // Mouse interaction with THROTTLING
-        let mouseX = 0;
-        let mouseY = 0;
-        let lastMouseMoveTime = 0;
-        const MOUSE_THROTTLE_MS = 16; // ~60fps throttle
+		// Mouse interaction with THROTTLING
+		let mouseX = 0;
+		let mouseY = 0;
+		let lastMouseMoveTime = 0;
+		const MOUSE_THROTTLE_MS = 16; // ~60fps throttle
 
-        const windowHalfX = window.innerWidth / 2;
-        const windowHalfY = window.innerHeight / 2;
+		const windowHalfX = window.innerWidth / 2;
+		const windowHalfY = window.innerHeight / 2;
 
-        document.addEventListener(
-            "mousemove",
-            (event) => {
-                const now = performance.now();
-                if (now - lastMouseMoveTime < MOUSE_THROTTLE_MS) return;
-                lastMouseMoveTime = now;
+		document.addEventListener(
+			"mousemove",
+			(event) => {
+				const now = performance.now();
+				if (now - lastMouseMoveTime < MOUSE_THROTTLE_MS) return;
+				lastMouseMoveTime = now;
 
-                mouseX = (event.clientX - windowHalfX) / windowHalfX;
-                mouseY = (event.clientY - windowHalfY) / windowHalfY;
-            },
-            { passive: true },
-        );
+				mouseX = (event.clientX - windowHalfX) / windowHalfX;
+				mouseY = (event.clientY - windowHalfY) / windowHalfY;
+			},
+			{ passive: true }
+		);
 
-        // Animation Loop - ONLY RENDER WHEN VISIBLE
-        function animate() {
-            // Only continue loop if visible
-            if (!isVisible) {
-                animationFrameId = null;
-                return;
-            }
+		// Animation Loop - ONLY RENDER WHEN VISIBLE
+		function animate() {
+			// Only continue loop if visible
+			if (!isVisible) {
+				animationFrameId = null;
+				return;
+			}
 
-            animationFrameId = requestAnimationFrame(animate);
+			animationFrameId = requestAnimationFrame(animate);
 
-            const group = (
-                window as typeof window & { heroModel?: THREE.Group }
-            ).heroModel;
+			const group = (window as typeof window & { heroModel?: THREE.Group })
+				.heroModel;
 
-            if (group) {
-                // 1. Rotation based on mouse (360 spin on Y, tilt on X)
-                // mouseX is -1 to 1. Multiplying by Math.PI gives -180 to +180 degrees (360 range).
-                const targetRotY = mouseX * Math.PI;
-                const targetRotX = mouseY * 0.5; // Keep slight vertical tilt
+			if (group) {
+				// 1. Rotation based on mouse (360 spin on Y, tilt on X)
+				// mouseX is -1 to 1. Multiplying by Math.PI gives -180 to +180 degrees (360 range).
+				const targetRotY = mouseX * Math.PI;
+				const targetRotX = mouseY * 0.5; // Keep slight vertical tilt
 
-                // Smoothly interpolate rotation
-                group.rotation.y += 0.05 * (targetRotY - group.rotation.y);
-                group.rotation.x += 0.05 * (targetRotX - group.rotation.x);
+				// Smoothly interpolate rotation
+				group.rotation.y += 0.05 * (targetRotY - group.rotation.y);
+				group.rotation.x += 0.05 * (targetRotX - group.rotation.x);
 
-                // 2. Position Movement (Parallax)
-                // Increased by 20% (0.5 * 1.2 = 0.6)
-                const targetPosX = -mouseX * 0.6;
-                const targetPosY = mouseY * 0.6;
+				// 2. Position Movement (Parallax)
+				// Increased by 20% (0.5 * 1.2 = 0.6)
+				const targetPosX = -mouseX * 0.6;
+				const targetPosY = mouseY * 0.6;
 
-                group.position.x += 0.05 * (targetPosX - group.position.x);
-                group.position.y += 0.05 * (targetPosY - group.position.y);
-            }
+				group.position.x += 0.05 * (targetPosX - group.position.x);
+				group.position.y += 0.05 * (targetPosY - group.position.y);
+			}
 
-            renderer.render(scene, camera);
-        }
+			renderer.render(scene, camera);
+		}
 
-        // Start/stop animation based on visibility
-        function startAnimation() {
-            if (animationFrameId === null) {
-                animate();
-            }
-        }
+		// Start/stop animation based on visibility
+		function startAnimation() {
+			if (animationFrameId === null) {
+				animate();
+			}
+		}
 
-        function stopAnimation() {
-            if (animationFrameId !== null) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-            }
-        }
+		function stopAnimation() {
+			if (animationFrameId !== null) {
+				cancelAnimationFrame(animationFrameId);
+				animationFrameId = null;
+			}
+		}
 
-        // Initial start
-        animate();
+		// Initial start
+		animate();
 
-        // Handle Resize with DEBOUNCING
-        let resizeTimeout: ReturnType<typeof setTimeout>;
-        window.addEventListener(
-            "resize",
-            () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                }, 100);
-            },
-            { passive: true },
-        );
+		// Handle Resize with DEBOUNCING
+		let resizeTimeout: ReturnType<typeof setTimeout>;
+		window.addEventListener(
+			"resize",
+			() => {
+				clearTimeout(resizeTimeout);
+				resizeTimeout = setTimeout(() => {
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+					renderer.setSize(window.innerWidth, window.innerHeight);
+				}, 100);
+			},
+			{ passive: true }
+		);
 
-        // Handle Theme Changes
-        window.addEventListener("theme-changed", (event: Event) => {
-            const customEvent = event as CustomEvent<{ theme: string }>;
-            const isDark = customEvent.detail.theme === "dark";
-        });
+		// Handle Theme Changes
 
-        // Handle Slam Events - PAUSE RENDERING WHEN HIDDEN
-        window.addEventListener("slam-impact", () => {
-            container.classList.add("opacity-0");
-            isVisible = false;
-            stopAnimation();
-        });
+		// Handle Slam Events - PAUSE RENDERING WHEN HIDDEN
+		window.addEventListener("slam-impact", () => {
+			container.classList.add("opacity-0");
+			isVisible = false;
+			stopAnimation();
+		});
 
-        window.addEventListener("slam-reset", () => {
-            container.classList.remove("opacity-0");
-            isVisible = true;
-            startAnimation();
-        });
+		window.addEventListener("slam-reset", () => {
+			container.classList.remove("opacity-0");
+			isVisible = true;
+			startAnimation();
+		});
 
-        // Use Page Visibility API to pause when tab is hidden
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) {
-                isVisible = false;
-                stopAnimation();
-            } else {
-                // Only restart if container is visible (not post-slam or scrolled past)
-                if (
-                    !container.classList.contains("opacity-0") &&
-                    window.scrollY < window.innerHeight
-                ) {
-                    isVisible = true;
-                    startAnimation();
-                }
-            }
-        });
+		// Use Page Visibility API to pause when tab is hidden
+		document.addEventListener("visibilitychange", () => {
+			if (document.hidden) {
+				isVisible = false;
+				stopAnimation();
+			} else {
+				// Only restart if container is visible (not post-slam or scrolled past)
+				if (
+					!container.classList.contains("opacity-0") &&
+					window.scrollY < window.innerHeight
+				) {
+					isVisible = true;
+					startAnimation();
+				}
+			}
+		});
 
-        // Handle View Changes - PAUSE RENDERING WHEN NOT ON HOME VIEW
-        window.addEventListener("view-change", (e: Event) => {
-            const customEvent = e as CustomEvent;
-            const viewId = customEvent.detail;
+		// Handle View Changes - PAUSE RENDERING WHEN NOT ON HOME VIEW
+		window.addEventListener("view-change", (e: Event) => {
+			const customEvent = e as CustomEvent;
+			const viewId = customEvent.detail;
 
-            if (viewId === "home") {
-                // Returning to home view - restart animation if appropriate
-                if (
-                    !container.classList.contains("opacity-0") &&
-                    !document.hidden
-                ) {
-                    isVisible = true;
-                    startAnimation();
-                }
-            } else {
-                // Navigating away from home - stop animation
-                isVisible = false;
-                stopAnimation();
-            }
-        });
+			if (viewId === "home") {
+				// Returning to home view - restart animation if appropriate
+				if (!container.classList.contains("opacity-0") && !document.hidden) {
+					isVisible = true;
+					startAnimation();
+				}
+			} else {
+				// Navigating away from home - stop animation
+				isVisible = false;
+				stopAnimation();
+			}
+		});
 
-        // SCROLL-BASED VISIBILITY: Stop rendering when scrolled past hero
-        let lastScrollCheck = 0;
-        const SCROLL_CHECK_INTERVAL = 150; // Check every 150ms max (was 100)
-        let hasPassedHero = false;
-        let restartDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+		// SCROLL-BASED VISIBILITY: Stop rendering when scrolled past hero
+		let lastScrollCheck = 0;
+		const SCROLL_CHECK_INTERVAL = 100; // Check every 100ms
+		let hasPassedHero = false;
 
-        window.addEventListener(
-            "scroll",
-            () => {
-                const now = performance.now();
-                if (now - lastScrollCheck < SCROLL_CHECK_INTERVAL) return;
-                lastScrollCheck = now;
+		window.addEventListener(
+			"scroll",
+			() => {
+				const now = performance.now();
+				if (now - lastScrollCheck < SCROLL_CHECK_INTERVAL) return;
+				lastScrollCheck = now;
 
-                const scrollY = window.scrollY;
-                const viewportHeight = window.innerHeight;
+				const scrollY = window.scrollY;
+				const viewportHeight = window.innerHeight;
 
-                // If scrolled past the hero section (use 90% for stop)
-                if (scrollY > viewportHeight * 0.9 && !hasPassedHero) {
-                    hasPassedHero = true;
-                    isVisible = false;
-                    stopAnimation();
+				// If scrolled past the hero section (use 90% for stop)
+				if (scrollY > viewportHeight * 0.9 && !hasPassedHero) {
+					hasPassedHero = true;
+					isVisible = false;
+					stopAnimation();
+				} else if (scrollY <= viewportHeight * 0.5 && hasPassedHero) {
+					// Scrolled back up into hero section - restart immediately
+					hasPassedHero = false;
 
-                    // Clear any pending restart
-                    if (restartDebounceTimer) {
-                        clearTimeout(restartDebounceTimer);
-                        restartDebounceTimer = null;
-                    }
-                } else if (scrollY <= viewportHeight * 0.3 && hasPassedHero) {
-                    // Scrolled back up into hero section (use 30% for restart - wider gap)
-                    hasPassedHero = false;
-
-                    // Debounce the restart to avoid rapid on/off
-                    if (restartDebounceTimer) {
-                        clearTimeout(restartDebounceTimer);
-                    }
-
-                    restartDebounceTimer = setTimeout(() => {
-                        // Only restart if conditions are still valid
-                        if (
-                            !container.classList.contains("opacity-0") &&
-                            !document.hidden &&
-                            window.scrollY <= viewportHeight * 0.4 // Double-check position
-                        ) {
-                            // Use requestIdleCallback for non-blocking restart if available
-                            if ("requestIdleCallback" in window) {
-                                (window as any).requestIdleCallback(
-                                    () => {
-                                        isVisible = true;
-                                        startAnimation();
-                                    },
-                                    { timeout: 100 },
-                                );
-                            } else {
-                                isVisible = true;
-                                startAnimation();
-                            }
-                        }
-                        restartDebounceTimer = null;
-                    }, 100); // 100ms debounce
-                }
-            },
-            { passive: true },
-        );
-    }
+					// Only restart if container is visible (not post-slam)
+					if (
+						!container.classList.contains("opacity-0") &&
+						!document.hidden
+					) {
+						isVisible = true;
+						startAnimation();
+					}
+				}
+			},
+			{ passive: true }
+		);
+	}
 </script>

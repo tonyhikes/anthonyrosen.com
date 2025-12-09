@@ -16,7 +16,7 @@ import Colophon from "../components/Colophon.astro";
 		<ThreeScene />
 		<Hero />
 		<main
-			class="content-layer shadow-2xl bg-white dark:bg-slate-900 relative z-10"
+			class="content-layer relative z-10 bg-white shadow-2xl dark:bg-slate-900"
 		>
 			<SlamSection />
 			<ImpactCharts />
@@ -55,7 +55,9 @@ import Colophon from "../components/Colophon.astro";
 		const meta = viewMeta[viewId] || { title: viewId, path: `/${viewId}` };
 
 		// Send to Google Analytics (gtag.js)
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		if (typeof window !== "undefined" && (window as any).gtag) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			(window as any).gtag("config", "G-7LRLJTJG4L", {
 				page_path: meta.path,
 				page_title: `${meta.title} | Tony Rosen`,
