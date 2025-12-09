@@ -156,7 +156,7 @@
 
 		// Start/stop animation based on visibility
 		function startAnimation() {
-			if (animationFrameId === null) {
+			if (animationFrameId === null && isVisible) {
 				animate();
 			}
 		}
@@ -165,6 +165,29 @@
 			if (animationFrameId !== null) {
 				cancelAnimationFrame(animationFrameId);
 				animationFrameId = null;
+			}
+		}
+
+		// Centralized visibility check - prevents race conditions
+		let isSlammedOut = false; // Track if we're past the slam animation
+
+		function checkAndUpdateVisibility() {
+			const scrollY = window.scrollY;
+			const viewportHeight = window.innerHeight;
+			const inHeroSection = scrollY < viewportHeight * 0.9;
+			const isTabVisible = !document.hidden;
+			const containerVisible = !container.classList.contains("opacity-0");
+
+			// Determine if animation should be running
+			const shouldBeVisible =
+				inHeroSection && isTabVisible && containerVisible && !isSlammedOut;
+
+			if (shouldBeVisible && !isVisible) {
+				isVisible = true;
+				startAnimation();
+			} else if (!shouldBeVisible && isVisible) {
+				isVisible = false;
+				stopAnimation();
 			}
 		}
 
@@ -191,31 +214,19 @@
 		// Handle Slam Events - PAUSE RENDERING WHEN HIDDEN
 		window.addEventListener("slam-impact", () => {
 			container.classList.add("opacity-0");
-			isVisible = false;
-			stopAnimation();
+			isSlammedOut = true;
+			checkAndUpdateVisibility();
 		});
 
 		window.addEventListener("slam-reset", () => {
 			container.classList.remove("opacity-0");
-			isVisible = true;
-			startAnimation();
+			isSlammedOut = false;
+			checkAndUpdateVisibility();
 		});
 
 		// Use Page Visibility API to pause when tab is hidden
 		document.addEventListener("visibilitychange", () => {
-			if (document.hidden) {
-				isVisible = false;
-				stopAnimation();
-			} else {
-				// Only restart if container is visible (not post-slam or scrolled past)
-				if (
-					!container.classList.contains("opacity-0") &&
-					window.scrollY < window.innerHeight
-				) {
-					isVisible = true;
-					startAnimation();
-				}
-			}
+			checkAndUpdateVisibility();
 		});
 
 		// Handle View Changes - PAUSE RENDERING WHEN NOT ON HOME VIEW
@@ -223,23 +234,18 @@
 			const customEvent = e as CustomEvent;
 			const viewId = customEvent.detail;
 
-			if (viewId === "home") {
-				// Returning to home view - restart animation if appropriate
-				if (!container.classList.contains("opacity-0") && !document.hidden) {
-					isVisible = true;
-					startAnimation();
-				}
-			} else {
+			if (viewId !== "home") {
 				// Navigating away from home - stop animation
 				isVisible = false;
 				stopAnimation();
+			} else {
+				checkAndUpdateVisibility();
 			}
 		});
 
-		// SCROLL-BASED VISIBILITY: Stop rendering when scrolled past hero
+		// SCROLL-BASED VISIBILITY: Check visibility on scroll
 		let lastScrollCheck = 0;
 		const SCROLL_CHECK_INTERVAL = 100; // Check every 100ms
-		let hasPassedHero = false;
 
 		window.addEventListener(
 			"scroll",
@@ -248,27 +254,7 @@
 				if (now - lastScrollCheck < SCROLL_CHECK_INTERVAL) return;
 				lastScrollCheck = now;
 
-				const scrollY = window.scrollY;
-				const viewportHeight = window.innerHeight;
-
-				// If scrolled past the hero section (use 90% for stop)
-				if (scrollY > viewportHeight * 0.9 && !hasPassedHero) {
-					hasPassedHero = true;
-					isVisible = false;
-					stopAnimation();
-				} else if (scrollY <= viewportHeight * 0.5 && hasPassedHero) {
-					// Scrolled back up into hero section - restart immediately
-					hasPassedHero = false;
-
-					// Only restart if container is visible (not post-slam)
-					if (
-						!container.classList.contains("opacity-0") &&
-						!document.hidden
-					) {
-						isVisible = true;
-						startAnimation();
-					}
-				}
+				checkAndUpdateVisibility();
 			},
 			{ passive: true }
 		);

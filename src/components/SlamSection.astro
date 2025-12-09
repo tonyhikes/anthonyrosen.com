@@ -166,11 +166,14 @@
 						rect.top > windowHeight * 0.9
 					) {
 						// RESET SEQUENCE (When scrolling back up significantly - increased threshold)
-						console.log("RESET TRIGGERED (Scroll)");
-						hasSlammed = false;
+					console.log("RESET TRIGGERED (Scroll)");
+					hasSlammed = false;
 
-						// Batch all resets in a single animation frame to prevent layout thrashing
-						requestAnimationFrame(() => {
+					// Dispatch slam-reset event to notify ThreeScene to restart animation
+					window.dispatchEvent(new CustomEvent("slam-reset"));
+
+					// Batch all resets in a single animation frame to prevent layout thrashing
+					requestAnimationFrame(() => {
 							// Reset Hero Content & Cotton Ball
 							anime.set([heroContent, canvasContainer], {
 								opacity: 1,
