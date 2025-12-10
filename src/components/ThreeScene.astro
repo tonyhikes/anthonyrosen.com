@@ -223,9 +223,9 @@
 			const IDLE_TIMEOUT = 5000;
 			setTimeout(() => {
 				if (!hasUserInteracted) {
-					console.log("Idle timeout reached");
-					// isVisible = false; // Disable idle timeout for debugging
-					// stopAnimation();
+					// Stop animation to save resources and allow Lighthouse to finish
+					isVisible = false;
+					stopAnimation();
 				}
 			}, IDLE_TIMEOUT);
 
