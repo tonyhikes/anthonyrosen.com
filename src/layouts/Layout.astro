@@ -46,14 +46,6 @@ const { title } = Astro.props;
 			rel="modulepreload"
 			href="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.es.js"
 		/>
-		<!-- Preload the 3D model so it starts downloading immediately -->
-		<link
-			rel="preload"
-			href="/cotton_ball-v1.glb"
-			as="fetch"
-			type="model/gltf-binary"
-			crossorigin
-		/>
 		<script is:inline>
 			// Initialize Theme
 			if (
@@ -90,69 +82,79 @@ const { title } = Astro.props;
 		<slot />
 		<Footer />
 		<script>
-			import Lenis from "lenis";
+			// Defer Lenis initialization to reduce TBT
+			function initLenis() {
+				import("lenis").then(({ default: Lenis }) => {
+					const lenis = new Lenis();
 
-			const lenis = new Lenis();
+					// Expose lenis globally for other components to use
+					window.lenis = lenis;
 
-			// Expose lenis globally for other components to use
-			window.lenis = lenis;
+					let lenisRafId: number | null = null;
+					let hasUserInteracted = false;
 
-			let lenisRafId: number | null = null;
-			let hasUserInteracted = false;
+					function raf(time: number) {
+						lenis.raf(time);
+						lenisRafId = requestAnimationFrame(raf);
+					}
 
-			function raf(time: number) {
-				lenis.raf(time);
-				lenisRafId = requestAnimationFrame(raf);
-			}
+					function startLenisLoop() {
+						if (lenisRafId === null) {
+							lenisRafId = requestAnimationFrame(raf);
+						}
+					}
 
-			function startLenisLoop() {
-				if (lenisRafId === null) {
-					lenisRafId = requestAnimationFrame(raf);
-				}
-			}
+					function stopLenisLoop() {
+						if (lenisRafId !== null) {
+							cancelAnimationFrame(lenisRafId);
+							lenisRafId = null;
+						}
+					}
 
-			function stopLenisLoop() {
-				if (lenisRafId !== null) {
-					cancelAnimationFrame(lenisRafId);
-					lenisRafId = null;
-				}
-			}
-
-			// Track user interaction
-			["scroll", "click", "keydown", "touchstart", "mousemove"].forEach(
-				(eventType) => {
-					document.addEventListener(
-						eventType,
-						() => {
-							hasUserInteracted = true;
-							// Restart Lenis if it was stopped by idle timeout
-							startLenisLoop();
-						},
-						{ passive: true }
+					// Track user interaction
+					["scroll", "click", "keydown", "touchstart", "mousemove"].forEach(
+						(eventType) => {
+							document.addEventListener(
+								eventType,
+								() => {
+									hasUserInteracted = true;
+									// Restart Lenis if it was stopped by idle timeout
+									startLenisLoop();
+								},
+								{ passive: true }
+							);
+						}
 					);
-				}
-			);
 
-			// Start on load
-			startLenisLoop();
-
-			// IDLE TIMEOUT: Stop Lenis after 5 seconds if no user interaction
-			// This helps Lighthouse complete its analysis
-			const IDLE_TIMEOUT = 5000;
-			setTimeout(() => {
-				if (!hasUserInteracted) {
-					stopLenisLoop();
-				}
-			}, IDLE_TIMEOUT);
-
-			// Pause Lenis when tab is hidden to save CPU
-			document.addEventListener("visibilitychange", () => {
-				if (document.hidden) {
-					stopLenisLoop();
-				} else if (hasUserInteracted) {
+					// Start on load
 					startLenisLoop();
-				}
-			});
+
+					// IDLE TIMEOUT: Stop Lenis after 5 seconds if no user interaction
+					// This helps Lighthouse complete its analysis
+					const IDLE_TIMEOUT = 5000;
+					setTimeout(() => {
+						if (!hasUserInteracted) {
+							stopLenisLoop();
+						}
+					}, IDLE_TIMEOUT);
+
+					// Pause Lenis when tab is hidden to save CPU
+					document.addEventListener("visibilitychange", () => {
+						if (document.hidden) {
+							stopLenisLoop();
+						} else if (hasUserInteracted) {
+							startLenisLoop();
+						}
+					});
+				});
+			}
+
+			// Use requestIdleCallback to defer Lenis initialization
+			if ("requestIdleCallback" in window) {
+				requestIdleCallback(() => initLenis(), { timeout: 2000 });
+			} else {
+				setTimeout(initLenis, 100);
+			}
 		</script>
 	</body>
 </html>

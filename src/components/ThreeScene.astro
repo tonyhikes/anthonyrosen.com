@@ -6,139 +6,120 @@
 	id="canvas-container"
 	class="pointer-events-none fixed inset-0 z-20 opacity-0 transition-opacity duration-300"
 >
+	<canvas id="three-canvas"></canvas>
 </div>
 
 <script>
-	// LAZY LOAD: Defer Three.js initialization until the browser is idle
-	// This prevents blocking the main thread during initial page load
-	function initThreeScene() {
-		// Dynamic imports to avoid blocking the main thread
-		Promise.all([
-			import("three"),
-			import("three/examples/jsm/loaders/GLTFLoader.js"),
-			import("three/examples/jsm/loaders/DRACOLoader.js"),
-			import("three/examples/jsm/environments/RoomEnvironment.js"),
-		]).then(([THREE, { GLTFLoader }, { DRACOLoader }, { RoomEnvironment }]) => {
-			const container = document.getElementById("canvas-container");
-			if (!container) {
-				console.error("ThreeScene: Container #canvas-container not found!");
-				return;
-			}
-			console.log("ThreeScene: Container found, initializing...");
+	const container = document.getElementById("canvas-container");
+	const canvas = document.getElementById("three-canvas") as HTMLCanvasElement;
 
-			// Track visibility state for performance
+	if (!container || !canvas) {
+		console.error("ThreeScene: Container or canvas not found!");
+	} else {
+		// Check for OffscreenCanvas support
+		const supportsOffscreen = "transferControlToOffscreen" in canvas;
+
+		if (supportsOffscreen) {
+			// --- WEB WORKER PATH (Modern browsers) ---
+			const offscreen = canvas.transferControlToOffscreen();
+
+			const worker = new Worker(
+				new URL("../workers/three-worker.ts", import.meta.url),
+				{ type: "module" }
+			);
+
+			// Initialize worker with canvas
+			worker.postMessage(
+				{
+					type: "init",
+					data: {
+						canvas: offscreen,
+						width: window.innerWidth,
+						height: window.innerHeight,
+					},
+				},
+				[offscreen]
+			);
+
+			// Track state
 			let isVisible = true;
-			let isIntersecting = true;
-			let animationFrameId: number | null = null;
 			let hasUserInteracted = false;
 			let isSlammedOut = false;
 
-			// Scene setup
-			const scene = new THREE.Scene();
-
-			// Camera
-			const camera = new THREE.PerspectiveCamera(
-				75,
-				window.innerWidth / window.innerHeight,
-				0.1,
-				1000
-			);
-			camera.position.z = 5;
-
-			// Renderer - CAP PIXEL RATIO AT 2 FOR PERFORMANCE
-			const renderer = new THREE.WebGLRenderer({
-				alpha: true,
-				antialias: true,
-			});
-			renderer.setSize(window.innerWidth, window.innerHeight);
-			renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-			renderer.toneMapping = THREE.ACESFilmicToneMapping;
-			renderer.toneMappingExposure = 1.0;
-			container.appendChild(renderer.domElement);
-
-			// Environment (Studio Lighting like Sketchfab)
-			const pmremGenerator = new THREE.PMREMGenerator(renderer);
-			const roomEnv = new RoomEnvironment();
-			scene.environment = pmremGenerator.fromScene(roomEnv, 0.04).texture;
-			pmremGenerator.dispose();
-
-			// Lights
-			const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-			directionalLight.position.set(5, 5, 5);
-			scene.add(directionalLight);
-
-			const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
-			backLight.position.set(-5, -5, -5);
-			scene.add(backLight);
-
-			// Model loading
-			const loader = new GLTFLoader();
-			const dracoLoader = new DRACOLoader();
-			dracoLoader.setDecoderPath("/draco/");
-			loader.setDRACOLoader(dracoLoader);
-
-			loader.load(
-				"/cotton_ball-v1.glb",
-				(gltf) => {
-					const model = gltf.scene;
-
-					// Center and scale model
-					const box = new THREE.Box3().setFromObject(model);
-					const center = box.getCenter(new THREE.Vector3());
-					const size = box.getSize(new THREE.Vector3());
-
-					const maxDim = Math.max(size.x, size.y, size.z);
-					const scale = 4.0 / maxDim;
-					model.scale.setScalar(scale);
-					model.position.sub(center.multiplyScalar(scale));
-
-					const group = new THREE.Group();
-					group.add(model);
-					scene.add(group);
-
-					(window as typeof window & { heroModel?: THREE.Group }).heroModel =
-						group;
-
-					// FADE IN: Show the container with a smooth fade after model loads
+			// Handle model loaded
+			worker.onmessage = (e) => {
+				if (e.data.type === "loaded") {
 					container.classList.remove("opacity-0");
 					container.classList.add("opacity-100");
-					
-					// Re-check visibility to start the animation loop now that we are visible
-					checkAndUpdateVisibility();
-				},
-				undefined,
-				(error) => {
-					console.error("Error loading model:", error);
 				}
-			);
+			};
 
-			// Mouse interaction with throttling
-			let mouseX = 0;
-			let mouseY = 0;
-			let lastMouseMoveTime = 0;
-			const MOUSE_THROTTLE_MS = 16;
-
-			const windowHalfX = window.innerWidth / 2;
-			const windowHalfY = window.innerHeight / 2;
+			// Mouse tracking
+			let lastMouseTime = 0;
+			const MOUSE_THROTTLE = 16;
+			const halfX = window.innerWidth / 2;
+			const halfY = window.innerHeight / 2;
 
 			document.addEventListener(
 				"mousemove",
-				(event) => {
+				(e) => {
 					hasUserInteracted = true;
 					const now = performance.now();
-					if (now - lastMouseMoveTime < MOUSE_THROTTLE_MS) return;
-					lastMouseMoveTime = now;
+					if (now - lastMouseTime < MOUSE_THROTTLE) return;
+					lastMouseTime = now;
 
-					mouseX = (event.clientX - windowHalfX) / windowHalfX;
-					mouseY = (event.clientY - windowHalfY) / windowHalfY;
+					worker.postMessage({
+						type: "mouse",
+						data: {
+							x: (e.clientX - halfX) / halfX,
+							y: (e.clientY - halfY) / halfY,
+						},
+					});
 				},
 				{ passive: true }
 			);
 
+			// Resize
+			let resizeTimeout: ReturnType<typeof setTimeout>;
+			window.addEventListener(
+				"resize",
+				() => {
+					clearTimeout(resizeTimeout);
+					resizeTimeout = setTimeout(() => {
+						worker.postMessage({
+							type: "resize",
+							data: {
+								width: window.innerWidth,
+								height: window.innerHeight,
+							},
+						});
+					}, 100);
+				},
+				{ passive: true }
+			);
+
+			// Visibility helpers
+			function updateWorkerVisibility() {
+				const shouldBeVisible =
+					isVisible && !isSlammedOut && !document.hidden;
+				worker.postMessage({
+					type: "visibility",
+					data: { visible: shouldBeVisible },
+				});
+			}
+
+			// Idle timeout for Lighthouse
+			setTimeout(() => {
+				if (!hasUserInteracted) {
+					isVisible = false;
+					updateWorkerVisibility();
+				}
+			}, 5000);
+
 			// Track user interaction
-			["scroll", "click", "keydown", "touchstart"].forEach((eventType) => {
+			["scroll", "click", "keydown", "touchstart"].forEach((evt) => {
 				document.addEventListener(
-					eventType,
+					evt,
 					() => {
 						hasUserInteracted = true;
 					},
@@ -146,110 +127,12 @@
 				);
 			});
 
-			// Animation loop
-			function animate() {
-				if (!isVisible) {
-					animationFrameId = null;
-					return;
-				}
-
-				animationFrameId = requestAnimationFrame(animate);
-
-				const group = (window as typeof window & { heroModel?: THREE.Group })
-					.heroModel;
-
-				if (group) {
-					const targetRotY = mouseX * Math.PI;
-					const targetRotX = mouseY * 0.5;
-
-					group.rotation.y += 0.05 * (targetRotY - group.rotation.y);
-					group.rotation.x += 0.05 * (targetRotX - group.rotation.x);
-
-					const targetPosX = -mouseX * 0.6;
-					const targetPosY = mouseY * 0.6;
-
-					group.position.x += 0.05 * (targetPosX - group.position.x);
-					group.position.y += 0.05 * (targetPosY - group.position.y);
-				}
-
-				renderer.render(scene, camera);
-			}
-
-			function startAnimation() {
-				if (animationFrameId === null && isVisible) {
-					animate();
-				}
-			}
-
-			function stopAnimation() {
-				if (animationFrameId !== null) {
-					cancelAnimationFrame(animationFrameId);
-					animationFrameId = null;
-				}
-			}
-
-			function checkAndUpdateVisibility() {
-				const isTabVisible = !document.hidden;
-				const containerVisible = !container.classList.contains("opacity-0");
-
-				const shouldBeVisible =
-					isIntersecting && isTabVisible && containerVisible && !isSlammedOut;
-
-				if (shouldBeVisible && !isVisible) {
-					isVisible = true;
-					startAnimation();
-				} else if (!shouldBeVisible && isVisible) {
-					isVisible = false;
-					stopAnimation();
-				}
-			}
-
-			// IntersectionObserver for viewport visibility
-			const observer = new IntersectionObserver(
-				(entries) => {
-					entries.forEach((entry) => {
-						isIntersecting = entry.isIntersecting;
-						checkAndUpdateVisibility();
-					});
-				},
-				{ threshold: 0.1 }
-			);
-			observer.observe(container);
-
-			// Start animation
-			animate();
-
-			// Idle timeout for Lighthouse
-			const IDLE_TIMEOUT = 5000;
-			setTimeout(() => {
-				if (!hasUserInteracted) {
-					// Stop animation to save resources and allow Lighthouse to finish
-					isVisible = false;
-					stopAnimation();
-				}
-			}, IDLE_TIMEOUT);
-
-			// Resize handler
-			let resizeTimeout: ReturnType<typeof setTimeout>;
-			window.addEventListener(
-				"resize",
-				() => {
-					clearTimeout(resizeTimeout);
-					resizeTimeout = setTimeout(() => {
-						camera.aspect = window.innerWidth / window.innerHeight;
-						camera.updateProjectionMatrix();
-						renderer.setSize(window.innerWidth, window.innerHeight);
-					}, 100);
-				},
-				{ passive: true }
-			);
-
-			// Event handlers
+			// Events
 			window.addEventListener("slam-impact", () => {
 				container.classList.remove("opacity-100");
 				container.classList.add("opacity-0");
 				isSlammedOut = true;
-				checkAndUpdateVisibility();
+				updateWorkerVisibility();
 			});
 
 			window.addEventListener("slam-reset", () => {
@@ -257,39 +140,43 @@
 				container.classList.add("opacity-100");
 				isSlammedOut = false;
 				hasUserInteracted = true;
-				checkAndUpdateVisibility();
+				updateWorkerVisibility();
 			});
 
 			document.addEventListener("visibilitychange", () => {
-				checkAndUpdateVisibility();
+				updateWorkerVisibility();
 			});
 
 			window.addEventListener("view-change", (e: Event) => {
-				const customEvent = e as CustomEvent;
-				const viewId = customEvent.detail;
-
+				const viewId = (e as CustomEvent).detail;
 				if (viewId !== "home") {
 					isVisible = false;
-					stopAnimation();
-					// Fade out
 					container.classList.remove("opacity-100");
 					container.classList.add("opacity-0");
 				} else {
+					isVisible = true;
+					isSlammedOut = false;
 					hasUserInteracted = true;
-					isSlammedOut = false; // Reset slam state in case we navigated away while slammed
-					// Fade in
 					container.classList.remove("opacity-0");
 					container.classList.add("opacity-100");
-					checkAndUpdateVisibility();
 				}
+				updateWorkerVisibility();
 			});
-		});
-	}
-
-	// Start loading when DOM is ready
-	if (document.readyState === "loading") {
-		document.addEventListener("DOMContentLoaded", initThreeScene);
-	} else {
-		initThreeScene();
+		} else {
+			// --- FALLBACK PATH (No OffscreenCanvas support) ---
+			// Dynamically import the legacy inline version
+			console.log("OffscreenCanvas not supported, using fallback");
+			import("./ThreeSceneFallback.ts");
+		}
 	}
 </script>
+
+<style>
+	#three-canvas {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+</style>

@@ -96,32 +96,41 @@ import Colophon from "../components/Colophon.astro";
 			}
 		});
 
+		// Helper to reset scroll position (both native and Lenis)
+		function resetScroll() {
+			window.scrollTo(0, 0);
+			// Also reset Lenis if it's initialized
+			if (window.lenis) {
+				window.lenis.scrollTo(0, { immediate: true });
+			}
+		}
+
 		// Show the target view
 		if (viewId === "resume" && resumeView) {
 			resumeView.classList.remove("hidden");
 			resumeView.classList.add("block");
-			window.scrollTo(0, 0);
+			resetScroll();
 			trackPageView("resume");
 		} else if (viewId === "portfolio" && portfolioView) {
 			portfolioView.classList.remove("hidden");
 			portfolioView.classList.add("block");
-			window.scrollTo(0, 0);
+			resetScroll();
 			trackPageView("portfolio");
 		} else if (viewId === "styleguide" && styleGuideView) {
 			styleGuideView.classList.remove("hidden");
 			styleGuideView.classList.add("block");
-			window.scrollTo(0, 0);
+			resetScroll();
 			trackPageView("styleguide");
 		} else if (viewId === "colophon" && colophonView) {
 			colophonView.classList.remove("hidden");
 			colophonView.classList.add("block");
-			window.scrollTo(0, 0);
+			resetScroll();
 			trackPageView("colophon");
 		} else if (homeView) {
 			// Default to home
 			homeView.classList.remove("hidden");
 			homeView.classList.add("block");
-			window.scrollTo(0, 0); // Reset scroll for home
+			resetScroll();
 			trackPageView("home");
 		}
 	}
