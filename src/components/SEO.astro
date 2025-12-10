@@ -18,6 +18,7 @@ const socialImageURL = new URL(image, Astro.url);
 <!-- Global Metadata -->
 <meta name="title" content={title} />
 <meta name="description" content={description} />
+<meta name="robots" content="index, follow" />
 <link rel="canonical" href={canonicalURL} />
 
 <!-- Open Graph / Facebook -->
@@ -33,3 +34,18 @@ const socialImageURL = new URL(image, Astro.url);
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={socialImageURL} />
+
+<!-- Structured Data (JSON-LD) -->
+<script type="application/ld+json" set:html={JSON.stringify({
+	"@context": "https://schema.org",
+	"@type": "Person",
+	"name": "Tony Rosen",
+	"alternateName": "Anthony Rosen",
+	"jobTitle": "Marketing & Creative Project Manager",
+	"url": "https://anthonyrosen.com",
+	"email": "mailto:anthonyrosen@gmail.com",
+	"sameAs": [
+		"https://linkedin.com/in/anthonyrosen"
+	]
+})} />
+

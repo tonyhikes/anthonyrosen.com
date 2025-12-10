@@ -127,20 +127,20 @@ Add to SEO.astro:
 
 ### Accessibility
 
-- [ ] Add `aria-label` to theme toggle buttons (Navbar.astro)
-- [ ] Add `aria-label` to mobile menu button (Navbar.astro)
-- [ ] Add `aria-expanded` to dropdown triggers (Resume.astro)
-- [ ] Add `aria-hidden="true"` to decorative SVGs
-- [ ] Audit and fix color contrast issues
-- [ ] Verify focus states on all interactive elements
-- [ ] Check heading hierarchy (h1 → h2 → h3)
+- [x] Add `aria-label` to theme toggle buttons (Navbar.astro)
+- [x] Add `aria-label` to mobile menu button (Navbar.astro)
+- [x] Add `aria-expanded` to dropdown triggers (Resume.astro)
+- [x] Add `aria-hidden="true"` to decorative SVGs
+- [x] Audit and fix color contrast issues (verify with PageSpeed)
+- [x] Verify focus states on all interactive elements (verify with PageSpeed)
+- [x] Check heading hierarchy (h1 → h2 → h3) (verify with PageSpeed)
 
 ### SEO
 
-- [ ] Create `public/robots.txt`
-- [ ] Install and configure `@astrojs/sitemap`
-- [ ] Add structured data (JSON-LD) to Layout.astro
-- [ ] Add `<meta name="robots" content="index, follow" />`
+- [x] Create `public/robots.txt`
+- [x] Install and configure `@astrojs/sitemap`
+- [x] Add structured data (JSON-LD) to SEO.astro
+- [x] Add `<meta name="robots" content="index, follow" />`
 
 ---
 
