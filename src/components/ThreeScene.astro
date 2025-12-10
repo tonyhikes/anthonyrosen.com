@@ -276,6 +276,7 @@
 					container.classList.add("opacity-0");
 				} else {
 					hasUserInteracted = true;
+					isSlammedOut = false; // Reset slam state in case we navigated away while slammed
 					// Fade in
 					container.classList.remove("opacity-0");
 					container.classList.add("opacity-100");

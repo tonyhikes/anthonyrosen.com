@@ -81,6 +81,13 @@ import Colophon from "../components/Colophon.astro";
 			colophonView,
 		];
 
+		// Update URL without reloading
+		if (viewId === "home") {
+			history.pushState(null, "", window.location.pathname); // Clear hash for home
+		} else {
+			history.pushState(null, "", `#${viewId}`);
+		}
+
 		// Hide all views first
 		views.forEach((view) => {
 			if (view) {
@@ -114,11 +121,8 @@ import Colophon from "../components/Colophon.astro";
 			// Default to home
 			homeView.classList.remove("hidden");
 			homeView.classList.add("block");
-
-			// Track home view (but not on initial page load - that's automatic)
-			if (window.location.hash === "#home") {
-				trackPageView("home");
-			}
+			window.scrollTo(0, 0); // Reset scroll for home
+			trackPageView("home");
 		}
 	}
 
