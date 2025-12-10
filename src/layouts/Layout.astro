@@ -34,6 +34,7 @@ const { title } = Astro.props;
 			media="(prefers-color-scheme: light)"
 		/>
 		<meta name="generator" content={Astro.generator} />
+
 		<!-- Preconnect to Google Fonts for faster font loading -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -48,7 +49,7 @@ const { title } = Astro.props;
 		<!-- Preload the 3D model so it starts downloading immediately -->
 		<link
 			rel="preload"
-			href="/cotton_ball.glb"
+			href="/cotton_ball-v1.glb"
 			as="fetch"
 			type="model/gltf-binary"
 			crossorigin

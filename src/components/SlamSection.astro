@@ -98,14 +98,17 @@
 
 							console.log("Debug: Timeline created");
 
-							// 1. Hide Hero Content & Cotton Ball instantly
+							// 1. Hide Hero Content & Cotton Ball (via event) instantly
 							timeline
 								.add({
-									targets: [heroContent, canvasContainer],
+									targets: [heroContent],
 									opacity: 0,
 									duration: 100,
 									easing: "linear",
-									begin: () => console.log("Debug: Hiding hero content"),
+									begin: () => {
+										console.log("Debug: Hiding hero content");
+										window.dispatchEvent(new CustomEvent("slam-impact"));
+									},
 								})
 								// 2. Slam Text In
 								.add(
@@ -174,8 +177,8 @@
 
 					// Batch all resets in a single animation frame to prevent layout thrashing
 					requestAnimationFrame(() => {
-							// Reset Hero Content & Cotton Ball
-							anime.set([heroContent, canvasContainer], {
+							// Reset Hero Content
+							anime.set([heroContent], {
 								opacity: 1,
 							});
 

@@ -4,7 +4,7 @@
 
 <div
 	id="canvas-container"
-	class="pointer-events-none fixed inset-0 z-20 opacity-0 transition-opacity duration-700"
+	class="pointer-events-none fixed inset-0 z-20 opacity-0 transition-opacity duration-300"
 >
 </div>
 
@@ -16,11 +16,15 @@
 		Promise.all([
 			import("three"),
 			import("three/examples/jsm/loaders/GLTFLoader.js"),
+			import("three/examples/jsm/loaders/DRACOLoader.js"),
 			import("three/examples/jsm/environments/RoomEnvironment.js"),
-		]).then(([THREE, { GLTFLoader }, { RoomEnvironment }]) => {
+		]).then(([THREE, { GLTFLoader }, { DRACOLoader }, { RoomEnvironment }]) => {
 			const container = document.getElementById("canvas-container");
-
-			if (!container) return;
+			if (!container) {
+				console.error("ThreeScene: Container #canvas-container not found!");
+				return;
+			}
+			console.log("ThreeScene: Container found, initializing...");
 
 			// Track visibility state for performance
 			let isVisible = true;
@@ -69,9 +73,12 @@
 
 			// Model loading
 			const loader = new GLTFLoader();
+			const dracoLoader = new DRACOLoader();
+			dracoLoader.setDecoderPath("/draco/");
+			loader.setDRACOLoader(dracoLoader);
 
 			loader.load(
-				"/cotton_ball.glb",
+				"/cotton_ball-v1.glb",
 				(gltf) => {
 					const model = gltf.scene;
 
@@ -95,6 +102,9 @@
 					// FADE IN: Show the container with a smooth fade after model loads
 					container.classList.remove("opacity-0");
 					container.classList.add("opacity-100");
+					
+					// Re-check visibility to start the animation loop now that we are visible
+					checkAndUpdateVisibility();
 				},
 				undefined,
 				(error) => {
@@ -213,8 +223,9 @@
 			const IDLE_TIMEOUT = 5000;
 			setTimeout(() => {
 				if (!hasUserInteracted) {
-					isVisible = false;
-					stopAnimation();
+					console.log("Idle timeout reached");
+					// isVisible = false; // Disable idle timeout for debugging
+					// stopAnimation();
 				}
 			}, IDLE_TIMEOUT);
 
@@ -235,6 +246,7 @@
 
 			// Event handlers
 			window.addEventListener("slam-impact", () => {
+				container.classList.remove("opacity-100");
 				container.classList.add("opacity-0");
 				isSlammedOut = true;
 				checkAndUpdateVisibility();
@@ -242,6 +254,7 @@
 
 			window.addEventListener("slam-reset", () => {
 				container.classList.remove("opacity-0");
+				container.classList.add("opacity-100");
 				isSlammedOut = false;
 				hasUserInteracted = true;
 				checkAndUpdateVisibility();
@@ -258,15 +271,24 @@
 				if (viewId !== "home") {
 					isVisible = false;
 					stopAnimation();
+					// Fade out
+					container.classList.remove("opacity-100");
+					container.classList.add("opacity-0");
 				} else {
 					hasUserInteracted = true;
+					// Fade in
+					container.classList.remove("opacity-0");
+					container.classList.add("opacity-100");
 					checkAndUpdateVisibility();
 				}
 			});
 		});
 	}
 
-	// Use a short delay to allow initial page paint, then load Three.js
-	// 200ms is enough to not block FCP/LCP but fast enough for good UX
-	setTimeout(initThreeScene, 200);
+	// Start loading when DOM is ready
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initThreeScene);
+	} else {
+		initThreeScene();
+	}
 </script>
