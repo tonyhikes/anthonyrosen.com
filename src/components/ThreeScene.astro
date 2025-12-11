@@ -49,8 +49,11 @@
 			// Handle model loaded
 			worker.onmessage = (e) => {
 				if (e.data.type === "loaded") {
-					container.classList.remove("opacity-0");
-					container.classList.add("opacity-100");
+					// Only show container if not slammed out and on home view
+					if (!isSlammedOut && isVisible) {
+						container.classList.remove("opacity-0");
+						container.classList.add("opacity-100");
+					}
 				}
 			};
 

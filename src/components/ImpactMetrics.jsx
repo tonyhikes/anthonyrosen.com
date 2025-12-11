@@ -374,7 +374,7 @@ const ImpactMetrics = () => {
 
 			{/* Cards Grid */}
 			<div className="animate-in fade-in zoom-in grid grid-cols-1 gap-6 duration-300 md:grid-cols-3">
-				{data[activeTab].map((item, index) => (
+				{(data[activeTab] || []).map((item, index) => (
 					<MetricCard key={index} {...item} />
 				))}
 			</div>
