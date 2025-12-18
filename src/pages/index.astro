@@ -64,6 +64,18 @@ import Colophon from "../components/Colophon.astro";
 			});
 			console.log(`📊 GA: Tracked pageview for ${meta.path}`);
 		}
+
+		// Send to PostHog
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		if (typeof window !== "undefined" && (window as any).posthog) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			(window as any).posthog.capture("$pageview", {
+				$current_url: window.location.origin + meta.path,
+				$pathname: meta.path,
+				title: `${meta.title} | Tony Rosen`,
+			});
+			console.log(`📊 PostHog: Tracked pageview for ${meta.path}`);
+		}
 	}
 
 	function navigateTo(viewId: string) {

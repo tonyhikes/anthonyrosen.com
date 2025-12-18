@@ -41,6 +41,13 @@ All commands are run from the root of the project, from a terminal:
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
+## 📚 Documentation
+
+- [Technical Audit](docs/technical_audit.md) — Current state and roadmap.
+- [Analytics Setup](docs/analytics_setup.md) — Detailed guide on tracking and B2B identification.
+- [Performance Optimization](docs/performance_optimization.md) — How we achieved a 100 PageSpeed score.
+- [Deployment Guide](docs/deployment_guide.md) — How to push updates to the live site.
+
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).

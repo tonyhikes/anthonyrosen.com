@@ -342,4 +342,23 @@
 			dropdownMenu.classList.add("hidden");
 		}
 	});
+
+	// Track Resume Downloads
+	const downloadLinks = document.querySelectorAll("#download-menu a");
+	downloadLinks.forEach((link) => {
+		link.addEventListener("click", (e) => {
+			const format = (e.currentTarget as HTMLElement).textContent?.includes(
+				"PDF"
+			)
+				? "pdf"
+				: "docx";
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			if ((window as any).posthog) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				(window as any).posthog.capture("resume_downloaded", {
+					format: format,
+				});
+			}
+		});
+	});
 </script>

@@ -6,15 +6,15 @@ You are already using one of the best modern frameworks for a portfolio that nee
 
 ## 1. Project Health Check
 
-| Category         | Status       | Notes                                                                                                                                                      |
-| :--------------- | :----------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Framework**    | 🟢 Excellent | Astro is perfect for high-performance content sites.                                                                                                       |
-| **Styling**      | 🟢 Excellent | Tailwind CSS + `index.css` is scalable and industry standard.                                                                                              |
-| **Analytics**    | 🟡 Basic     | Google Analytics is present (`Layout.astro`), but manually added. Consider moving to an integration or "Partytown" to prevent it from blocking page loads. |
-| **SEO**          | 🟡 Good      | Basic title/description present. Missing Open Graph (social share cards) and Sitemap.                                                                      |
-| **Performance**  | 🟢 Good      | `Lenis` for smooth scroll is good. Assets handled well.                                                                                                    |
-| **Code Quality** | 🟢 Fixed     | `Prettier` (formatting) and `ESLint` (code checking) are now configured and enforcing standards.                                                           |
-| **Testing**      | 🔴 Missing   | No automated testing setup (`Vitest` or `Playwright`).                                                                                                     |
+| Category         | Status       | Notes                                                                                            |
+| :--------------- | :----------- | :----------------------------------------------------------------------------------------------- |
+| **Framework**    | 🟢 Excellent | Astro is perfect for high-performance content sites.                                             |
+| **Styling**      | 🟢 Excellent | Tailwind CSS + `index.css` is scalable and industry standard.                                    |
+| **Analytics**    | 🟢 Excellent | GA4, PostHog (Recordings/Heatmaps), LinkedIn, and RB2B integrated via Partytown.                 |
+| **SEO**          | 🟡 Good      | Basic title/description present. Missing Open Graph (social share cards) and Sitemap.            |
+| **Performance**  | 🟢 Good      | `Lenis` for smooth scroll is good. Assets handled well.                                          |
+| **Code Quality** | 🟢 Fixed     | `Prettier` (formatting) and `ESLint` (code checking) are now configured and enforcing standards. |
+| **Testing**      | 🔴 Missing   | No automated testing setup (`Vitest` or `Playwright`).                                           |
 
 ## 2. Why Astro is better than the alternatives for YOU
 
@@ -56,4 +56,4 @@ To take your project from "Beginner" to "Pro" without changing frameworks, here 
 > **Integrations > Building from scratch.** Don't build a database for emails. Use standard tools.
 
 - **Newsletters**: Embed a ConvertKit or Substack form.
-- **Analytics**: You have GA. Consider **PostHog** if you want to see "heatmaps" of where people click.
+- **Analytics**: GA4 and PostHog are implemented with session recordings, heatmaps, and B2B identity tracking (LinkedIn & RB2B).

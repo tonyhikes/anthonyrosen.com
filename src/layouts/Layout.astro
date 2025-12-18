@@ -4,6 +4,8 @@ import Footer from "../components/Footer.astro";
 import "../styles/global.css";
 import PostHog from "../components/PostHog.astro";
 import SEO from "../components/SEO.astro";
+import LinkedInTag from "../components/LinkedInTag.astro";
+import RB2B from "../components/RB2B.astro";
 
 interface Props {
 	title: string;
@@ -75,6 +77,8 @@ const { title } = Astro.props;
 			gtag("config", "G-7LRLJTJG4L");
 		</script>
 		<PostHog />
+		<LinkedInTag />
+		<RB2B />
 	</head>
 	<body
 		class="bg-slate-900 text-gray-900 transition-colors duration-300 selection:bg-blue-500 selection:text-white dark:text-white"
