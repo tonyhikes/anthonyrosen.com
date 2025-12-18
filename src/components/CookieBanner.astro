@@ -1,0 +1,74 @@
+---
+// Minimalistic, sophisticated cookie banner
+---
+
+<div
+	id="cookie-banner"
+	class="fixed bottom-6 right-6 z-50 translate-x-full opacity-0 transition-all duration-500 ease-out"
+>
+	<div
+		class="flex flex-col gap-4 rounded-lg border border-slate-700/50 bg-slate-900/95 px-6 py-4 backdrop-blur-sm shadow-2xl max-w-sm"
+	>
+		<div>
+			<p class="text-sm text-slate-300 leading-relaxed">
+				This site uses cookies for analytics.
+				<a
+					href="/privacy"
+					class="text-slate-100 underline decoration-slate-500 underline-offset-2 hover:decoration-slate-300 transition-colors"
+					>Privacy Policy</a
+				>
+			</p>
+		</div>
+		<div class="flex gap-3">
+			<button
+				id="cookie-accept"
+				class="flex-1 px-4 py-2 text-sm font-medium text-slate-900 bg-slate-100 rounded hover:bg-white active:scale-[0.98] transition-all duration-150"
+			>
+				Accept
+			</button>
+			<button
+				id="cookie-decline"
+				class="flex-1 px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-100 active:scale-[0.98] transition-all duration-150"
+			>
+				Decline
+			</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	// Cookie consent management
+	const CONSENT_KEY = "cookie-consent";
+	const banner = document.getElementById("cookie-banner");
+	const acceptBtn = document.getElementById("cookie-accept");
+	const declineBtn = document.getElementById("cookie-decline");
+
+	// Check if user has already responded
+	const consent = localStorage.getItem(CONSENT_KEY);
+
+	if (!consent) {
+		// Show banner with smooth animation after a brief delay
+		setTimeout(() => {
+			banner?.classList.remove("translate-x-full", "opacity-0");
+		}, 1000);
+	}
+
+	acceptBtn?.addEventListener("click", () => {
+		localStorage.setItem(CONSENT_KEY, "accepted");
+		hideBanner();
+	});
+
+	declineBtn?.addEventListener("click", () => {
+		localStorage.setItem(CONSENT_KEY, "declined");
+		hideBanner();
+		// In production, you'd disable analytics here
+		console.log("Analytics disabled by user preference");
+	});
+
+	function hideBanner() {
+		banner?.classList.add("translate-x-full", "opacity-0");
+		setTimeout(() => {
+			banner?.remove();
+		}, 500);
+	}
+</script>
