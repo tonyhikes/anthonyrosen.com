@@ -16,7 +16,7 @@ let mouseY = 0;
 let isVisible = true;
 let animationFrameId: number | null = null;
 
-function init(offscreenCanvas: OffscreenCanvas, width: number, height: number) {
+function init(offscreenCanvas: OffscreenCanvas, width: number, height: number, isMobile: boolean) {
 	canvas = offscreenCanvas;
 
 	// Scene
@@ -30,10 +30,11 @@ function init(offscreenCanvas: OffscreenCanvas, width: number, height: number) {
 	renderer = new THREE.WebGLRenderer({
 		canvas: canvas,
 		alpha: true,
-		antialias: true,
+		antialias: !isMobile, // Disable antialias on mobile for performance
 	});
 	renderer.setSize(width, height, false);
-	renderer.setPixelRatio(Math.min(2, self.devicePixelRatio || 1));
+	// Limit pixel ratio on mobile to reduce fragment shader cost
+	renderer.setPixelRatio(isMobile ? 1.0 : Math.min(2, self.devicePixelRatio || 1));
 	renderer.toneMapping = THREE.ACESFilmicToneMapping;
 	renderer.toneMappingExposure = 1.0;
 
@@ -133,7 +134,7 @@ self.onmessage = (e: MessageEvent) => {
 
 	switch (type) {
 		case "init":
-			init(data.canvas, data.width, data.height);
+			init(data.canvas, data.width, data.height, data.isMobile);
 			break;
 
 		case "mouse":

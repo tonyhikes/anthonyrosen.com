@@ -28,6 +28,9 @@
 				{ type: "module" }
 			);
 
+			// Detect mobile
+			const isMobile = window.innerWidth < 768;
+
 			// Initialize worker with canvas
 			worker.postMessage(
 				{
@@ -36,6 +39,7 @@
 						canvas: offscreen,
 						width: window.innerWidth,
 						height: window.innerHeight,
+						isMobile: isMobile,
 					},
 				},
 				[offscreen]
@@ -103,8 +107,7 @@
 
 			// Visibility helpers
 			function updateWorkerVisibility() {
-				const shouldBeVisible =
-					isVisible && !isSlammedOut && !document.hidden;
+				const shouldBeVisible = isVisible && !isSlammedOut && !document.hidden;
 				worker.postMessage({
 					type: "visibility",
 					data: { visible: shouldBeVisible },
