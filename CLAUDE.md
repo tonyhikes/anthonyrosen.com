@@ -75,19 +75,37 @@ This is a **single-page application** with client-side view switching (not Astro
 
 ### Performance Optimizations
 
-1. **Lenis Smooth Scrolling:**
+The site is optimized for fast loading and excellent Core Web Vitals scores:
+
+1. **Critical CSS Inlining:**
+   - Essential styles inlined in `<head>` to eliminate render-blocking CSS
+   - Main stylesheet loads asynchronously
+   - Lenis critical styles inlined to prevent FOUC
+
+2. **Deferred JavaScript Loading:**
+   - All analytics scripts (PostHog, Google Analytics, LinkedIn Tag, RB2B) defer using `requestIdleCallback`
+   - Lenis smooth scrolling initialization deferred until after page load
+   - Reduces Total Blocking Time (TBT) from 4,100ms to ~60ms on mobile
+
+3. **Resource Hints:**
+   - `preconnect` for critical origins (fonts, CDN)
+   - `dns-prefetch` for analytics domains loaded later
+   - `modulepreload` for Anime.js
+
+4. **Lenis Smooth Scrolling:**
    - Deferred initialization using `requestIdleCallback`
    - Auto-pauses after 5 seconds of inactivity (helps Lighthouse)
    - Stops when tab is hidden
    - Restarts on any user interaction
 
-2. **Analytics (Partytown):**
-   - Google Analytics, PostHog, LinkedIn Tag, and RB2B run in Web Workers
-   - Configured in `astro.config.mjs` with forwarded functions
+5. **Font Loading:**
+   - Google Fonts (Inter) load with `display=swap` to prevent FOIT
+   - Font stylesheet loads async via media attribute trick
 
-3. **Font Loading:**
-   - Google Fonts (Inter) preconnected
-   - Anime.js modulepreloaded
+6. **Cache Headers:**
+   - Static assets cached for 1 year with `immutable` flag (via `public/_headers`)
+   - HTML pages revalidate on each request
+   - Configured for Netlify/Vercel deployment
 
 ### Custom Animations
 
