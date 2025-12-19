@@ -15,4 +15,10 @@ export default defineConfig({
     },
 
     integrations: [react(), sitemap()],
+
+    // Performance optimizations
+    build: {
+        inlineStylesheets: "auto", // Inline small stylesheets automatically
+    },
+    compressHTML: true, // Minify HTML output
 });

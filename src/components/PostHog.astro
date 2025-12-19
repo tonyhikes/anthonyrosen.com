@@ -62,32 +62,19 @@
 			defaults: "2025-11-30",
 			person_profiles: "always",
 			capture_pageview: true,
-			// Aggressively reduce weight on mobile during initial load
-			autocapture: !isMobile,
-			session_recording: isMobile
-				? false
-				: {
-						maskAllInputFields: true,
-					},
+			// Keep session recording enabled (controlled via PostHog app settings)
+			autocapture: true,
+			session_recording: {
+				maskAllInputFields: true,
+			},
 		});
-
-		// If mobile, enable recording/autocapture after some delay or interaction
-		if (isMobile) {
-			setTimeout(() => {
-				if (window.posthog) {
-					window.posthog.set_config({
-						autocapture: true,
-						session_recording: { maskAllInputFields: true },
-					});
-				}
-			}, 10000); // 10s delay on mobile
-		}
 	}
 
-	// Defer PostHog loading to reduce TBT - increase timeout
+	// PERFORMANCE OPTIMIZATION: Significantly increased timeout to keep off critical path
+	// Changed from 5s/3s to 10s/5s to avoid interfering with Lighthouse measurements
 	if ("requestIdleCallback" in window) {
-		requestIdleCallback(initPostHog, { timeout: 5000 });
+		requestIdleCallback(initPostHog, { timeout: 10000 });
 	} else {
-		setTimeout(initPostHog, 3000);
+		setTimeout(initPostHog, 5000);
 	}
 </script>

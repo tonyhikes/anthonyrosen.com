@@ -20,11 +20,12 @@
 		})(window.lintrk);
 	}
 
-	// Defer LinkedIn Tag to reduce TBT
+	// PERFORMANCE OPTIMIZATION: Delay B2B tracking significantly
+	// Changed from 5s/3s to 15s/10s since B2B tracking is secondary to core analytics
 	if ("requestIdleCallback" in window) {
-		requestIdleCallback(initLinkedIn, { timeout: 5000 });
+		requestIdleCallback(initLinkedIn, { timeout: 15000 });
 	} else {
-		setTimeout(initLinkedIn, 3000);
+		setTimeout(initLinkedIn, 10000);
 	}
 </script>
 <noscript>

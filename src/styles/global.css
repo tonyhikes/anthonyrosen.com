@@ -1,6 +1,15 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Self-hosted Inter Variable Font */
+@font-face {
+	font-family: "Inter";
+	src: url("/fonts/inter/Inter-Variable.ttf") format("truetype-variations");
+	font-weight: 400 700;
+	font-display: swap;
+	font-style: normal;
+}
+
 @theme {
 	--animate-slam: slam 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 	--animate-shake: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
