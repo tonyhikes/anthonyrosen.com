@@ -39,17 +39,51 @@ const { title } = Astro.props;
 		/>
 		<meta name="generator" content={Astro.generator} />
 
-		<!-- Preconnect to Google Fonts for faster font loading -->
+		<!-- Preconnect to critical third-party origins -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link rel="preconnect" href="https://us.i.posthog.com" />
+		<link rel="preconnect" href="https://us-assets.i.posthog.com" />
+		<link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
+		<!-- Load fonts with display=swap and optional to avoid render blocking -->
 		<link
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
 			rel="stylesheet"
+			media="print"
+			onload="this.media='all'"
 		/>
+		<noscript>
+			<link
+				href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+				rel="stylesheet"
+			/>
+		</noscript>
+		<!-- Preload critical JavaScript modules -->
 		<link
 			rel="modulepreload"
 			href="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.es.js"
 		/>
+
+		<!-- Inline critical CSS for initial render to improve FCP -->
+		<style>
+			/* Critical above-the-fold styles */
+			html {
+				height: auto;
+			}
+			body {
+				margin: 0;
+				background-color: rgb(15 23 42); /* slate-900 */
+				color: white;
+				font-family: Inter, system-ui, -apple-system, sans-serif;
+				transition: color 0.3s, background-color 0.3s;
+			}
+			/* Prevent layout shift */
+			* {
+				box-sizing: border-box;
+			}
+		</style>
+
 		<script is:inline>
 			// Initialize Theme
 			if (
@@ -62,19 +96,30 @@ const { title } = Astro.props;
 				document.documentElement.classList.remove("dark");
 			}
 		</script>
-		<!-- Google tag (gtag.js) -->
-		<script
-			is:inline
-			async
-			src="https://www.googletagmanager.com/gtag/js?id=G-7LRLJTJG4L"></script>
+		<!-- Google tag (gtag.js) - Deferred for performance -->
 		<script is:inline>
+			// Defer Google Analytics to improve initial page load
 			window.dataLayer = window.dataLayer || [];
 			function gtag() {
 				dataLayer.push(arguments);
 			}
 			gtag("js", new Date());
-
 			gtag("config", "G-7LRLJTJG4L");
+
+			// Load GA script after page is interactive
+			function loadGA() {
+				const script = document.createElement("script");
+				script.src = "https://www.googletagmanager.com/gtag/js?id=G-7LRLJTJG4L";
+				script.async = true;
+				document.head.appendChild(script);
+			}
+
+			// Use requestIdleCallback to defer GA loading
+			if ("requestIdleCallback" in window) {
+				requestIdleCallback(loadGA, { timeout: 2000 });
+			} else {
+				setTimeout(loadGA, 2000);
+			}
 		</script>
 		<PostHog />
 		<LinkedInTag />
@@ -88,7 +133,7 @@ const { title } = Astro.props;
 		<Footer />
 		<CookieBanner />
 		<script>
-			// Defer Lenis initialization to reduce TBT
+			// Defer Lenis initialization to reduce TBT and improve LCP/FCP
 			function initLenis() {
 				import("lenis").then(({ default: Lenis }) => {
 					const lenis = new Lenis();
@@ -127,7 +172,7 @@ const { title } = Astro.props;
 									// Restart Lenis if it was stopped by idle timeout
 									startLenisLoop();
 								},
-								{ passive: true }
+								{ passive: true, once: eventType === "scroll" }
 							);
 						}
 					);
@@ -155,11 +200,24 @@ const { title } = Astro.props;
 				});
 			}
 
-			// Use requestIdleCallback to defer Lenis initialization
-			if ("requestIdleCallback" in window) {
-				requestIdleCallback(() => initLenis(), { timeout: 2000 });
+			// Delay Lenis even more aggressively - wait for page load event
+			// This moves it completely off the critical rendering path
+			if (document.readyState === "complete") {
+				// Page already loaded
+				if ("requestIdleCallback" in window) {
+					requestIdleCallback(initLenis, { timeout: 3000 });
+				} else {
+					setTimeout(initLenis, 1000);
+				}
 			} else {
-				setTimeout(initLenis, 100);
+				// Wait for load event
+				window.addEventListener("load", () => {
+					if ("requestIdleCallback" in window) {
+						requestIdleCallback(initLenis, { timeout: 3000 });
+					} else {
+						setTimeout(initLenis, 1000);
+					}
+				});
 			}
 		</script>
 	</body>
