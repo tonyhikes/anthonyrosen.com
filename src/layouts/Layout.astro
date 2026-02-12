@@ -58,12 +58,6 @@ const { title } = Astro.props;
 			crossorigin
 		/>
 
-		<!-- Preload critical JavaScript modules -->
-		<link
-			rel="modulepreload"
-			href="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"
-		/>
-
 		<!-- Inline critical CSS for initial render to improve FCP -->
 		<style>
 			/* Critical above-the-fold styles */
