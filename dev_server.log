@@ -1,0 +1,21 @@
+
+> tony-rosen-portfolio@0.0.1 dev
+> astro dev
+
+13:52:42 [types] Generated 1ms
+13:52:42 [content] Syncing content
+13:52:42 [content] Synced content
+13:52:42 [vite] Re-optimizing dependencies because vite config has changed
+
+ astro  v5.15.9 ready in 443 ms
+
+┃ Local    http://localhost:4321/
+┃ Network  use --host to expose
+
+13:52:42 watching for file changes...
+
+ update  ▶ New version of Astro available: 5.17.2
+  Run npx @astrojs/upgrade to update
+
+13:53:56 [200] / 215ms
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
