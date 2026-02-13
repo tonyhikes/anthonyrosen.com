@@ -214,9 +214,20 @@
 	const btn = document.getElementById("mobile-menu-btn");
 	const menu = document.getElementById("mobile-menu");
 
+	function closeMobileMenu() {
+		if (menu && !menu.classList.contains("hidden")) {
+			menu.classList.add("hidden");
+			btn?.setAttribute("aria-expanded", "false");
+			btn?.setAttribute("aria-label", "Open menu");
+		}
+	}
+
 	btn?.addEventListener("click", (e) => {
 		e.stopPropagation(); // Prevent immediate closing if we add document click listener
-		menu?.classList.toggle("hidden");
+		const isHidden = menu?.classList.toggle("hidden");
+		const isExpanded = !isHidden;
+		btn.setAttribute("aria-expanded", isExpanded.toString());
+		btn.setAttribute("aria-label", isExpanded ? "Close menu" : "Open menu");
 	});
 
 	// Close mobile menu when clicking outside
@@ -227,8 +238,16 @@
 			!btn?.contains(e.target as Node) &&
 			!menu.contains(e.target as Node)
 		) {
-			menu.classList.add("hidden");
+			closeMobileMenu();
 		}
+	});
+
+	// Close mobile menu when clicking ANY link inside it
+	const menuLinks = menu?.querySelectorAll("a");
+	menuLinks?.forEach((link) => {
+		link.addEventListener("click", () => {
+			closeMobileMenu();
+		});
 	});
 
 	// --- Navigation Logic ---
@@ -238,9 +257,10 @@
 			const target = (e.currentTarget as HTMLElement).dataset.target;
 			if (target) {
 				// Check if we're on the home page (/ or /index.html)
-				const isHomePage = window.location.pathname === "/" ||
-				                   window.location.pathname === "/index.html" ||
-				                   window.location.pathname.endsWith("/");
+				const isHomePage =
+					window.location.pathname === "/" ||
+					window.location.pathname === "/index.html" ||
+					window.location.pathname.endsWith("/");
 
 				if (isHomePage) {
 					// Use view switching for single-page navigation
@@ -254,10 +274,8 @@
 					window.location.href = target === "home" ? "/" : `/#${target}`;
 				}
 
-				// Close mobile menu
-				if (!menu?.classList.contains("hidden")) {
-					menu?.classList.add("hidden");
-				}
+				// Close mobile menu if open (handled by generic listener, but safe to keep/ensure)
+				closeMobileMenu();
 			}
 		});
 	});
