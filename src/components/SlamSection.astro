@@ -36,18 +36,21 @@
 
 				let hasSlammed = false;
 				let isAnimating = false;
+				let ticking = false;
+
+				// Cache DOM elements to avoid querying on every scroll
+				const container = document.getElementById("hire-section");
+				const title = document.getElementById("slam-target");
+				const subtitle = document.getElementById("subtitle");
+				const heroContent = document.getElementById("hero-content");
+				const canvasContainer = document.getElementById("canvas-container");
 
 				function checkScroll() {
+					// Reset ticking flag so next scroll event can trigger rAF
+					ticking = false;
+
 					// If currently animating, don't check scroll triggers
 					if (isAnimating) return;
-
-					const windowHeight = window.innerHeight;
-
-					const container = document.getElementById("hire-section");
-					const title = document.getElementById("slam-target");
-					const subtitle = document.getElementById("subtitle");
-					const heroContent = document.getElementById("hero-content");
-					const canvasContainer = document.getElementById("canvas-container");
 
 					if (!container) {
 						console.log("Debug: Missing container");
@@ -66,6 +69,7 @@
 						return;
 					}
 
+					const windowHeight = window.innerHeight;
 					const rect = container.getBoundingClientRect();
 
 					// Trigger when the top of the section hits the top of the viewport (or very close)
@@ -203,9 +207,18 @@
 					}
 				}
 
-				window.addEventListener("scroll", checkScroll, {
-					passive: true,
-				});
+				window.addEventListener(
+					"scroll",
+					() => {
+						if (!ticking) {
+							window.requestAnimationFrame(checkScroll);
+							ticking = true;
+						}
+					},
+					{
+						passive: true,
+					}
+				);
 				// Check once on load
 				setTimeout(() => checkScroll(), 100);
 			}
