@@ -64,8 +64,8 @@
 			// Mouse tracking
 			let lastMouseTime = 0;
 			const MOUSE_THROTTLE = 16;
-			const halfX = window.innerWidth / 2;
-			const halfY = window.innerHeight / 2;
+			let halfX = window.innerWidth / 2;
+			let halfY = window.innerHeight / 2;
 
 			document.addEventListener(
 				"mousemove",
@@ -93,6 +93,8 @@
 				() => {
 					clearTimeout(resizeTimeout);
 					resizeTimeout = setTimeout(() => {
+						halfX = window.innerWidth / 2;
+						halfY = window.innerHeight / 2;
 						worker.postMessage({
 							type: "resize",
 							data: {
