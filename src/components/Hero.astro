@@ -12,8 +12,10 @@
 		>
 			Tired of the fluff?
 		</h1>
-		<div
-			class="animate-pulse-slow flex flex-col items-center gap-2 drop-shadow-2xl"
+		<button
+			id="scroll-down-btn"
+			class="pointer-events-auto animate-pulse-slow flex flex-col items-center gap-2 drop-shadow-2xl cursor-pointer hover:scale-110 transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded-lg p-2"
+			aria-label="Scroll to content"
 		>
 			<span class="text-base font-bold tracking-widest text-blue-600 uppercase"
 				>Scroll</span
@@ -29,7 +31,7 @@
 					stroke-width="3"
 					d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg
 			>
-		</div>
+		</button>
 	</div>
 </div>
 
@@ -93,4 +95,19 @@
 			if (heroContent) heroContent.classList.remove("opacity-0");
 		});
 	}
+
+	// Scroll Down Button Logic
+	const scrollBtn = document.getElementById("scroll-down-btn");
+	scrollBtn?.addEventListener("click", () => {
+		const target = document.getElementById("hire-section");
+		if (target) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			if ((window as any).lenis) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				(window as any).lenis.scrollTo(target);
+			} else {
+				target.scrollIntoView({ behavior: "smooth" });
+			}
+		}
+	});
 </script>
