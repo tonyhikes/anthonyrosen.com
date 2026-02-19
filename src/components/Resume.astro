@@ -326,9 +326,20 @@
 	const dropdownBtn = document.getElementById("download-menu-btn");
 	const dropdownMenu = document.getElementById("download-menu");
 
+	function setDropdownState(isOpen: boolean) {
+		if (isOpen) {
+			dropdownMenu?.classList.remove("hidden");
+			dropdownBtn?.setAttribute("aria-expanded", "true");
+		} else {
+			dropdownMenu?.classList.add("hidden");
+			dropdownBtn?.setAttribute("aria-expanded", "false");
+		}
+	}
+
 	dropdownBtn?.addEventListener("click", (e) => {
 		e.stopPropagation();
-		dropdownMenu?.classList.toggle("hidden");
+		const isHidden = dropdownMenu?.classList.contains("hidden");
+		setDropdownState(!!isHidden);
 	});
 
 	// Close dropdown when clicking outside
@@ -339,7 +350,15 @@
 			!dropdownBtn.contains(e.target as Node) &&
 			!dropdownMenu.contains(e.target as Node)
 		) {
-			dropdownMenu.classList.add("hidden");
+			setDropdownState(false);
+		}
+	});
+
+	// Close dropdown with Escape key
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape" && !dropdownMenu?.classList.contains("hidden")) {
+			setDropdownState(false);
+			dropdownBtn?.focus(); // Return focus to the button
 		}
 	});
 

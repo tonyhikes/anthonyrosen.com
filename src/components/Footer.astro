@@ -94,9 +94,7 @@
 						>
 					</li>
 					<li>
-						<a
-							href="/privacy"
-							class="transition-colors hover:text-blue-400"
+						<a href="/privacy" class="transition-colors hover:text-blue-400"
 							>Privacy Policy</a
 						>
 					</li>
@@ -136,9 +134,10 @@
 			const target = (e.currentTarget as HTMLElement).dataset.target;
 			if (target) {
 				// Check if we're on the home page (/ or /index.html)
-				const isHomePage = window.location.pathname === "/" ||
-				                   window.location.pathname === "/index.html" ||
-				                   window.location.pathname.endsWith("/");
+				const isHomePage =
+					window.location.pathname === "/" ||
+					window.location.pathname === "/index.html" ||
+					window.location.pathname.endsWith("/");
 
 				if (isHomePage) {
 					// Use view switching for single-page navigation

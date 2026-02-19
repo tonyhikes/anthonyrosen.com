@@ -9,16 +9,16 @@ import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
-    site: "https://anthonyrosen.com",
-    vite: {
-        plugins: [tailwindcss()],
-    },
+	site: "https://anthonyrosen.com",
+	vite: {
+		plugins: [tailwindcss()],
+	},
 
-    integrations: [react(), sitemap()],
+	integrations: [react(), sitemap()],
 
-    // Performance optimizations
-    build: {
-        inlineStylesheets: "auto", // Inline small stylesheets automatically
-    },
-    compressHTML: true, // Minify HTML output
+	// Performance optimizations
+	build: {
+		inlineStylesheets: "auto", // Inline small stylesheets automatically
+	},
+	compressHTML: true, // Minify HTML output
 });

@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Tony Rosen's portfolio website - a single-page application built with Astro, featuring a 3D Three.js hero background, smooth scrolling with Lenis, and comprehensive analytics integration.
 
 **Tech Stack:**
+
 - **Framework:** Astro 5 with React integration
 - **Styling:** Tailwind CSS 4 (with Preline UI plugin)
 - **3D Graphics:** Three.js (runs in Web Worker via OffscreenCanvas)
@@ -47,6 +48,7 @@ This is a **single-page application** with client-side view switching (not Astro
 - `/#colophon` - Colophon view
 
 **How it works:**
+
 1. Navbar dispatches `view-change` custom events
 2. `index.astro` listens for these events and shows/hides view containers
 3. Each view change triggers analytics pageviews (GA4 + PostHog)
@@ -69,6 +71,7 @@ This is a **single-page application** with client-side view switching (not Astro
 **3D Asset:** `/public/cotton_ball-v1.glb` (loaded via GLTFLoader with Draco compression)
 
 **Visibility states:**
+
 - Shows on home view only
 - Hides during "slam" interactions
 - Starts idle after 5 seconds without user interaction (for Lighthouse)
@@ -116,6 +119,7 @@ Defined in `src/styles/global.css`:
 - **`pulse-slow`** - Slow pulse (3s infinite, used in Hero scroll indicator)
 
 Custom utility class:
+
 - `.slam-text` - Text shadow effect for slam interactions
 
 ### Analytics Integration
@@ -196,6 +200,7 @@ Components like `ImpactCharts.astro` defensively handle potentially undefined da
 ### Scroll Interactions
 
 The Hero section fades out as user scrolls (opacity calculated from scroll position). This is coordinated with:
+
 - Lenis smooth scrolling
 - `sticky-hero` positioning (fixed → absolute when scrolled past)
 - Content layer with `margin-top: 100vh` to reveal fixed hero
@@ -203,6 +208,7 @@ The Hero section fades out as user scrolls (opacity calculated from scroll posit
 ### Slam Interactions
 
 The "slam" effect is a coordinated animation across multiple components:
+
 1. User triggers slam (button click in SlamSection)
 2. Custom `slam` event dispatched
 3. Hero content hides
