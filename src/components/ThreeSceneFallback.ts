@@ -105,6 +105,7 @@ if (container && canvas) {
 			lastMouseTime = now;
 			mouseX = (e.clientX - halfX) / halfX;
 			mouseY = (e.clientY - halfY) / halfY;
+			startAnimation();
 		},
 		{ passive: true }
 	);
@@ -124,15 +125,45 @@ if (container && canvas) {
 			animationFrameId = null;
 			return;
 		}
-		animationFrameId = requestAnimationFrame(animate);
+
+		let settled = false;
 
 		if (group) {
-			group.rotation.y += 0.05 * (mouseX * Math.PI - group.rotation.y);
-			group.rotation.x += 0.05 * (mouseY * 0.5 - group.rotation.x);
-			group.position.x += 0.05 * (-mouseX * 0.6 - group.position.x);
-			group.position.y += 0.05 * (mouseY * 0.6 - group.position.y);
+			const targetRotY = mouseX * Math.PI;
+			const targetRotX = mouseY * 0.5;
+
+			const diffRotY = targetRotY - group.rotation.y;
+			const diffRotX = targetRotX - group.rotation.x;
+
+			group.rotation.y += 0.05 * diffRotY;
+			group.rotation.x += 0.05 * diffRotX;
+
+			const targetPosX = -mouseX * 0.6;
+			const targetPosY = mouseY * 0.6;
+
+			const diffPosX = targetPosX - group.position.x;
+			const diffPosY = targetPosY - group.position.y;
+
+			group.position.x += 0.05 * diffPosX;
+			group.position.y += 0.05 * diffPosY;
+
+			// PERFORMANCE OPTIMIZATION: Stop animation loop if movement is negligible
+			if (
+				Math.abs(diffRotY) < 0.001 &&
+				Math.abs(diffRotX) < 0.001 &&
+				Math.abs(diffPosX) < 0.001 &&
+				Math.abs(diffPosY) < 0.001
+			) {
+				settled = true;
+			}
 		}
 		renderer.render(scene, camera);
+
+		if (settled && group) {
+			animationFrameId = null;
+		} else {
+			animationFrameId = requestAnimationFrame(animate);
+		}
 	}
 
 	function startAnimation() {
@@ -178,6 +209,7 @@ if (container && canvas) {
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 				renderer.setSize(window.innerWidth, window.innerHeight);
+				startAnimation();
 			}, 100);
 		},
 		{ passive: true }
