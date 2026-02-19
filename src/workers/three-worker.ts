@@ -16,7 +16,12 @@ let mouseY = 0;
 let isVisible = true;
 let animationFrameId: number | null = null;
 
-function init(offscreenCanvas: OffscreenCanvas, width: number, height: number, isMobile: boolean) {
+function init(
+	offscreenCanvas: OffscreenCanvas,
+	width: number,
+	height: number,
+	isMobile: boolean
+) {
 	canvas = offscreenCanvas;
 
 	// Scene
@@ -34,7 +39,9 @@ function init(offscreenCanvas: OffscreenCanvas, width: number, height: number, i
 	});
 	renderer.setSize(width, height, false);
 	// Limit pixel ratio on mobile to reduce fragment shader cost
-	renderer.setPixelRatio(isMobile ? 1.0 : Math.min(2, self.devicePixelRatio || 1));
+	renderer.setPixelRatio(
+		isMobile ? 1.0 : Math.min(2, self.devicePixelRatio || 1)
+	);
 	renderer.toneMapping = THREE.ACESFilmicToneMapping;
 	renderer.toneMappingExposure = 1.0;
 

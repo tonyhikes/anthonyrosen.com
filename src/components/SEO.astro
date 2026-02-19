@@ -36,16 +36,16 @@ const socialImageURL = new URL(image, Astro.url);
 <meta property="twitter:image" content={socialImageURL} />
 
 <!-- Structured Data (JSON-LD) -->
-<script type="application/ld+json" set:html={JSON.stringify({
-	"@context": "https://schema.org",
-	"@type": "Person",
-	"name": "Tony Rosen",
-	"alternateName": "Anthony Rosen",
-	"jobTitle": "Marketing & Creative Project Manager",
-	"url": "https://anthonyrosen.com",
-	"email": "mailto:anthonyrosen@gmail.com",
-	"sameAs": [
-		"https://linkedin.com/in/anthonyrosen"
-	]
-})} />
-
+<script
+	type="application/ld+json"
+	set:html={JSON.stringify({
+		"@context": "https://schema.org",
+		"@type": "Person",
+		name: "Tony Rosen",
+		alternateName: "Anthony Rosen",
+		jobTitle: "Marketing & Creative Project Manager",
+		url: "https://anthonyrosen.com",
+		email: "mailto:anthonyrosen@gmail.com",
+		sameAs: ["https://linkedin.com/in/anthonyrosen"],
+	})}
+/>
