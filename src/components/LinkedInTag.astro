@@ -1,39 +1,75 @@
 <!-- LinkedIn Insight Tag - Deferred for performance -->
 <script is:inline>
-	function initLinkedIn() {
-		_linkedin_partner_id = "8445700";
-		window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
-		window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+	(() => {
+		const CONSENT_KEY = "cookie-consent";
+		const ANALYTICS_READY_EVENT = "anthony-analytics-ready";
+		let linkedInScheduled = false;
+		let linkedInWaitingForReady = false;
 
-		(function (l) {
-			if (!l) {
-				window.lintrk = function (a, b) {
-					window.lintrk.q.push([a, b]);
-				};
-				window.lintrk.q = [];
+		function initLinkedIn() {
+			_linkedin_partner_id = "8445700";
+			window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+			window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+
+			(function (l) {
+				if (!l) {
+					window.lintrk = function (a, b) {
+						window.lintrk.q.push([a, b]);
+					};
+					window.lintrk.q = [];
+				}
+				var s = document.getElementsByTagName("script")[0];
+				var b = document.createElement("script");
+				b.async = true;
+				b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+				s.parentNode.insertBefore(b, s);
+			})(window.lintrk);
+		}
+
+		function scheduleLinkedIn() {
+			if (linkedInScheduled) return;
+			linkedInScheduled = true;
+
+			// PERFORMANCE OPTIMIZATION: Delay B2B tracking significantly
+			// Changed from 5s/3s to 15s/10s since B2B tracking is secondary to core analytics
+			if ("requestIdleCallback" in window) {
+				requestIdleCallback(initLinkedIn, { timeout: 15000 });
+			} else {
+				setTimeout(initLinkedIn, 10000);
 			}
-			var s = document.getElementsByTagName("script")[0];
-			var b = document.createElement("script");
-			b.async = true;
-			b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
-			s.parentNode.insertBefore(b, s);
-		})(window.lintrk);
-	}
+		}
 
-	// PERFORMANCE OPTIMIZATION: Delay B2B tracking significantly
-	// Changed from 5s/3s to 15s/10s since B2B tracking is secondary to core analytics
-	if ("requestIdleCallback" in window) {
-		requestIdleCallback(initLinkedIn, { timeout: 15000 });
-	} else {
-		setTimeout(initLinkedIn, 10000);
-	}
+		function requestLinkedInStart() {
+			if (linkedInScheduled) return;
+
+			if (window.__anthonyAnalyticsReady) {
+				scheduleLinkedIn();
+				return;
+			}
+
+			if (linkedInWaitingForReady) return;
+			linkedInWaitingForReady = true;
+
+			window.addEventListener(
+				ANALYTICS_READY_EVENT,
+				() => {
+					linkedInWaitingForReady = false;
+					scheduleLinkedIn();
+				},
+				{ once: true }
+			);
+
+			window.__armAnthonyAnalyticsReady?.();
+		}
+
+		if (localStorage.getItem(CONSENT_KEY) === "accepted") {
+			requestLinkedInStart();
+		}
+
+		window.addEventListener("cookie-consent-updated", (event) => {
+			if (event && event.detail === "accepted") {
+				requestLinkedInStart();
+			}
+		});
+	})();
 </script>
-<noscript>
-	<img
-		height="1"
-		width="1"
-		style="display:none;"
-		alt=""
-		src="https://px.ads.linkedin.com/collect/?pid=8445700&fmt=gif"
-	/>
-</noscript>

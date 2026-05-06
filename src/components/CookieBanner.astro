@@ -4,7 +4,7 @@
 
 <div
 	id="cookie-banner"
-	class="fixed bottom-6 right-6 z-50 translate-x-full opacity-0 transition-all duration-500 ease-out"
+	class="pointer-events-none fixed right-6 bottom-6 z-50 opacity-0 transition-opacity duration-300 ease-out"
 >
 	<div
 		class="flex flex-col gap-4 rounded-lg border border-slate-700/50 bg-slate-900/95 px-6 py-4 backdrop-blur-sm shadow-2xl max-w-sm"
@@ -49,24 +49,26 @@
 	if (!consent) {
 		// Show banner with smooth animation after a brief delay
 		setTimeout(() => {
-			banner?.classList.remove("translate-x-full", "opacity-0");
+			banner?.classList.remove("opacity-0", "pointer-events-none");
 		}, 1000);
 	}
 
 	acceptBtn?.addEventListener("click", () => {
 		localStorage.setItem(CONSENT_KEY, "accepted");
+		window.dispatchEvent(new CustomEvent("cookie-consent-updated", { detail: "accepted" }));
 		hideBanner();
 	});
 
 	declineBtn?.addEventListener("click", () => {
 		localStorage.setItem(CONSENT_KEY, "declined");
+		window.dispatchEvent(new CustomEvent("cookie-consent-updated", { detail: "declined" }));
 		hideBanner();
 		// In production, you'd disable analytics here
 		console.log("Analytics disabled by user preference");
 	});
 
 	function hideBanner() {
-		banner?.classList.add("translate-x-full", "opacity-0");
+		banner?.classList.add("opacity-0", "pointer-events-none");
 		setTimeout(() => {
 			banner?.remove();
 		}, 500);

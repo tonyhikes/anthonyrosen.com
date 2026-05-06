@@ -1,24 +1,6 @@
 ---
 import PortfolioV2 from "./PortfolioV2.astro";
 
-const heroTiles = [
-	{
-		title: "Science Magazine",
-		label: "Publishing Operations",
-		src: "/portfolio/publishing-operations/1.jpg",
-	},
-	{
-		title: "Annual Reports",
-		label: "Editorial Systems",
-		src: "/portfolio/annual-reports/01.jpg",
-	},
-	{
-		title: "RxExplorer",
-		label: "Product Marketing",
-		src: "/portfolio/rxexplorer-product-brochure/01.jpg",
-	},
-];
-
 const previewImages: Record<string, string> = {
 	"annual-reports-study": "/portfolio/annual-reports/01.jpg",
 	"rxexplorer-study": "/portfolio/rxexplorer-product-brochure/01.jpg",
@@ -41,9 +23,9 @@ const previewImages: Record<string, string> = {
 };
 ---
 
-<PortfolioV2 />
+<PortfolioV2 portfolioVersion="v3" />
 
-<script define:vars={{ heroTiles, previewImages }}>
+<script define:vars={{ previewImages }}>
 	function initPortfolioV3() {
 		const root = document.getElementById("portfolio-view");
 		if (!root || root.dataset.v3Init === "true") return;
@@ -78,72 +60,62 @@ const previewImages: Record<string, string> = {
 						}
 					}
 
-					if (mode === "hero") {
-						const tile = image.closest(".v3-hero-tile");
-						if (tile instanceof HTMLElement) {
-							tile.classList.add("v3-hero-tile--fallback");
-							image.remove();
-						}
-					}
 				});
 			});
 		};
 
-		const overview = root.querySelector("#v2-page-overview");
-		const heroLead = overview?.querySelector("section:first-of-type > div:first-of-type");
+		const hydratePortfolioVisuals = () => {
+			if (root.dataset.v3Hydrated === "true") return;
+			root.dataset.v3Hydrated = "true";
 
-		if (heroLead && !heroLead.querySelector(".v3-hero-strip")) {
-			heroLead.insertAdjacentHTML(
-				"beforeend",
-				`
-					<div class="v3-hero-strip" aria-hidden="true">
-						${heroTiles
-							.map(
-								(tile) => `
-									<article class="v3-hero-tile">
-										<img src="${tile.src}" alt="" class="v3-hero-image" loading="eager" decoding="async" data-v3-image="hero" />
-										<div class="v3-hero-meta">
-											<p>${tile.label}</p>
-											<h3>${tile.title}</h3>
-										</div>
-									</article>
-								`
-							)
-							.join("")}
-					</div>
-				`
-			);
+			root.querySelectorAll(".v2-dir-row").forEach((row) => {
+				if (!(row instanceof HTMLElement)) return;
+				if (row.dataset.v3ThumbReady === "true") return;
+
+				const thumb = row.querySelector(".v2-thumb");
+				const pageTrigger = row.querySelector("[data-v2-page]");
+				if (!(thumb instanceof HTMLElement) || !(pageTrigger instanceof HTMLElement)) return;
+
+				const pageId = pageTrigger.dataset.v2Page ?? "";
+				const src = previewImages[pageId];
+				row.dataset.v3ThumbReady = "true";
+
+				if (src) {
+					thumb.classList.add("v3-thumb-has-image");
+					thumb.innerHTML = `
+						<img
+							src="${src}"
+							alt=""
+							class="v3-thumb-image"
+							loading="lazy"
+							decoding="async"
+							fetchpriority="low"
+							data-v3-image="thumb"
+						/>
+						<span class="v3-thumb-sheen"></span>
+					`;
+				} else {
+					thumb.classList.add("v3-thumb-fallback");
+					thumb.innerHTML = renderThumbFallback();
+				}
+			});
+
+			root.querySelectorAll("#v2-page-overview .v2-entrance").forEach((section) => {
+				if (section instanceof HTMLElement) section.classList.add("v2-visible");
+			});
+
+			bindImageFallbacks();
+		};
+
+		if (window.location.hash === "#portfolio" || !root.classList.contains("hidden")) {
+			hydratePortfolioVisuals();
 		}
 
-		root.querySelectorAll(".v2-dir-row").forEach((row) => {
-			if (!(row instanceof HTMLElement)) return;
-			if (row.dataset.v3ThumbReady === "true") return;
-
-			const thumb = row.querySelector(".v2-thumb");
-			const pageTrigger = row.querySelector("[data-v2-page]");
-			if (!(thumb instanceof HTMLElement) || !(pageTrigger instanceof HTMLElement)) return;
-
-			const pageId = pageTrigger.dataset.v2Page ?? "";
-			const src = previewImages[pageId];
-			row.dataset.v3ThumbReady = "true";
-
-			if (src) {
-				thumb.classList.add("v3-thumb-has-image");
-				thumb.innerHTML = `
-					<img src="${src}" alt="" class="v3-thumb-image" loading="eager" decoding="async" data-v3-image="thumb" />
-					<span class="v3-thumb-sheen"></span>
-				`;
-			} else {
-				thumb.classList.add("v3-thumb-fallback");
-				thumb.innerHTML = renderThumbFallback();
+		window.addEventListener("view-change", (event) => {
+			if (event && event.detail === "portfolio") {
+				hydratePortfolioVisuals();
 			}
 		});
-
-		root.querySelectorAll("#v2-page-overview .v2-entrance").forEach((section) => {
-			if (section instanceof HTMLElement) section.classList.add("v2-visible");
-		});
-
-		bindImageFallbacks();
 	}
 
 	if (document.readyState === "loading") {
@@ -175,8 +147,9 @@ const previewImages: Record<string, string> = {
 		padding-top: 6.5rem;
 	}
 
-	#portfolio-view[data-portfolio-version="v3"] aside {
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside {
 		position: relative;
+		align-self: start;
 		border-color: rgba(15, 23, 42, 0.96);
 		background:
 			linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.96)),
@@ -184,12 +157,12 @@ const previewImages: Record<string, string> = {
 		box-shadow: 0 28px 70px rgba(15, 23, 42, 0.22);
 	}
 
-	.dark #portfolio-view[data-portfolio-version="v3"] aside {
+	.dark #portfolio-view[data-portfolio-version="v3"] > div > div > aside {
 		border-color: rgba(71, 85, 105, 0.9);
 		box-shadow: 0 28px 70px rgba(2, 6, 23, 0.5);
 	}
 
-	#portfolio-view[data-portfolio-version="v3"] aside::before {
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside::before {
 		content: "";
 		position: absolute;
 		left: 0;
@@ -199,42 +172,48 @@ const previewImages: Record<string, string> = {
 		background: linear-gradient(180deg, rgba(96, 165, 250, 0.95), rgba(14, 165, 233, 0.3));
 	}
 
-	#portfolio-view[data-portfolio-version="v3"] aside > div:first-child,
-	#portfolio-view[data-portfolio-version="v3"] aside > div:last-child {
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside > div:first-child,
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside > div:last-child {
 		border-color: rgba(71, 85, 105, 0.72);
 	}
 
-	#portfolio-view[data-portfolio-version="v3"] aside button,
-	#portfolio-view[data-portfolio-version="v3"] aside p,
-	#portfolio-view[data-portfolio-version="v3"] aside span {
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside button,
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside p,
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside span {
 		color: rgba(226, 232, 240, 0.94);
 	}
 
-	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-900,
-	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-700,
-	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-600,
-	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-500,
-	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-300,
-	#portfolio-view[data-portfolio-version="v3"] aside .text-white {
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside .text-slate-900,
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside .text-slate-700,
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside .text-slate-600,
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside .text-slate-500,
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside .text-slate-300,
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside .text-white {
 		color: rgba(241, 245, 249, 0.98) !important;
 	}
 
-	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-700,
-	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-600,
-	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-500 {
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside .text-slate-700,
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside .text-slate-600,
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside .text-slate-500 {
 		color: rgb(226 232 240);
 	}
 
-	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-400 {
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside .text-slate-400 {
 		color: rgba(191, 219, 254, 0.88) !important;
 	}
 
-	#portfolio-view[data-portfolio-version="v3"] aside .border-slate-200 {
+	#portfolio-view[data-portfolio-version="v3"] > div > div > aside .border-slate-200 {
 		border-color: rgba(71, 85, 105, 0.72);
 	}
 
 	#portfolio-view[data-portfolio-version="v3"] .v2-toc-scroll {
-		scrollbar-color: rgba(96, 165, 250, 0.92) transparent;
+		scrollbar-width: auto;
+		scrollbar-gutter: stable both-edges;
+		scrollbar-color: rgba(96, 165, 250, 0.92) rgba(15, 23, 42, 0.22);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-toc-scroll::-webkit-scrollbar {
+		width: 14px;
 	}
 
 	#portfolio-view[data-portfolio-version="v3"] .v2-toc-scroll::-webkit-scrollbar-track {
@@ -245,6 +224,9 @@ const previewImages: Record<string, string> = {
 	#portfolio-view[data-portfolio-version="v3"] .v2-toc-scroll::-webkit-scrollbar-thumb {
 		background: linear-gradient(180deg, rgb(96 165 250), rgb(14 165 233));
 		border-color: rgb(15 23 42);
+		border-radius: 999px;
+		background-clip: padding-box;
+		box-shadow: inset 0 0 0 1px rgba(191, 219, 254, 0.2);
 	}
 
 	#portfolio-view[data-portfolio-version="v3"] .v2-toc-item {
@@ -318,81 +300,16 @@ const previewImages: Record<string, string> = {
 		gap: 2rem;
 	}
 
-	#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child > div:first-child h1 {
+	#portfolio-view[data-portfolio-version="v3"] .v3-hero-copy h1 {
 		max-width: 12ch;
 		font-size: clamp(3.25rem, 5.5vw, 5.6rem);
 		line-height: 0.95;
 		letter-spacing: -0.06em;
 	}
 
-	#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child > div:first-child p:last-of-type {
+	#portfolio-view[data-portfolio-version="v3"] .v3-hero-copy p:last-of-type {
 		max-width: 56rem;
 		font-size: 1.02rem;
-	}
-
-	#portfolio-view[data-portfolio-version="v3"] .v3-hero-strip {
-		display: grid;
-		gap: 1rem;
-		margin-top: 2rem;
-	}
-
-	#portfolio-view[data-portfolio-version="v3"] .v3-hero-tile {
-		position: relative;
-		overflow: hidden;
-		border: 1px solid rgba(191, 219, 254, 0.9);
-		min-height: 12rem;
-		background: rgba(255, 255, 255, 0.9);
-	}
-
-	.dark #portfolio-view[data-portfolio-version="v3"] .v3-hero-tile {
-		border-color: rgba(71, 85, 105, 0.88);
-		background: rgba(15, 23, 42, 0.84);
-	}
-
-	#portfolio-view[data-portfolio-version="v3"] .v3-hero-tile--fallback {
-		background:
-			linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(239, 246, 255, 0.92)),
-			radial-gradient(circle at top right, rgba(59, 130, 246, 0.2), transparent 42%);
-	}
-
-	.dark #portfolio-view[data-portfolio-version="v3"] .v3-hero-tile--fallback {
-		background:
-			linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.94)),
-			radial-gradient(circle at top right, rgba(59, 130, 246, 0.2), transparent 42%);
-	}
-
-	#portfolio-view[data-portfolio-version="v3"] .v3-hero-image {
-		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-
-	#portfolio-view[data-portfolio-version="v3"] .v3-hero-meta {
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		padding: 1rem;
-		background: linear-gradient(180deg, transparent, rgba(15, 23, 42, 0.88));
-		color: white;
-	}
-
-	#portfolio-view[data-portfolio-version="v3"] .v3-hero-meta p {
-		margin: 0;
-		font-size: 0.65rem;
-		font-weight: 700;
-		letter-spacing: 0.22em;
-		text-transform: uppercase;
-		color: rgba(191, 219, 254, 0.88);
-	}
-
-	#portfolio-view[data-portfolio-version="v3"] .v3-hero-meta h3 {
-		margin: 0.5rem 0 0;
-		font-size: 1.2rem;
-		font-weight: 800;
-		letter-spacing: -0.03em;
 	}
 
 	#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child > div:last-child {
@@ -609,6 +526,28 @@ const previewImages: Record<string, string> = {
 			radial-gradient(circle at top right, rgba(59, 130, 246, 0.16), transparent 42%);
 	}
 
+	#portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) > .mt-6 > aside > p:first-child {
+		color: rgb(37 99 235);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) > .mt-6 > aside ul {
+		color: rgb(30 41 59);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) > .mt-6 > aside li span:last-child {
+		color: rgb(15 23 42);
+		font-weight: 600;
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) > .mt-6 > aside > p:first-child {
+		color: rgba(191, 219, 254, 0.92);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) > .mt-6 > aside ul,
+	.dark #portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) > .mt-6 > aside li span:last-child {
+		color: rgba(226, 232, 240, 0.96);
+	}
+
 	#portfolio-view[data-portfolio-version="v3"] .v2-lightbox {
 		background: rgba(2, 6, 23, 0.82);
 		backdrop-filter: blur(18px);
@@ -619,21 +558,33 @@ const previewImages: Record<string, string> = {
 		box-shadow: 0 32px 90px rgba(2, 6, 23, 0.5);
 	}
 
-	@media (min-width: 768px) {
-		#portfolio-view[data-portfolio-version="v3"] .v3-hero-strip {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
-	}
-
 	@media (min-width: 1024px) {
-		#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child > div:first-child {
-			grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
-			align-items: end;
+		#portfolio-view[data-portfolio-version="v3"] .v3-hero-copy {
+			max-width: 42rem;
 		}
 
 		#portfolio-view[data-portfolio-version="v3"] #sec-marketing > div:last-child,
 		#portfolio-view[data-portfolio-version="v3"] #sec-proposal > div:last-child {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (min-width: 1280px) {
+		#portfolio-view[data-portfolio-version="v3"] > div > div {
+			grid-template-columns: 17rem minmax(0, 1fr);
+			align-items: start;
+		}
+
+		#portfolio-view[data-portfolio-version="v3"] > div > div > aside {
+			display: flex !important;
+			grid-column: 1;
+			grid-row: 1;
+			top: 0;
+		}
+
+		#portfolio-view[data-portfolio-version="v3"] main {
+			grid-column: 2;
+			grid-row: 1;
 		}
 	}
 </style>

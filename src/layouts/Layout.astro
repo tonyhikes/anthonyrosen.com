@@ -49,15 +49,6 @@ const { title } = Astro.props;
 		<link rel="dns-prefetch" href="https://snap.licdn.com" />
 		<link rel="dns-prefetch" href="https://ddwl4m2hdecbv.cloudfront.net" />
 
-		<!-- Preload self-hosted Inter variable font -->
-		<link
-			rel="preload"
-			href="/fonts/inter/Inter-Variable.ttf"
-			as="font"
-			type="font/ttf"
-			crossorigin
-		/>
-
 		<!-- Preload critical JavaScript modules -->
 		<link
 			rel="modulepreload"
@@ -65,7 +56,7 @@ const { title } = Astro.props;
 		/>
 
 		<!-- Inline critical CSS for initial render to improve FCP -->
-		<style>
+		<style is:inline>
 			/* Critical above-the-fold styles */
 			html {
 				height: auto;
@@ -87,6 +78,13 @@ const { title } = Astro.props;
 			* {
 				box-sizing: border-box;
 			}
+			/* Keep Tailwind visibility classes working before the main stylesheet loads */
+			.hidden {
+				display: none;
+			}
+			.block {
+				display: block;
+			}
 			/* Lenis critical styles - inlined to prevent FOUC */
 			html.lenis,
 			html.lenis body {
@@ -97,6 +95,18 @@ const { title } = Astro.props;
 			}
 			.lenis.lenis-stopped {
 				overflow: hidden;
+			}
+			html[data-initial-view="resume"] #home-view,
+			html[data-initial-view="portfolio"] #home-view,
+			html[data-initial-view="styleguide"] #home-view,
+			html[data-initial-view="colophon"] #home-view {
+				display: none !important;
+			}
+			html[data-initial-view="resume"] #resume-view,
+			html[data-initial-view="portfolio"] #portfolio-view,
+			html[data-initial-view="styleguide"] #styleguide-view,
+			html[data-initial-view="colophon"] #colophon-view {
+				display: block !important;
 			}
 		</style>
 
@@ -112,8 +122,67 @@ const { title } = Astro.props;
 				document.documentElement.classList.remove("dark");
 			}
 		</script>
+		<script is:inline>
+			const initialHashView = window.location.hash.replace("#", "");
+			if (["resume", "portfolio", "styleguide", "colophon"].includes(initialHashView)) {
+				document.documentElement.dataset.initialView = initialHashView;
+			}
+		</script>
+		<script is:inline>
+			const ANALYTICS_READY_EVENT = "anthony-analytics-ready";
+			const analyticsInteractionEvents = [
+				"pointerdown",
+				"keydown",
+				"touchstart",
+				"wheel",
+			];
+
+			if (!window.__armAnthonyAnalyticsReady) {
+				let analyticsFallbackTimer;
+
+				const markAnalyticsReady = () => {
+					if (window.__anthonyAnalyticsReady) return;
+					window.__anthonyAnalyticsReady = true;
+					window.__anthonyAnalyticsReadyArmed = false;
+
+					analyticsInteractionEvents.forEach((eventName) => {
+						window.removeEventListener(eventName, markAnalyticsReady);
+					});
+
+					if (analyticsFallbackTimer) {
+						clearTimeout(analyticsFallbackTimer);
+					}
+
+					window.dispatchEvent(new CustomEvent(ANALYTICS_READY_EVENT));
+				};
+
+				window.__armAnthonyAnalyticsReady = () => {
+					if (window.__anthonyAnalyticsReady) {
+						window.dispatchEvent(new CustomEvent(ANALYTICS_READY_EVENT));
+						return;
+					}
+
+					if (window.__anthonyAnalyticsReadyArmed) return;
+					window.__anthonyAnalyticsReadyArmed = true;
+
+					analyticsInteractionEvents.forEach((eventName) => {
+						window.addEventListener(eventName, markAnalyticsReady, {
+							passive: true,
+							once: true,
+						});
+					});
+
+					// Quiet sessions still eventually initialize analytics.
+					analyticsFallbackTimer = window.setTimeout(markAnalyticsReady, 15000);
+				};
+			}
+		</script>
 		<!-- Google tag (gtag.js) - Deferred for performance -->
 		<script is:inline>
+			const CONSENT_KEY = "cookie-consent";
+			let gaScheduled = false;
+			let gaWaitingForReady = false;
+
 			// Defer Google Analytics to improve initial page load
 			window.dataLayer = window.dataLayer || [];
 			function gtag() {
@@ -130,13 +199,51 @@ const { title } = Astro.props;
 				document.head.appendChild(script);
 			}
 
-			// PERFORMANCE OPTIMIZATION: Increased timeout to keep GA off critical path
-			// Changed from 5s to 10s to avoid interfering with Lighthouse measurements
-			if ("requestIdleCallback" in window) {
-				requestIdleCallback(loadGA, { timeout: 10000 });
-			} else {
-				setTimeout(loadGA, 5000);
+			function scheduleGA() {
+				if (gaScheduled) return;
+				gaScheduled = true;
+
+				// PERFORMANCE OPTIMIZATION: Increased timeout to keep GA off critical path
+				// Changed from 5s to 10s to avoid interfering with Lighthouse measurements
+				if ("requestIdleCallback" in window) {
+					requestIdleCallback(loadGA, { timeout: 10000 });
+				} else {
+					setTimeout(loadGA, 5000);
+				}
 			}
+
+			function requestGAStart() {
+				if (gaScheduled) return;
+
+				if (window.__anthonyAnalyticsReady) {
+					scheduleGA();
+					return;
+				}
+
+				if (gaWaitingForReady) return;
+				gaWaitingForReady = true;
+
+				window.addEventListener(
+					ANALYTICS_READY_EVENT,
+					() => {
+						gaWaitingForReady = false;
+						scheduleGA();
+					},
+					{ once: true }
+				);
+
+				window.__armAnthonyAnalyticsReady?.();
+			}
+
+			if (localStorage.getItem(CONSENT_KEY) === "accepted") {
+				requestGAStart();
+			}
+
+			window.addEventListener("cookie-consent-updated", (event) => {
+				if (event.detail === "accepted") {
+					requestGAStart();
+				}
+			});
 		</script>
 		<PostHog />
 		<LinkedInTag />

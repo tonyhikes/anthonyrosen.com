@@ -18,11 +18,26 @@
 	} else {
 		// Check for OffscreenCanvas support
 		const supportsOffscreen = "transferControlToOffscreen" in canvas;
+		const initialHash = window.location.hash.replace("#", "");
+		const shouldInitImmediately = !initialHash || initialHash === "home";
+		let sceneInitialized = false;
 
-		if (supportsOffscreen) {
+		const waitForHomeView = (callback: () => void) => {
+			const startOnHome = (e: Event) => {
+				if ((e as CustomEvent).detail !== "home") return;
+				window.removeEventListener("view-change", startOnHome);
+				callback();
+			};
+
+			window.addEventListener("view-change", startOnHome);
+		};
+
+		const initOffscreenScene = () => {
+			if (sceneInitialized) return;
+			sceneInitialized = true;
+
 			// --- WEB WORKER PATH (Modern browsers) ---
 			const offscreen = canvas.transferControlToOffscreen();
-
 			const worker = new Worker(
 				new URL("../workers/three-worker.ts", import.meta.url),
 				{ type: "module" }
@@ -168,11 +183,28 @@
 				}
 				updateWorkerVisibility();
 			});
-		} else {
+		};
+
+		const initFallbackScene = () => {
+			if (sceneInitialized) return;
+			sceneInitialized = true;
+
 			// --- FALLBACK PATH (No OffscreenCanvas support) ---
 			// Dynamically import the legacy inline version
 			console.log("OffscreenCanvas not supported, using fallback");
 			import("./ThreeSceneFallback.ts");
+		};
+
+		if (supportsOffscreen) {
+			if (shouldInitImmediately) {
+				initOffscreenScene();
+			} else {
+				waitForHomeView(initOffscreenScene);
+			}
+		} else if (shouldInitImmediately) {
+			initFallbackScene();
+		} else {
+			waitForHomeView(initFallbackScene);
 		}
 	}
 </script>

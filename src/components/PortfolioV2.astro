@@ -169,6 +169,11 @@ const marketingItems: DirectoryItem[] = [
 	},
 ];
 
+const hiddenMarketingItemIds = new Set([
+	"kepro-logo-reveal-video",
+	"rxexplorer-product-brochure",
+]);
+
 const proposalItems: DirectoryItem[] = [
 	{
 		id: "covers",
@@ -697,6 +702,14 @@ const caseStudies: CaseStudy[] = [
 	},
 ];
 
+const hiddenCaseStudyIds = new Set(["kepro-video-study", "rxexplorer-study"]);
+const visibleMarketingItems = marketingItems.filter(
+	(item) => !hiddenMarketingItemIds.has(item.id)
+);
+const visibleCaseStudies = caseStudies.filter(
+	(study) => !hiddenCaseStudyIds.has(study.id)
+);
+
 /* ─── TOC structure ─── */
 
 const tocSections = [
@@ -707,8 +720,8 @@ const tocSections = [
 	{
 		label: "Marketing",
 		target: "sec-marketing",
-		count: marketingItems.length,
-		children: marketingItems.map((item) => ({
+		count: visibleMarketingItems.length,
+		children: visibleMarketingItems.map((item) => ({
 			label: item.title,
 			target: item.detailPage ?? item.id,
 			isPage: !!item.detailPage,
@@ -730,11 +743,13 @@ const tocSections = [
 	},
 ];
 
-const totalPieces = marketingItems.length + proposalItems.length;
+const totalPieces = visibleMarketingItems.length + proposalItems.length;
+const { portfolioVersion } = Astro.props;
 ---
 
 <div
 	id="portfolio-view"
+	data-portfolio-version={portfolioVersion}
 	class="hidden min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-white"
 >
 	<div class="mx-auto max-w-[92rem] px-4 pt-24 pb-20 sm:px-6 lg:px-8">
@@ -766,7 +781,7 @@ const totalPieces = marketingItems.length + proposalItems.length;
 
 				<!-- Scrollable TOC -->
 				<div
-					class="v2-toc-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-5 py-5 pr-3"
+					class="v2-toc-scroll min-h-0 flex-1 overflow-y-scroll overflow-x-hidden px-5 py-5 pr-3"
 					data-lenis-prevent
 					tabindex="0"
 					aria-label="Portfolio table of contents"
@@ -827,7 +842,7 @@ const totalPieces = marketingItems.length + proposalItems.length;
 				<div class="border-t border-slate-200 px-5 py-4 dark:border-slate-800">
 					<div class="flex items-center justify-between text-sm">
 						<span class="font-semibold text-slate-700 dark:text-slate-200">{totalPieces} projects</span>
-						<span class="text-slate-400">{caseStudies.length} case studies</span>
+						<span class="text-slate-400">{visibleCaseStudies.length} case studies</span>
 					</div>
 				</div>
 			</aside>
@@ -841,13 +856,15 @@ const totalPieces = marketingItems.length + proposalItems.length;
 					<!-- Hero -->
 					<section class="border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
 						<div class="p-6 lg:p-8">
-							<p class="text-[11px] font-semibold tracking-[0.24em] text-blue-600 uppercase dark:text-blue-400">Portfolio</p>
-							<h1 class="mt-3 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl dark:text-white">
-								Selected Work
-							</h1>
-							<p class="mt-4 max-w-3xl text-base leading-7 text-slate-600 dark:text-slate-300">
-								Design and communications work spanning editorial systems, marketing campaigns, proposals, and motion. Select a project below or use the sidebar to navigate.
-							</p>
+							<div class="v3-hero-copy">
+								<p class="text-[11px] font-semibold tracking-[0.24em] text-blue-600 uppercase dark:text-blue-400">Portfolio</p>
+								<h1 class="mt-3 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl dark:text-white">
+									Selected Work
+								</h1>
+								<p class="mt-4 max-w-3xl text-base leading-7 text-slate-600 dark:text-slate-300">
+									Design and communications work spanning editorial systems, marketing campaigns, proposals, and motion. Select a project below or use the sidebar to navigate.
+								</p>
+							</div>
 						</div>
 						<div class="grid grid-cols-3 gap-px border-t border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800">
 							<div class="bg-white p-4 dark:bg-slate-900">
@@ -855,7 +872,7 @@ const totalPieces = marketingItems.length + proposalItems.length;
 								<p class="mt-1 text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">Projects</p>
 							</div>
 							<div class="bg-white p-4 dark:bg-slate-900">
-								<p class="text-2xl font-black tracking-tight text-slate-950 dark:text-white">{caseStudies.length}</p>
+								<p class="text-2xl font-black tracking-tight text-slate-950 dark:text-white">{visibleCaseStudies.length}</p>
 								<p class="mt-1 text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">Case studies</p>
 							</div>
 							<div class="bg-white p-4 dark:bg-slate-900">
@@ -922,11 +939,11 @@ const totalPieces = marketingItems.length + proposalItems.length;
 									<p class="text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">Section 01</p>
 									<h2 class="mt-2 text-3xl font-black tracking-tight text-slate-950 dark:text-white">Marketing</h2>
 								</div>
-								<p class="text-sm text-slate-400">{marketingItems.length} projects</p>
+								<p class="text-sm text-slate-400">{visibleMarketingItems.length} projects</p>
 							</div>
 						</div>
 						<div class="divide-y divide-slate-200 dark:divide-slate-800">
-							{marketingItems.map((item, i) => (
+							{visibleMarketingItems.map((item, i) => (
 								<div class="v2-dir-row group grid items-center gap-4 px-6 py-4 transition grid-cols-[4rem_minmax(0,1fr)_auto] lg:grid-cols-[4rem_minmax(0,1fr)_minmax(0,1.2fr)_10rem_auto] lg:px-8 hover:bg-slate-50 dark:hover:bg-slate-800/50">
 									<!-- Thumbnail placeholder -->
 									<div class="v2-thumb h-14 w-16 border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800 overflow-hidden flex items-center justify-center">
@@ -1034,7 +1051,7 @@ const totalPieces = marketingItems.length + proposalItems.length;
 				</div>
 
 				<!-- ─── CASE STUDY DETAIL PAGES ─── -->
-				{caseStudies.map((study) => (
+				{visibleCaseStudies.map((study) => (
 					<div id={`v2-page-${study.id}`} data-v2-view={study.id} class="hidden">
 						<div class="mb-6 flex items-center gap-3">
 							<button type="button" data-v2-page="overview" class="text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200">&larr; Back to overview</button>
@@ -1064,63 +1081,73 @@ const totalPieces = marketingItems.length + proposalItems.length;
 						<!-- Media sections -->
 						<div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_14rem]">
 							<div class="space-y-8">
-								{study.mediaSections.map((ms) => (
-									<section class="border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-										<div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-											<h2 class="text-lg font-bold tracking-tight text-slate-950 dark:text-white">{ms.title}</h2>
-											<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{ms.description}</p>
-										</div>
-										<div class="grid gap-3 p-5 sm:grid-cols-2">
-											{ms.items.map((item, idx) => (
-												<button
-													type="button"
-													data-v2-lightbox
-													data-v2-group={study.id}
-													data-v2-index={String(idx)}
-													data-v2-title={item.title}
-													data-v2-caption={item.caption}
-													data-v2-type={item.type}
-													data-v2-src={item.src ?? ""}
-													data-v2-embed={item.embedUrl ?? ""}
-													data-v2-badge={item.badge ?? ""}
-													class:list={[
-														"v2-media-tile group border border-slate-200 text-left transition hover:border-blue-600 dark:border-slate-800 dark:hover:border-blue-400",
-														item.aspectClass,
-													]}
-												>
-													<div class="flex h-full flex-col">
-														{item.src ? (
-															<div class="flex-1 bg-slate-100 dark:bg-slate-900">
-																<img src={item.src} alt={item.title} class="h-full w-full object-cover" loading="lazy" />
-															</div>
-														) : (
-															<div class="v2-placeholder flex flex-1 items-center justify-center bg-slate-50 p-6 dark:bg-slate-900/50">
-																<div class="text-center">
-																	<div class="mx-auto mb-3 h-px w-10 bg-blue-600 dark:bg-blue-400"></div>
-																	{item.type === "video" ? (
-																		<div class="mx-auto flex h-10 w-10 items-center justify-center border border-slate-300 dark:border-slate-600">
-																			<div class="h-0 w-0 border-y-[6px] border-l-[10px] border-y-transparent border-l-slate-400 dark:border-l-slate-500 ml-0.5"></div>
-																		</div>
-																	) : (
-																		<div class="mx-auto grid h-10 w-14 grid-cols-2 gap-1">
-																			<div class="bg-slate-200 dark:bg-slate-700"></div>
-																			<div class="bg-slate-200 dark:bg-slate-700"></div>
-																			<div class="col-span-2 bg-slate-200 dark:bg-slate-700"></div>
-																		</div>
-																	)}
+								<div data-v2-study-media-host={study.id}></div>
+								<template data-v2-study-media-template={study.id}>
+									{study.mediaSections.map((ms) => (
+										<section class="border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+											<div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+												<h2 class="text-lg font-bold tracking-tight text-slate-950 dark:text-white">{ms.title}</h2>
+												<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{ms.description}</p>
+											</div>
+											<div class="grid gap-3 p-5 sm:grid-cols-2">
+												{ms.items.map((item, idx) => (
+													<button
+														type="button"
+														data-v2-lightbox
+														data-v2-group={study.id}
+														data-v2-index={String(idx)}
+														data-v2-title={item.title}
+														data-v2-caption={item.caption}
+														data-v2-type={item.type}
+														data-v2-src={item.src ?? ""}
+														data-v2-embed={item.embedUrl ?? ""}
+														data-v2-badge={item.badge ?? ""}
+														class:list={[
+															"v2-media-tile group border border-slate-200 text-left transition hover:border-blue-600 dark:border-slate-800 dark:hover:border-blue-400",
+															item.aspectClass,
+														]}
+													>
+														<div class="flex h-full flex-col">
+															{item.src ? (
+																<div class="flex-1 bg-slate-100 dark:bg-slate-900">
+																	<img
+																		src={item.src}
+																		alt={item.title}
+																		class="h-full w-full object-cover"
+																		loading="lazy"
+																		decoding="async"
+																		fetchpriority="low"
+																	/>
 																</div>
+															) : (
+																<div class="v2-placeholder flex flex-1 items-center justify-center bg-slate-50 p-6 dark:bg-slate-900/50">
+																	<div class="text-center">
+																		<div class="mx-auto mb-3 h-px w-10 bg-blue-600 dark:bg-blue-400"></div>
+																		{item.type === "video" ? (
+																			<div class="mx-auto flex h-10 w-10 items-center justify-center border border-slate-300 dark:border-slate-600">
+																				<div class="h-0 w-0 border-y-[6px] border-l-[10px] border-y-transparent border-l-slate-400 ml-0.5 dark:border-l-slate-500"></div>
+																			</div>
+																		) : (
+																			<div class="mx-auto grid h-10 w-14 grid-cols-2 gap-1">
+																				<div class="bg-slate-200 dark:bg-slate-700"></div>
+																				<div class="bg-slate-200 dark:bg-slate-700"></div>
+																				<div class="col-span-2 bg-slate-200 dark:bg-slate-700"></div>
+																			</div>
+																		)}
+																	</div>
+																</div>
+															)}
+															<div class="border-t border-slate-200 px-4 py-3 dark:border-slate-800">
+																<p class="text-sm font-semibold text-slate-700 group-hover:text-blue-600 dark:text-slate-200 dark:group-hover:text-blue-300">{item.title}</p>
+																<p class="mt-0.5 text-xs text-slate-400">{item.caption}</p>
 															</div>
-														)}
-														<div class="border-t border-slate-200 px-4 py-3 dark:border-slate-800">
-															<p class="text-sm font-semibold text-slate-700 group-hover:text-blue-600 dark:text-slate-200 dark:group-hover:text-blue-300">{item.title}</p>
-															<p class="mt-0.5 text-xs text-slate-400">{item.caption}</p>
 														</div>
-													</div>
-												</button>
-											))}
-										</div>
-									</section>
-								))}
+													</button>
+												))}
+											</div>
+										</section>
+									))}
+								</template>
 							</div>
 
 							<!-- Deliverables sidebar -->
@@ -1202,13 +1229,52 @@ const totalPieces = marketingItems.length + proposalItems.length;
 			Array.from(root.querySelectorAll(sel)).filter(
 				(el) => el instanceof HTMLButtonElement
 			) as HTMLButtonElement[];
+		const hydrateStudyMedia = (pageId: string) => {
+			const host = root.querySelector(
+				`[data-v2-study-media-host="${pageId}"]`
+			) as HTMLElement | null;
+			const template = root.querySelector(
+				`template[data-v2-study-media-template="${pageId}"]`
+			) as HTMLTemplateElement | null;
+
+			if (!host || !template || host.dataset.v2Hydrated === "true") return;
+
+			host.appendChild(template.content.cloneNode(true));
+			host.dataset.v2Hydrated = "true";
+		};
 
 		const views = root.querySelectorAll<HTMLElement>("[data-v2-view]");
+		const tocScroll = root.querySelector(".v2-toc-scroll");
 		let currentView = "overview";
+		let lastTocScrollTop = tocScroll instanceof HTMLElement ? tocScroll.scrollTop : 0;
+		const isDesktopTocButton = (button: HTMLButtonElement) =>
+			button.closest(".v2-toc-scroll") !== null;
+		const getTocScrollTop = (button?: HTMLButtonElement | null) =>
+			tocScroll instanceof HTMLElement && button && isDesktopTocButton(button)
+				? lastTocScrollTop
+				: null;
+		const restoreTocScrollTop = (scrollTop: number | null) => {
+			if (!(tocScroll instanceof HTMLElement) || scrollTop === null) return;
+			lastTocScrollTop = scrollTop;
+			tocScroll.scrollTop = scrollTop;
+			requestAnimationFrame(() => {
+				tocScroll.scrollTop = scrollTop;
+			});
+			window.setTimeout(() => {
+				tocScroll.scrollTop = scrollTop;
+			}, 80);
+			window.setTimeout(() => {
+				tocScroll.scrollTop = scrollTop;
+			}, 220);
+		};
 
 		/* ─── Page switching ─── */
 
-		const showPage = (pageId: string) => {
+		const showPage = (
+			pageId: string,
+			options: { tocScrollTop?: number | null } = {}
+		) => {
+			hydrateStudyMedia(pageId);
 			currentView = pageId;
 			views.forEach((v) => {
 				const isTarget = v.dataset.v2View === pageId;
@@ -1236,31 +1302,68 @@ const totalPieces = marketingItems.length + proposalItems.length;
 					});
 				}
 			}
+
+			restoreTocScrollTop(options.tocScrollTop ?? null);
 		};
 
+		if (tocScroll instanceof HTMLElement) {
+			tocScroll.addEventListener("scroll", () => {
+				lastTocScrollTop = tocScroll.scrollTop;
+			});
+
+			tocScroll.addEventListener(
+				"wheel",
+				(event) => {
+					if (tocScroll.scrollHeight <= tocScroll.clientHeight) return;
+					tocScroll.scrollTop += event.deltaY;
+					lastTocScrollTop = tocScroll.scrollTop;
+					event.preventDefault();
+					event.stopPropagation();
+				},
+				{ passive: false }
+			);
+		}
+
 		$$("[data-v2-page]").forEach((btn) => {
+			btn.addEventListener("pointerdown", () => {
+				if (tocScroll instanceof HTMLElement && isDesktopTocButton(btn)) {
+					lastTocScrollTop = tocScroll.scrollTop;
+				}
+			});
+
 			btn.addEventListener("click", () => {
 				const pageId = btn.dataset.v2Page;
-				if (pageId) showPage(pageId);
+				if (pageId) {
+					showPage(pageId, { tocScrollTop: getTocScrollTop(btn) });
+					btn.blur();
+				}
 			});
 		});
 
 		/* ─── Scroll within overview ─── */
 
 		$$("[data-v2-scroll]").forEach((btn) => {
+			btn.addEventListener("pointerdown", () => {
+				if (tocScroll instanceof HTMLElement && isDesktopTocButton(btn)) {
+					lastTocScrollTop = tocScroll.scrollTop;
+				}
+			});
+
 			btn.addEventListener("click", () => {
 				const targetId = btn.dataset.v2Scroll;
 				if (!targetId) return;
+				const tocScrollTop = getTocScrollTop(btn);
 
 				// If we're not on overview and the target is an overview section, go to overview first
 				if (currentView !== "overview" && !document.getElementById(`v2-page-${targetId}`)) {
-					showPage("overview");
+					showPage("overview", { tocScrollTop });
 					setTimeout(() => {
 						const el = document.getElementById(targetId);
 						if (el) {
 							const top = el.getBoundingClientRect().top + window.scrollY - 128;
 							window.scrollTo({ top, behavior: "smooth" });
 						}
+						restoreTocScrollTop(tocScrollTop);
 					}, 100);
 				} else {
 					const el = document.getElementById(targetId);
@@ -1268,7 +1371,9 @@ const totalPieces = marketingItems.length + proposalItems.length;
 						const top = el.getBoundingClientRect().top + window.scrollY - 128;
 						window.scrollTo({ top, behavior: "smooth" });
 					}
+					restoreTocScrollTop(tocScrollTop);
 				}
+				btn.blur();
 			});
 		});
 
@@ -1399,8 +1504,11 @@ const totalPieces = marketingItems.length + proposalItems.length;
 			}, 220);
 		};
 
-		$$("[data-v2-lightbox]").forEach((btn) => {
-			btn.addEventListener("click", () => openLightbox(btn));
+		root.addEventListener("click", (event) => {
+			const target = event.target;
+			if (!(target instanceof Element)) return;
+			const btn = target.closest("[data-v2-lightbox]");
+			if (btn instanceof HTMLButtonElement) openLightbox(btn);
 		});
 
 		prevBtn.addEventListener("click", () => { if (activeIdx > 0) { activeIdx--; render(); } });
@@ -1437,47 +1545,46 @@ const totalPieces = marketingItems.length + proposalItems.length;
 	/* ─── Entrance animations ─── */
 
 	.v2-entrance {
-		opacity: 0;
-		transform: translateY(16px);
-		transition:
-			opacity 500ms cubic-bezier(0.2, 0.8, 0.2, 1),
-			transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+		opacity: 1;
+		transform: none;
 	}
 
 	.v2-entrance.v2-visible {
 		opacity: 1;
-		transform: translateY(0);
+		transform: none;
 	}
 
 	/* ─── TOC ─── */
 
 	.v2-toc-scroll {
-		scrollbar-gutter: stable;
-		scrollbar-width: thin;
-		scrollbar-color: rgb(37 99 235) transparent;
+		overscroll-behavior: contain;
+		scrollbar-gutter: stable both-edges;
+		scrollbar-width: auto;
+		scrollbar-color: rgb(37 99 235) rgba(226, 232, 240, 0.16);
 	}
 
 	.v2-toc-scroll::-webkit-scrollbar {
-		width: 12px;
+		width: 14px;
 	}
 
 	.v2-toc-scroll::-webkit-scrollbar-track {
-		background: linear-gradient(180deg, rgba(226, 232, 240, 0.7), rgba(226, 232, 240, 0.15));
-		border-left: 1px solid rgba(226, 232, 240, 0.9);
+		background: linear-gradient(180deg, rgba(226, 232, 240, 0.9), rgba(226, 232, 240, 0.3));
+		border-left: 1px solid rgba(203, 213, 225, 0.95);
 	}
 
 	.v2-toc-scroll::-webkit-scrollbar-thumb {
 		background: linear-gradient(180deg, rgb(30 41 59), rgb(37 99 235));
 		border: 3px solid rgb(255 255 255);
-		border-radius: 2px;
+		border-radius: 999px;
+		background-clip: padding-box;
 	}
 
 	.dark .v2-toc-scroll {
-		scrollbar-color: rgb(96 165 250) transparent;
+		scrollbar-color: rgb(96 165 250) rgba(15, 23, 42, 0.28);
 	}
 
 	.dark .v2-toc-scroll::-webkit-scrollbar-track {
-		background: linear-gradient(180deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.25));
+		background: linear-gradient(180deg, rgba(30, 41, 59, 0.94), rgba(15, 23, 42, 0.38));
 		border-left-color: rgba(51, 65, 85, 0.95);
 	}
 

@@ -24,7 +24,7 @@
 			</a>
 
 			<!-- Desktop Links -->
-			<div class="hidden items-center gap-8 md:flex">
+			<div class="navbar-desktop-links items-center gap-8">
 				<!-- Portfolio Link -->
 				<a
 					href="#portfolio"
@@ -76,7 +76,7 @@
 			</div>
 
 			<!-- Mobile Menu Button -->
-			<div class="flex items-center md:hidden">
+			<div class="navbar-mobile-controls flex items-center md:hidden">
 				<button
 					id="theme-toggle-mobile"
 					type="button"
@@ -149,6 +149,22 @@
 		</div>
 	</div>
 </nav>
+
+<style>
+	.navbar-desktop-links {
+		display: none;
+	}
+
+	@media (min-width: 768px) {
+		.navbar-desktop-links {
+			display: flex;
+		}
+
+		.navbar-mobile-controls {
+			display: none;
+		}
+	}
+</style>
 
 <script>
 	// --- Dark Mode Logic ---

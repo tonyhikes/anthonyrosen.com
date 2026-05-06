@@ -1,24 +1,69 @@
 <!-- RB2B Tracking - Deferred for performance -->
 <script is:inline>
-	function initRB2B() {
-		!(function (key) {
-			if (window.reb2b) return;
-			window.reb2b = { loaded: true };
-			var s = document.createElement("script");
-			s.async = true;
-			s.src =
-				"https://ddwl4m2hdecbv.cloudfront.net/b/" + key + "/" + key + ".js.gz";
-			document
-				.getElementsByTagName("script")[0]
-				.parentNode.insertBefore(s, document.getElementsByTagName("script")[0]);
-		})("W6Z57HZZ9POX");
-	}
+	(() => {
+		const CONSENT_KEY = "cookie-consent";
+		const ANALYTICS_READY_EVENT = "anthony-analytics-ready";
+		let rb2bScheduled = false;
+		let rb2bWaitingForReady = false;
 
-	// PERFORMANCE OPTIMIZATION: Delay B2B tracking significantly
-	// Changed from 5s/3s to 20s/15s since RB2B is lowest priority tracking
-	if ("requestIdleCallback" in window) {
-		requestIdleCallback(initRB2B, { timeout: 20000 });
-	} else {
-		setTimeout(initRB2B, 15000);
-	}
+		function initRB2B() {
+			!(function (key) {
+				if (window.reb2b) return;
+				window.reb2b = { loaded: true };
+				var s = document.createElement("script");
+				s.async = true;
+				s.src =
+					"https://ddwl4m2hdecbv.cloudfront.net/b/" + key + "/" + key + ".js.gz";
+				document
+					.getElementsByTagName("script")[0]
+					.parentNode.insertBefore(s, document.getElementsByTagName("script")[0]);
+			})("W6Z57HZZ9POX");
+		}
+
+		function scheduleRB2B() {
+			if (rb2bScheduled) return;
+			rb2bScheduled = true;
+
+			// PERFORMANCE OPTIMIZATION: Delay B2B tracking significantly
+			// Changed from 5s/3s to 20s/15s since RB2B is lowest priority tracking
+			if ("requestIdleCallback" in window) {
+				requestIdleCallback(initRB2B, { timeout: 20000 });
+			} else {
+				setTimeout(initRB2B, 15000);
+			}
+		}
+
+		function requestRB2BStart() {
+			if (rb2bScheduled) return;
+
+			if (window.__anthonyAnalyticsReady) {
+				scheduleRB2B();
+				return;
+			}
+
+			if (rb2bWaitingForReady) return;
+			rb2bWaitingForReady = true;
+
+			window.addEventListener(
+				ANALYTICS_READY_EVENT,
+				() => {
+					rb2bWaitingForReady = false;
+					scheduleRB2B();
+				},
+				{ once: true }
+			);
+
+			window.__armAnthonyAnalyticsReady?.();
+		}
+
+		if (localStorage.getItem(CONSENT_KEY) === "accepted") {
+			requestRB2BStart();
+		}
+
+		window.addEventListener("cookie-consent-updated", (event) => {
+			if (event && event.detail === "accepted") {
+				requestRB2BStart();
+			}
+		});
+	})();
 </script>
