@@ -1,0 +1,639 @@
+---
+import PortfolioV2 from "./PortfolioV2.astro";
+
+const heroTiles = [
+	{
+		title: "Science Magazine",
+		label: "Publishing Operations",
+		src: "/portfolio/publishing-operations/1.jpg",
+	},
+	{
+		title: "Annual Reports",
+		label: "Editorial Systems",
+		src: "/portfolio/annual-reports/01.jpg",
+	},
+	{
+		title: "RxExplorer",
+		label: "Product Marketing",
+		src: "/portfolio/rxexplorer-product-brochure/01.jpg",
+	},
+];
+
+const previewImages: Record<string, string> = {
+	"annual-reports-study": "/portfolio/annual-reports/01.jpg",
+	"rxexplorer-study": "/portfolio/rxexplorer-product-brochure/01.jpg",
+	"hcqu-study": "/portfolio/hcqu-fact-sheets/01.jpg",
+	"whitepaper-study": "/portfolio/whitepaper/01.jpg",
+	"pfizer-study": "/portfolio/pfizer-healthy-living/01.jpg",
+	"ppt-study": "/portfolio/powerpoint-presentations/01.jpeg",
+	"newsletters-study": "/portfolio/newsletters/01.jpg",
+	"eap-study": "/portfolio/eap-promos/01.jpg",
+	"covers-study": "/portfolio/covers/01.jpg",
+	"call-outs-study": "/portfolio/call-outs/01.jpg",
+	"story-flows-study": "/portfolio/story-flows/01.jpg",
+	"flow-charts-study": "/portfolio/flow-charts/01.jpg",
+	"timelines-study": "/portfolio/timelines/01.jpg",
+	"graphs-study": "/portfolio/graphs-and-demographics/01.jpg",
+	"infographics-study": "/portfolio/infographics/01.jpg",
+	"maps-study": "/portfolio/maps/01.jpg",
+	"org-charts-study": "/portfolio/org-charts/01.jpg",
+	"forms-study": "/portfolio/forms-and-applications/01.jpg",
+};
+---
+
+<PortfolioV2 />
+
+<script define:vars={{ heroTiles, previewImages }}>
+	function initPortfolioV3() {
+		const root = document.getElementById("portfolio-view");
+		if (!root || root.dataset.v3Init === "true") return;
+
+		root.dataset.v3Init = "true";
+		root.dataset.portfolioVersion = "v3";
+
+		const renderThumbFallback = () => `
+			<span class="v3-thumb-abstract">
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+			</span>
+		`;
+
+		const bindImageFallbacks = () => {
+			root.querySelectorAll("img[data-v3-image]").forEach((image) => {
+				if (!(image instanceof HTMLImageElement)) return;
+				if (image.dataset.v3Bound === "true") return;
+				image.dataset.v3Bound = "true";
+
+				image.addEventListener("error", () => {
+					const mode = image.dataset.v3Image;
+
+					if (mode === "thumb") {
+						const frame = image.closest(".v2-thumb");
+						if (frame instanceof HTMLElement) {
+							frame.classList.remove("v3-thumb-has-image");
+							frame.classList.add("v3-thumb-fallback");
+							frame.innerHTML = renderThumbFallback();
+						}
+					}
+
+					if (mode === "hero") {
+						const tile = image.closest(".v3-hero-tile");
+						if (tile instanceof HTMLElement) {
+							tile.classList.add("v3-hero-tile--fallback");
+							image.remove();
+						}
+					}
+				});
+			});
+		};
+
+		const overview = root.querySelector("#v2-page-overview");
+		const heroLead = overview?.querySelector("section:first-of-type > div:first-of-type");
+
+		if (heroLead && !heroLead.querySelector(".v3-hero-strip")) {
+			heroLead.insertAdjacentHTML(
+				"beforeend",
+				`
+					<div class="v3-hero-strip" aria-hidden="true">
+						${heroTiles
+							.map(
+								(tile) => `
+									<article class="v3-hero-tile">
+										<img src="${tile.src}" alt="" class="v3-hero-image" loading="eager" decoding="async" data-v3-image="hero" />
+										<div class="v3-hero-meta">
+											<p>${tile.label}</p>
+											<h3>${tile.title}</h3>
+										</div>
+									</article>
+								`
+							)
+							.join("")}
+					</div>
+				`
+			);
+		}
+
+		root.querySelectorAll(".v2-dir-row").forEach((row) => {
+			if (!(row instanceof HTMLElement)) return;
+			if (row.dataset.v3ThumbReady === "true") return;
+
+			const thumb = row.querySelector(".v2-thumb");
+			const pageTrigger = row.querySelector("[data-v2-page]");
+			if (!(thumb instanceof HTMLElement) || !(pageTrigger instanceof HTMLElement)) return;
+
+			const pageId = pageTrigger.dataset.v2Page ?? "";
+			const src = previewImages[pageId];
+			row.dataset.v3ThumbReady = "true";
+
+			if (src) {
+				thumb.classList.add("v3-thumb-has-image");
+				thumb.innerHTML = `
+					<img src="${src}" alt="" class="v3-thumb-image" loading="eager" decoding="async" data-v3-image="thumb" />
+					<span class="v3-thumb-sheen"></span>
+				`;
+			} else {
+				thumb.classList.add("v3-thumb-fallback");
+				thumb.innerHTML = renderThumbFallback();
+			}
+		});
+
+		root.querySelectorAll("#v2-page-overview .v2-entrance").forEach((section) => {
+			if (section instanceof HTMLElement) section.classList.add("v2-visible");
+		});
+
+		bindImageFallbacks();
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initPortfolioV3, { once: true });
+	} else {
+		initPortfolioV3();
+	}
+
+	document.addEventListener("astro:page-load", initPortfolioV3);
+</script>
+
+<style is:global>
+	#portfolio-view[data-portfolio-version="v3"] {
+		background:
+			radial-gradient(circle at top left, rgba(59, 130, 246, 0.14), transparent 28%),
+			radial-gradient(circle at top right, rgba(148, 163, 184, 0.18), transparent 24%),
+			linear-gradient(180deg, #f8fafc 0%, #eef4ff 32%, #f8fafc 100%);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] {
+		background:
+			radial-gradient(circle at top left, rgba(59, 130, 246, 0.16), transparent 22%),
+			radial-gradient(circle at bottom right, rgba(51, 65, 85, 0.4), transparent 30%),
+			linear-gradient(180deg, #020617 0%, #0f172a 40%, #020617 100%);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] > div {
+		max-width: 96rem;
+		padding-top: 6.5rem;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] aside {
+		position: relative;
+		border-color: rgba(15, 23, 42, 0.96);
+		background:
+			linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.96)),
+			radial-gradient(circle at top right, rgba(59, 130, 246, 0.2), transparent 34%);
+		box-shadow: 0 28px 70px rgba(15, 23, 42, 0.22);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] aside {
+		border-color: rgba(71, 85, 105, 0.9);
+		box-shadow: 0 28px 70px rgba(2, 6, 23, 0.5);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] aside::before {
+		content: "";
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		width: 3px;
+		background: linear-gradient(180deg, rgba(96, 165, 250, 0.95), rgba(14, 165, 233, 0.3));
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] aside > div:first-child,
+	#portfolio-view[data-portfolio-version="v3"] aside > div:last-child {
+		border-color: rgba(71, 85, 105, 0.72);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] aside button,
+	#portfolio-view[data-portfolio-version="v3"] aside p,
+	#portfolio-view[data-portfolio-version="v3"] aside span {
+		color: rgba(226, 232, 240, 0.94);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-900,
+	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-700,
+	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-600,
+	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-500,
+	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-300,
+	#portfolio-view[data-portfolio-version="v3"] aside .text-white {
+		color: rgba(241, 245, 249, 0.98) !important;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-700,
+	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-600,
+	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-500 {
+		color: rgb(226 232 240);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] aside .text-slate-400 {
+		color: rgba(191, 219, 254, 0.88) !important;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] aside .border-slate-200 {
+		border-color: rgba(71, 85, 105, 0.72);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-toc-scroll {
+		scrollbar-color: rgba(96, 165, 250, 0.92) transparent;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-toc-scroll::-webkit-scrollbar-track {
+		background: rgba(15, 23, 42, 0.18);
+		border-left: 1px solid rgba(71, 85, 105, 0.55);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-toc-scroll::-webkit-scrollbar-thumb {
+		background: linear-gradient(180deg, rgb(96 165 250), rgb(14 165 233));
+		border-color: rgb(15 23 42);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-toc-item {
+		position: relative;
+		padding-left: 0.9rem;
+		border-left: 1px solid transparent;
+		color: rgba(226, 232, 240, 0.92) !important;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-toc-item::before {
+		content: "";
+		position: absolute;
+		left: -1px;
+		top: 0.7rem;
+		width: 0;
+		height: 2px;
+		background: rgb(96 165 250);
+		transition: width 180ms ease;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-toc-item:hover::before,
+	#portfolio-view[data-portfolio-version="v3"] .v2-toc-active::before {
+		width: 0.65rem;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-toc-item:hover {
+		color: white !important;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-toc-active {
+		color: rgb(191 219 254) !important;
+		border-left-color: rgba(96, 165, 250, 0.6);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] main .text-slate-500 {
+		color: rgb(51 65 85);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] main .text-slate-400 {
+		color: rgb(100 116 139);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] main .text-slate-500 {
+		color: rgba(226, 232, 240, 0.88);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] main .text-slate-400 {
+		color: rgba(191, 219, 254, 0.8);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child {
+		position: relative;
+		overflow: hidden;
+		border-color: rgba(191, 219, 254, 0.85);
+		background:
+			linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(239, 246, 255, 0.92)),
+			radial-gradient(circle at top right, rgba(59, 130, 246, 0.16), transparent 40%);
+		box-shadow: 0 24px 60px rgba(148, 163, 184, 0.2);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child {
+		border-color: rgba(71, 85, 105, 0.85);
+		background:
+			linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.9)),
+			radial-gradient(circle at top right, rgba(59, 130, 246, 0.2), transparent 40%);
+		box-shadow: 0 24px 60px rgba(2, 6, 23, 0.42);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child > div:first-child {
+		display: grid;
+		gap: 2rem;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child > div:first-child h1 {
+		max-width: 12ch;
+		font-size: clamp(3.25rem, 5.5vw, 5.6rem);
+		line-height: 0.95;
+		letter-spacing: -0.06em;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child > div:first-child p:last-of-type {
+		max-width: 56rem;
+		font-size: 1.02rem;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-hero-strip {
+		display: grid;
+		gap: 1rem;
+		margin-top: 2rem;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-hero-tile {
+		position: relative;
+		overflow: hidden;
+		border: 1px solid rgba(191, 219, 254, 0.9);
+		min-height: 12rem;
+		background: rgba(255, 255, 255, 0.9);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] .v3-hero-tile {
+		border-color: rgba(71, 85, 105, 0.88);
+		background: rgba(15, 23, 42, 0.84);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-hero-tile--fallback {
+		background:
+			linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(239, 246, 255, 0.92)),
+			radial-gradient(circle at top right, rgba(59, 130, 246, 0.2), transparent 42%);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] .v3-hero-tile--fallback {
+		background:
+			linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.94)),
+			radial-gradient(circle at top right, rgba(59, 130, 246, 0.2), transparent 42%);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-hero-image {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-hero-meta {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		padding: 1rem;
+		background: linear-gradient(180deg, transparent, rgba(15, 23, 42, 0.88));
+		color: white;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-hero-meta p {
+		margin: 0;
+		font-size: 0.65rem;
+		font-weight: 700;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: rgba(191, 219, 254, 0.88);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-hero-meta h3 {
+		margin: 0.5rem 0 0;
+		font-size: 1.2rem;
+		font-weight: 800;
+		letter-spacing: -0.03em;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child > div:last-child {
+		border-top-color: rgba(191, 219, 254, 0.8);
+		background: rgba(15, 23, 42, 0.96);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child > div:last-child > div {
+		background: transparent;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child > div:last-child p:first-child {
+		color: white;
+		font-size: 2rem;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child > div:last-child p:last-child {
+		color: rgba(191, 219, 254, 0.76);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #overview-publishing,
+	#portfolio-view[data-portfolio-version="v3"] #sec-marketing,
+	#portfolio-view[data-portfolio-version="v3"] #sec-proposal,
+	#portfolio-view[data-portfolio-version="v3"] #sec-contact,
+	#portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) > section:first-of-type,
+	#portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) > .mt-6 > section {
+		border-color: rgba(203, 213, 225, 0.95);
+		box-shadow: 0 18px 45px rgba(148, 163, 184, 0.14);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] #overview-publishing,
+	.dark #portfolio-view[data-portfolio-version="v3"] #sec-marketing,
+	.dark #portfolio-view[data-portfolio-version="v3"] #sec-proposal,
+	.dark #portfolio-view[data-portfolio-version="v3"] #sec-contact,
+	.dark #portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) > section:first-of-type,
+	.dark #portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) > .mt-6 > section {
+		border-color: rgba(51, 65, 85, 0.95);
+		box-shadow: 0 22px 60px rgba(2, 6, 23, 0.34);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #overview-publishing {
+		overflow: hidden;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #overview-publishing > div:first-child {
+		background:
+			linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.9)),
+			radial-gradient(circle at right, rgba(59, 130, 246, 0.12), transparent 35%);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] #overview-publishing > div:first-child {
+		background:
+			linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.9)),
+			radial-gradient(circle at right, rgba(59, 130, 246, 0.18), transparent 35%);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #sec-marketing > div:last-child,
+	#portfolio-view[data-portfolio-version="v3"] #sec-proposal > div:last-child {
+		display: grid;
+		gap: 1rem;
+		padding: 1.25rem;
+		background: transparent;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] #sec-marketing > div:last-child > *,
+	#portfolio-view[data-portfolio-version="v3"] #sec-proposal > div:last-child > * {
+		border-top: 0 !important;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-dir-row {
+		grid-template-columns: minmax(0, 1fr) auto !important;
+		grid-template-areas:
+			"thumb thumb"
+			"title index"
+			"summary summary"
+			"cta cta";
+		align-content: start;
+		gap: 1rem;
+		padding: 1rem !important;
+		border: 1px solid rgba(203, 213, 225, 0.95);
+		background: rgba(255, 255, 255, 0.92);
+		box-shadow: 0 12px 30px rgba(148, 163, 184, 0.1);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] .v2-dir-row {
+		border-color: rgba(51, 65, 85, 0.95);
+		background: rgba(15, 23, 42, 0.92);
+		box-shadow: 0 18px 36px rgba(2, 6, 23, 0.28);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-dir-row:hover {
+		transform: translateY(-3px);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-dir-row > :nth-child(1) {
+		grid-area: thumb;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-dir-row > :nth-child(2) {
+		grid-area: title;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-dir-row > :nth-child(3) {
+		grid-area: summary;
+		display: block !important;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-dir-row > :nth-child(4) {
+		grid-area: index;
+		display: block !important;
+		justify-self: end;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-dir-row > :nth-child(5) {
+		grid-area: cta;
+		justify-self: start;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-thumb {
+		position: relative;
+		width: 100%;
+		height: 13rem;
+		overflow: hidden;
+		border-color: rgba(191, 219, 254, 0.9);
+		background:
+			linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(239, 246, 255, 0.92)),
+			radial-gradient(circle at top right, rgba(59, 130, 246, 0.14), transparent 42%);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] .v2-thumb {
+		border-color: rgba(71, 85, 105, 0.88);
+		background:
+			linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.92)),
+			radial-gradient(circle at top right, rgba(59, 130, 246, 0.16), transparent 42%);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-thumb-image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-thumb-sheen {
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 45%),
+			linear-gradient(180deg, transparent 40%, rgba(15, 23, 42, 0.78));
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-thumb-abstract {
+		display: grid;
+		width: 100%;
+		height: 100%;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-rows: repeat(3, minmax(0, 1fr));
+		gap: 0.55rem;
+		padding: 0.75rem;
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-thumb-abstract span {
+		display: block;
+		border: 1px solid rgba(191, 219, 254, 0.88);
+		background: rgba(255, 255, 255, 0.94);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] .v3-thumb-abstract span {
+		border-color: rgba(71, 85, 105, 0.88);
+		background: rgba(15, 23, 42, 0.94);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-thumb-abstract span:first-child {
+		grid-column: 1 / 3;
+		grid-row: 1 / 3;
+		background:
+			linear-gradient(180deg, rgba(59, 130, 246, 0.18), rgba(255, 255, 255, 0.96)),
+			rgba(255, 255, 255, 0.96);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v3-thumb-abstract span:last-child {
+		grid-column: 2 / 4;
+		grid-row: 3 / 4;
+		background:
+			linear-gradient(180deg, rgba(15, 23, 42, 0.86), rgba(51, 65, 85, 0.92)),
+			rgba(15, 23, 42, 0.94);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) .v2-media-tile {
+		overflow: hidden;
+		box-shadow: 0 14px 36px rgba(148, 163, 184, 0.12);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) .v2-media-tile {
+		box-shadow: 0 18px 44px rgba(2, 6, 23, 0.32);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) .v2-media-tile:hover {
+		transform: translateY(-4px);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) > .mt-6 > aside {
+		position: sticky;
+		top: 7rem;
+		border-color: rgba(191, 219, 254, 0.88);
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 246, 255, 0.92)),
+			radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 40%);
+	}
+
+	.dark #portfolio-view[data-portfolio-version="v3"] [data-v2-view]:not([data-v2-view="overview"]) > .mt-6 > aside {
+		border-color: rgba(71, 85, 105, 0.88);
+		background:
+			linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.9)),
+			radial-gradient(circle at top right, rgba(59, 130, 246, 0.16), transparent 42%);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-lightbox {
+		background: rgba(2, 6, 23, 0.82);
+		backdrop-filter: blur(18px);
+	}
+
+	#portfolio-view[data-portfolio-version="v3"] .v2-lightbox-panel > div {
+		border-color: rgba(96, 165, 250, 0.28);
+		box-shadow: 0 32px 90px rgba(2, 6, 23, 0.5);
+	}
+
+	@media (min-width: 768px) {
+		#portfolio-view[data-portfolio-version="v3"] .v3-hero-strip {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+	}
+
+	@media (min-width: 1024px) {
+		#portfolio-view[data-portfolio-version="v3"] #v2-page-overview > section:first-child > div:first-child {
+			grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
+			align-items: end;
+		}
+
+		#portfolio-view[data-portfolio-version="v3"] #sec-marketing > div:last-child,
+		#portfolio-view[data-portfolio-version="v3"] #sec-proposal > div:last-child {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+</style>

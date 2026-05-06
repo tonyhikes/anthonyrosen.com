@@ -1,0 +1,1640 @@
+---
+type MediaType = "image" | "video";
+
+type MediaItem = {
+	id: string;
+	title: string;
+	caption: string;
+	type: MediaType;
+	aspectClass: string;
+	src?: string;
+	embedUrl?: string;
+	badge?: string;
+};
+
+type MediaSection = {
+	title: string;
+	description: string;
+	items: MediaItem[];
+};
+
+type DirectoryItem = {
+	id: string;
+	title: string;
+	kind: string;
+	summary: string;
+	detailPage?: string; // links to a case study page ID
+};
+
+type CaseStudy = {
+	id: string;
+	title: string;
+	kind: string;
+	intro: string;
+	meta: { label: string; value: string }[];
+	deliverables: string[];
+	mediaSections: MediaSection[];
+};
+
+const img = (
+	id: string,
+	title: string,
+	caption: string,
+	aspectClass: string,
+	badge = "Image",
+	src?: string
+): MediaItem => ({ id, title, caption, type: "image", aspectClass, badge, src });
+
+const vid = (
+	id: string,
+	title: string,
+	caption: string,
+	aspectClass: string,
+	badge = "Video",
+	src?: string,
+	embedUrl?: string
+): MediaItem => ({ id, title, caption, type: "video", aspectClass, badge, src, embedUrl });
+
+/* Helper: generate image items from a folder */
+const folder = (dir: string, files: string[], titles: string[]): MediaItem[] =>
+	files.map((f, i) => ({
+		id: `${dir}-${i + 1}`,
+		title: titles[i] ?? `Image ${i + 1}`,
+		caption: "",
+		type: "image" as MediaType,
+		aspectClass: i === 0 ? "sm:col-span-2" : "",
+		badge: "Image",
+		src: `/portfolio/${dir}/${f}`,
+	}));
+
+/* ─── Publishing feature ─── */
+
+const publishing = {
+	id: "publishing-operations",
+	title: "Science Magazine",
+	kicker: "Publishing Operations",
+	summary:
+		"Ten years of publishing operations work built the systems thinking behind the rest of this portfolio: editorial structure, production discipline, and calm under deadline pressure.",
+	stats: [
+		{ value: "129,552", label: "Print subscribers" },
+		{ value: "40,000", label: "App subscribers" },
+		{ value: "570,400", label: "Weekly online viewers" },
+	],
+	points: [
+		"Workflow improvements that cut print cost and reduced operational drag.",
+		"Coordination across design, editorial, and production for mobile and print programs.",
+		"Process systems that helped remove publication bottlenecks and schedule slips.",
+	],
+	highlights: [
+		{ value: "10 years", label: "publishing operations" },
+		{ value: "6", label: "weekly journals" },
+		{ value: "$50K", label: "annual print savings" },
+	],
+};
+
+/* ─── Marketing directory ─── */
+
+const marketingItems: DirectoryItem[] = [
+	{
+		id: "annual-reports",
+		title: "Annual Reports",
+		kind: "Editorial systems",
+		summary:
+			"Healthcare report systems built around covers, chapter pacing, charts, and long-form readability.",
+		detailPage: "annual-reports-study",
+	},
+	{
+		id: "kepro-logo-reveal-video",
+		title: "Kepro Logo Reveal Video",
+		kind: "Motion",
+		summary:
+			"Brand reveal video and supporting still frames for a corporate rebrand launch.",
+		detailPage: "kepro-video-study",
+	},
+	{
+		id: "rxexplorer-product-brochure",
+		title: "RxExplorer Product Brochure",
+		kind: "Product marketing",
+		summary:
+			"Product brochure system with audience analysis panels, feature spreads, and data-led content design.",
+		detailPage: "rxexplorer-study",
+	},
+	{
+		id: "hcqu-fact-sheets",
+		title: "HCQU Fact Sheets",
+		kind: "Healthcare communications",
+		summary:
+			"Scannable one-pagers for complex topics, built to stay clean when imagery arrives later.",
+		detailPage: "hcqu-study",
+	},
+	{
+		id: "whitepaper",
+		title: "Whitepaper",
+		kind: "Thought leadership",
+		summary:
+			"Long-form information design and content hierarchy for dense subject matter.",
+		detailPage: "whitepaper-study",
+	},
+	{
+		id: "pfizer-healthy-living",
+		title: "Pfizer Healthy Living",
+		kind: "Campaign",
+		summary:
+			"Audience-facing campaign materials shaped for trust, clarity, and an orderly reading flow.",
+		detailPage: "pfizer-study",
+	},
+	{
+		id: "powerpoint-presentations",
+		title: "Powerpoint Presentations",
+		kind: "Presentation design",
+		summary:
+			"Narrative deck systems for leadership, partners, and internal alignment work.",
+		detailPage: "ppt-study",
+	},
+	{
+		id: "newsletters",
+		title: "Newsletters",
+		kind: "Lifecycle content",
+		summary:
+			"Repeatable update formats built for cadence, consistency, and fewer last-minute fixes.",
+		detailPage: "newsletters-study",
+	},
+	{
+		id: "eap-promos",
+		title: "EAP Promos",
+		kind: "Promotional design",
+		summary:
+			"Benefit-led promotional pieces ready for final imagery and tighter campaign copy.",
+		detailPage: "eap-study",
+	},
+];
+
+const proposalItems: DirectoryItem[] = [
+	{
+		id: "covers",
+		title: "Covers",
+		kind: "Proposal design",
+		summary:
+			"Front-door presentation systems that set tone and trust before the first paragraph.",
+		detailPage: "covers-study",
+	},
+	{
+		id: "call-outs",
+		title: "Call Outs",
+		kind: "Content system",
+		summary:
+			"Highlight patterns for surfacing proof points and must-read details quickly.",
+		detailPage: "call-outs-study",
+	},
+	{
+		id: "story-flows",
+		title: "Story Flows",
+		kind: "Narrative structure",
+		summary:
+			"Sequencing systems that help large proposals feel deliberate instead of crowded.",
+		detailPage: "story-flows-study",
+	},
+	{
+		id: "flow-charts",
+		title: "Flow Charts",
+		kind: "Process visualization",
+		summary:
+			"Decision and process maps built for readers who need clarity on the first pass.",
+		detailPage: "flow-charts-study",
+	},
+	{
+		id: "timelines",
+		title: "Timelines",
+		kind: "Scheduling clarity",
+		summary:
+			"Milestone storytelling for dependencies, pacing, and ownership across complex submissions.",
+		detailPage: "timelines-study",
+	},
+	{
+		id: "graphs-and-demographics",
+		title: "Graphs and Demographics",
+		kind: "Data display",
+		summary:
+			"Charts and demographic layouts built to stay credible, legible, and calm.",
+		detailPage: "graphs-study",
+	},
+	{
+		id: "infographics",
+		title: "Infographics",
+		kind: "Information design",
+		summary:
+			"Complex ideas reduced to clear visual systems without turning into noise.",
+		detailPage: "infographics-study",
+	},
+	{
+		id: "maps",
+		title: "Maps",
+		kind: "Geographic storytelling",
+		summary:
+			"Location context and service-area visuals designed for fast orientation.",
+		detailPage: "maps-study",
+	},
+	{
+		id: "org-charts",
+		title: "Org Charts",
+		kind: "Stakeholder clarity",
+		summary:
+			"Role and reporting structures that keep reviewers oriented as complexity grows.",
+		detailPage: "org-charts-study",
+	},
+	{
+		id: "forms-and-applications",
+		title: "Forms & Applications",
+		kind: "Functional design",
+		summary:
+			"Working documents that stay usable and on-brand at the same time.",
+		detailPage: "forms-study",
+	},
+];
+
+/* ─── Case studies ─── */
+
+const P = "/portfolio";
+
+const caseStudies: CaseStudy[] = [
+	/* ── MARKETING ── */
+	{
+		id: "annual-reports-study",
+		title: "Annual Reports",
+		kind: "Editorial systems",
+		intro: "Annual report systems for state Medicaid programs, built around cover design, data visualization, and long-form editorial pacing.",
+		meta: [
+			{ label: "Scope", value: "Print + Digital" },
+			{ label: "Programs", value: "MassHealth, Oregon Health Plan" },
+			{ label: "Format", value: "38 assets" },
+		],
+		deliverables: ["Cover and opener layouts", "Interior spread crops", "Chart and table details", "Full-page views"],
+		mediaSections: [
+			{
+				title: "MassHealth Reports",
+				description: "Cover, openers, chart-heavy spreads, and close-up detail crops.",
+				items: Array.from({ length: 16 }, (_, i) => {
+					const n = String(i + 1).padStart(2, "0");
+					return img(`ar-${n}`, `Report page ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/annual-reports/${n}.jpg`);
+				}),
+			},
+			{
+				title: "Oregon Health Plan",
+				description: "Multi-page sequences, infographics, lifestyle imagery, and appendix layouts.",
+				items: Array.from({ length: 22 }, (_, i) => {
+					const n = String(i + 17).padStart(2, "0");
+					return img(`ar-${n}`, `Report page ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/annual-reports/${n}.jpg`);
+				}),
+			},
+		],
+	},
+	{
+		id: "kepro-video-study",
+		title: "Kepro Logo Reveal Video",
+		kind: "Motion",
+		intro: "Brand reveal video and supporting still frames for a corporate rebrand launch.",
+		meta: [
+			{ label: "Scope", value: "Video + Stills" },
+			{ label: "Deliverables", value: "Logo reveal, frame stills" },
+			{ label: "Format", value: "Video embed" },
+		],
+		deliverables: ["Embedded reveal video", "Storyboard or key-frame stills", "Thumbnail grid", "Mixed image and video support"],
+		mediaSections: [
+			{
+				title: "Motion and supporting frames",
+				description: "Lead video slot with frame stills and launch graphics.",
+				items: [
+					vid("kepro-video-main", "Primary embed", "Vimeo or YouTube embed.", "sm:col-span-2"),
+					img("kepro-frame-1", "Frame still 01", "Supporting still or storyboard frame.", ""),
+					img("kepro-frame-2", "Frame still 02", "Supporting still or storyboard frame.", ""),
+				],
+			},
+		],
+	},
+	{
+		id: "rxexplorer-study",
+		title: "RxExplorer Product Brochure",
+		kind: "Product marketing",
+		intro: "Product brochure system with audience analysis panels, feature spreads, and data-led content design.",
+		meta: [
+			{ label: "Scope", value: "Print brochure" },
+			{ label: "Programs", value: "Brochure spreads, audience analysis" },
+			{ label: "Format", value: "9 assets" },
+		],
+		deliverables: ["Cover and hero spreads", "Diagram and product detail crops", "Audience analysis panels", "Brochure sequence support"],
+		mediaSections: [
+			{
+				title: "Brochure system",
+				description: "Opening spread, feature pages, data panels, and close-up details.",
+				items: [
+					img("rx-01", "Brochure cover", "Lead hero spread.", "sm:col-span-2", "Image", `${P}/rxexplorer-product-brochure/01.jpg`),
+					img("rx-02", "Feature spread A", "Product feature layout.", "", "Image", `${P}/rxexplorer-product-brochure/02.jpeg`),
+					img("rx-03", "Feature spread B", "Supporting spread.", "", "Image", `${P}/rxexplorer-product-brochure/03.jpeg`),
+					img("rx-04", "Detail crop A", "Diagram spread.", "", "Image", `${P}/rxexplorer-product-brochure/04.jpeg`),
+					img("rx-05", "Detail crop B", "Benefits panel.", "", "Image", `${P}/rxexplorer-product-brochure/05.jpeg`),
+				],
+			},
+			{
+				title: "ACT Audience Analysis",
+				description: "Analysis work, charts, and audience mapping tied to the brochure system.",
+				items: [
+					img("rx-06", "Audience panel", "Overview analysis.", "", "Image", `${P}/rxexplorer-product-brochure/06.jpeg`),
+					img("rx-07", "Chart sequence", "Data-led chart view.", "", "Image", `${P}/rxexplorer-product-brochure/07.jpeg`),
+					img("rx-08", "Comparison grid", "Segmentation panel.", "", "Image", `${P}/rxexplorer-product-brochure/08.jpeg`),
+					img("rx-09", "Summary panel", "Closing analysis.", "", "Image", `${P}/rxexplorer-product-brochure/09.jpeg`),
+				],
+			},
+		],
+	},
+	{
+		id: "hcqu-study",
+		title: "HCQU Fact Sheets",
+		kind: "Healthcare communications",
+		intro: "Scannable one-pagers for complex healthcare topics, designed for clarity and fast comprehension.",
+		meta: [
+			{ label: "Scope", value: "Print" },
+			{ label: "Type", value: "Fact sheets" },
+			{ label: "Format", value: "4 assets" },
+		],
+		deliverables: ["One-pager layouts", "Information hierarchy", "Data callouts", "Branded templates"],
+		mediaSections: [{
+			title: "Fact sheet designs",
+			description: "Scannable layouts for complex healthcare topics.",
+			items: Array.from({ length: 4 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`hcqu-${n}`, `Fact sheet ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/hcqu-fact-sheets/${n}.jpg`);
+			}),
+		}],
+	},
+	{
+		id: "whitepaper-study",
+		title: "Whitepaper",
+		kind: "Thought leadership",
+		intro: "Long-form information design and content hierarchy for dense subject matter.",
+		meta: [
+			{ label: "Scope", value: "Print + Digital" },
+			{ label: "Type", value: "Thought leadership" },
+			{ label: "Format", value: "8 assets" },
+		],
+		deliverables: ["Cover design", "Interior page systems", "Data visualization", "Typography hierarchy"],
+		mediaSections: [{
+			title: "Whitepaper pages",
+			description: "Cover, interior layouts, and data-driven content pages.",
+			items: Array.from({ length: 8 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`wp-${n}`, `Page ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/whitepaper/${n}.jpg`);
+			}),
+		}],
+	},
+	{
+		id: "pfizer-study",
+		title: "Pfizer Healthy Living",
+		kind: "Campaign",
+		intro: "Audience-facing campaign materials shaped for trust, clarity, and an orderly reading flow.",
+		meta: [
+			{ label: "Scope", value: "Print campaign" },
+			{ label: "Client", value: "Pfizer" },
+			{ label: "Format", value: "4 assets" },
+		],
+		deliverables: ["Campaign collateral", "Audience-facing design", "Brand-consistent layouts", "Print production"],
+		mediaSections: [{
+			title: "Campaign materials",
+			description: "Trust-driven campaign pieces for health and wellness audiences.",
+			items: Array.from({ length: 4 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`pfizer-${n}`, `Campaign piece ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/pfizer-healthy-living/${n}.jpg`);
+			}),
+		}],
+	},
+	{
+		id: "ppt-study",
+		title: "Powerpoint Presentations",
+		kind: "Presentation design",
+		intro: "Narrative deck systems for leadership, partners, and internal alignment work.",
+		meta: [
+			{ label: "Scope", value: "Presentations" },
+			{ label: "Type", value: "Narrative decks" },
+			{ label: "Format", value: "63 slides" },
+		],
+		deliverables: ["Slide master systems", "Data visualization slides", "Executive summaries", "Partner-facing decks"],
+		mediaSections: [
+			{
+				title: "Deck layouts",
+				description: "Title slides, data pages, and narrative structures.",
+				items: Array.from({ length: 20 }, (_, i) => {
+					const n = String(i + 1).padStart(2, "0");
+					return img(`ppt-${n}`, `Slide ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/powerpoint-presentations/${n}.jpeg`);
+				}),
+			},
+			{
+				title: "Supporting slides",
+				description: "Charts, diagrams, and detail pages.",
+				items: Array.from({ length: 20 }, (_, i) => {
+					const n = String(i + 21).padStart(2, "0");
+					return img(`ppt-${n}`, `Slide ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/powerpoint-presentations/${n}.jpeg`);
+				}),
+			},
+			{
+				title: "Additional slides",
+				description: "Extended deck content and appendix materials.",
+				items: Array.from({ length: 23 }, (_, i) => {
+					const n = String(i + 41).padStart(2, "0");
+					return img(`ppt-${n}`, `Slide ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/powerpoint-presentations/${n}.jpeg`);
+				}),
+			},
+		],
+	},
+	{
+		id: "newsletters-study",
+		title: "Newsletters",
+		kind: "Lifecycle content",
+		intro: "Repeatable update formats built for cadence, consistency, and fewer last-minute fixes.",
+		meta: [
+			{ label: "Scope", value: "Print + Digital" },
+			{ label: "Type", value: "Lifecycle content" },
+			{ label: "Format", value: "3 assets" },
+		],
+		deliverables: ["Newsletter templates", "Content hierarchy", "Recurring format systems"],
+		mediaSections: [{
+			title: "Newsletter designs",
+			description: "Recurring formats for consistent communication.",
+			items: Array.from({ length: 3 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`news-${n}`, `Newsletter ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/newsletters/${n}.jpg`);
+			}),
+		}],
+	},
+	{
+		id: "eap-study",
+		title: "EAP Promos",
+		kind: "Promotional design",
+		intro: "Benefit-led promotional pieces for employee assistance programs.",
+		meta: [
+			{ label: "Scope", value: "Print" },
+			{ label: "Type", value: "Promotional" },
+			{ label: "Format", value: "2 assets" },
+		],
+		deliverables: ["Promotional layouts", "Benefit-focused messaging", "Brand-consistent design"],
+		mediaSections: [{
+			title: "Promotional pieces",
+			description: "Benefit-led promotional materials.",
+			items: Array.from({ length: 2 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`eap-${n}`, `Promo ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/eap-promos/${n}.jpg`);
+			}),
+		}],
+	},
+	/* ── PROPOSAL ── */
+	{
+		id: "covers-study",
+		title: "Covers",
+		kind: "Proposal design",
+		intro: "Front-door presentation systems that set tone and trust before the first paragraph.",
+		meta: [
+			{ label: "Scope", value: "Proposal covers" },
+			{ label: "Type", value: "Presentation design" },
+			{ label: "Format", value: "4 assets" },
+		],
+		deliverables: ["Cover systems", "Title treatments", "Brand-consistent openers"],
+		mediaSections: [{
+			title: "Proposal covers",
+			description: "Cover designs that set tone and build credibility.",
+			items: Array.from({ length: 4 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`covers-${n}`, `Cover ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/covers/${n}.jpg`);
+			}),
+		}],
+	},
+	{
+		id: "call-outs-study",
+		title: "Call Outs",
+		kind: "Content system",
+		intro: "Highlight patterns for surfacing proof points and must-read details quickly.",
+		meta: [
+			{ label: "Scope", value: "Proposal graphics" },
+			{ label: "Type", value: "Content callouts" },
+			{ label: "Format", value: "6 assets" },
+		],
+		deliverables: ["Callout patterns", "Proof point highlights", "Visual emphasis systems"],
+		mediaSections: [{
+			title: "Callout designs",
+			description: "Patterns for surfacing proof points and key details.",
+			items: Array.from({ length: 6 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`callouts-${n}`, `Callout ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/call-outs/${n}.jpg`);
+			}),
+		}],
+	},
+	{
+		id: "story-flows-study",
+		title: "Story Flows",
+		kind: "Narrative structure",
+		intro: "Sequencing systems that help large proposals feel deliberate instead of crowded.",
+		meta: [
+			{ label: "Scope", value: "Proposal narrative" },
+			{ label: "Type", value: "Story sequencing" },
+			{ label: "Format", value: "7 assets" },
+		],
+		deliverables: ["Narrative sequencing", "Page flow systems", "Reading path design"],
+		mediaSections: [{
+			title: "Story flow designs",
+			description: "Sequencing systems for large-format proposals.",
+			items: Array.from({ length: 7 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`storyflows-${n}`, `Flow ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/story-flows/${n}.jpg`);
+			}),
+		}],
+	},
+	{
+		id: "flow-charts-study",
+		title: "Flow Charts",
+		kind: "Process visualization",
+		intro: "Decision and process maps built for readers who need clarity on the first pass.",
+		meta: [
+			{ label: "Scope", value: "Process graphics" },
+			{ label: "Type", value: "Decision maps" },
+			{ label: "Format", value: "5 assets" },
+		],
+		deliverables: ["Decision flow maps", "Process visualizations", "Dependency diagrams"],
+		mediaSections: [{
+			title: "Process and decision maps",
+			description: "Flow charts designed for first-pass clarity.",
+			items: Array.from({ length: 5 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`flowcharts-${n}`, `Flow chart ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/flow-charts/${n}.jpg`);
+			}),
+		}],
+	},
+	{
+		id: "timelines-study",
+		title: "Timelines",
+		kind: "Scheduling clarity",
+		intro: "Milestone storytelling for dependencies, pacing, and ownership across complex submissions.",
+		meta: [
+			{ label: "Scope", value: "Proposal timelines" },
+			{ label: "Type", value: "Milestone design" },
+			{ label: "Format", value: "4 assets" },
+		],
+		deliverables: ["Milestone visualizations", "Dependency mapping", "Pacing diagrams"],
+		mediaSections: [{
+			title: "Timeline designs",
+			description: "Milestone storytelling for complex submissions.",
+			items: Array.from({ length: 4 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`timelines-${n}`, `Timeline ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/timelines/${n}.jpg`);
+			}),
+		}],
+	},
+	{
+		id: "graphs-study",
+		title: "Graphs and Demographics",
+		kind: "Data display",
+		intro: "Charts and demographic layouts built to stay credible, legible, and calm.",
+		meta: [
+			{ label: "Scope", value: "Data graphics" },
+			{ label: "Type", value: "Charts and demographics" },
+			{ label: "Format", value: "7 assets" },
+		],
+		deliverables: ["Chart systems", "Demographic layouts", "Data credibility design"],
+		mediaSections: [{
+			title: "Data visualizations",
+			description: "Charts and demographics designed for credibility and legibility.",
+			items: Array.from({ length: 7 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`graphs-${n}`, `Chart ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/graphs-and-demographics/${n}.jpg`);
+			}),
+		}],
+	},
+	{
+		id: "infographics-study",
+		title: "Infographics",
+		kind: "Information design",
+		intro: "Complex ideas reduced to clear visual systems without turning into noise.",
+		meta: [
+			{ label: "Scope", value: "Information graphics" },
+			{ label: "Type", value: "Visual systems" },
+			{ label: "Format", value: "22 assets" },
+		],
+		deliverables: ["Information graphics", "Visual complexity reduction", "Data storytelling"],
+		mediaSections: [
+			{
+				title: "Infographic designs",
+				description: "Complex ideas distilled into clear visual systems.",
+				items: Array.from({ length: 11 }, (_, i) => {
+					const n = String(i + 1).padStart(2, "0");
+					return img(`info-${n}`, `Infographic ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/infographics/${n}.jpg`);
+				}),
+			},
+			{
+				title: "Additional infographics",
+				description: "Extended information design and data storytelling.",
+				items: Array.from({ length: 11 }, (_, i) => {
+					const n = String(i + 12).padStart(2, "0");
+					return img(`info-${n}`, `Infographic ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/infographics/${n}.jpg`);
+				}),
+			},
+		],
+	},
+	{
+		id: "maps-study",
+		title: "Maps",
+		kind: "Geographic storytelling",
+		intro: "Location context and service-area visuals designed for fast orientation.",
+		meta: [
+			{ label: "Scope", value: "Geographic graphics" },
+			{ label: "Type", value: "Service-area maps" },
+			{ label: "Format", value: "2 assets" },
+		],
+		deliverables: ["Service-area maps", "Geographic context", "Location visuals"],
+		mediaSections: [{
+			title: "Map designs",
+			description: "Location context and service-area visualizations.",
+			items: Array.from({ length: 2 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`maps-${n}`, `Map ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/maps/${n}.jpg`);
+			}),
+		}],
+	},
+	{
+		id: "org-charts-study",
+		title: "Org Charts",
+		kind: "Stakeholder clarity",
+		intro: "Role and reporting structures that keep reviewers oriented as complexity grows.",
+		meta: [
+			{ label: "Scope", value: "Organizational graphics" },
+			{ label: "Type", value: "Reporting structures" },
+			{ label: "Format", value: "7 assets" },
+		],
+		deliverables: ["Org chart systems", "Reporting hierarchies", "Role clarity design"],
+		mediaSections: [{
+			title: "Organizational charts",
+			description: "Role and reporting structures for complex organizations.",
+			items: Array.from({ length: 7 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`orgcharts-${n}`, `Org chart ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/org-charts/${n}.jpg`);
+			}),
+		}],
+	},
+	{
+		id: "forms-study",
+		title: "Forms & Applications",
+		kind: "Functional design",
+		intro: "Working documents that stay usable and on-brand at the same time.",
+		meta: [
+			{ label: "Scope", value: "Functional documents" },
+			{ label: "Type", value: "Forms and applications" },
+			{ label: "Format", value: "4 assets" },
+		],
+		deliverables: ["Form design", "Application layouts", "Functional branding"],
+		mediaSections: [{
+			title: "Form and application designs",
+			description: "Functional documents that balance usability and brand consistency.",
+			items: Array.from({ length: 4 }, (_, i) => {
+				const n = String(i + 1).padStart(2, "0");
+				return img(`forms-${n}`, `Form ${n}`, "", i === 0 ? "sm:col-span-2" : "", "Image", `${P}/forms-and-applications/${n}.jpg`);
+			}),
+		}],
+	},
+];
+
+/* ─── TOC structure ─── */
+
+const tocSections = [
+	{
+		label: "Publishing",
+		target: "overview-publishing",
+	},
+	{
+		label: "Marketing",
+		target: "sec-marketing",
+		count: marketingItems.length,
+		children: marketingItems.map((item) => ({
+			label: item.title,
+			target: item.detailPage ?? item.id,
+			isPage: !!item.detailPage,
+		})),
+	},
+	{
+		label: "Proposal",
+		target: "sec-proposal",
+		count: proposalItems.length,
+		children: proposalItems.map((item) => ({
+			label: item.title,
+			target: item.detailPage ?? item.id,
+			isPage: !!item.detailPage,
+		})),
+	},
+	{
+		label: "Contact",
+		target: "sec-contact",
+	},
+];
+
+const totalPieces = marketingItems.length + proposalItems.length;
+---
+
+<div
+	id="portfolio-view"
+	class="hidden min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-white"
+>
+	<div class="mx-auto max-w-[92rem] px-4 pt-24 pb-20 sm:px-6 lg:px-8">
+		<div class="grid gap-8 xl:grid-cols-[17rem_minmax(0,1fr)]">
+
+			<!-- ═══ LEFT SIDEBAR TOC ═══ -->
+			<aside class="hidden xl:flex xl:sticky xl:top-24 xl:h-[calc(100vh-7rem)] xl:flex-col xl:overflow-hidden border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+				<!-- Header -->
+				<div class="border-b border-slate-200 px-5 py-5 dark:border-slate-800">
+					<div class="flex items-center justify-between gap-4">
+						<div class="flex items-center gap-3">
+							<div class="flex h-10 w-10 items-center justify-center bg-slate-900 text-sm font-black tracking-[0.18em] text-white dark:bg-white dark:text-slate-950">
+								AR
+							</div>
+							<div>
+								<p class="text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">Portfolio</p>
+								<p class="text-sm font-semibold text-slate-700 dark:text-slate-200">Anthony Rosen</p>
+							</div>
+						</div>
+						<button
+							type="button"
+							data-v2-nav="home"
+							class="border border-slate-200 px-2.5 py-1 text-[11px] font-semibold tracking-[0.24em] text-slate-500 uppercase transition hover:border-blue-600 hover:text-blue-600 dark:border-slate-700 dark:text-slate-300 dark:hover:border-blue-400 dark:hover:text-blue-300"
+						>
+							Back
+						</button>
+					</div>
+				</div>
+
+				<!-- Scrollable TOC -->
+				<div
+					class="v2-toc-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-5 py-5 pr-3"
+					data-lenis-prevent
+					tabindex="0"
+					aria-label="Portfolio table of contents"
+				>
+					<div class="space-y-5">
+						<!-- Overview link -->
+						<button
+							type="button"
+							data-v2-page="overview"
+							class="v2-toc-item w-full text-left text-[14px] font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+						>
+							Overview
+						</button>
+
+						{tocSections.map((group) => (
+							<div>
+								{!group.children ? (
+									<button
+										type="button"
+										data-v2-page={group.isPage ? group.target : undefined}
+										data-v2-scroll={!group.isPage ? group.target : undefined}
+										class="v2-toc-item w-full text-left text-[14px] font-medium text-slate-500 transition hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-300"
+									>
+										{group.label}
+									</button>
+								) : (
+									<div>
+										<div class="mb-3 flex items-center justify-between gap-4">
+											<button
+												type="button"
+												data-v2-scroll={group.target}
+												class="v2-toc-item text-left text-[11px] font-black tracking-[0.18em] text-slate-900 uppercase transition hover:text-blue-600 dark:text-white dark:hover:text-blue-300"
+											>
+												{group.label}
+											</button>
+											<span class="text-xs font-semibold text-slate-400">{group.count}</span>
+										</div>
+										<div class="space-y-1.5 border-l border-slate-200 pl-4 dark:border-slate-800">
+											{group.children.map((child) => (
+												<button
+													type="button"
+													data-v2-page={child.isPage ? child.target : undefined}
+													data-v2-scroll={!child.isPage ? child.target : undefined}
+													class="v2-toc-item block w-full text-left text-[14px] leading-6 text-slate-400 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+												>
+													{child.label}
+												</button>
+											))}
+										</div>
+									</div>
+								)}
+							</div>
+						))}
+					</div>
+				</div>
+
+				<!-- Stat footer -->
+				<div class="border-t border-slate-200 px-5 py-4 dark:border-slate-800">
+					<div class="flex items-center justify-between text-sm">
+						<span class="font-semibold text-slate-700 dark:text-slate-200">{totalPieces} projects</span>
+						<span class="text-slate-400">{caseStudies.length} case studies</span>
+					</div>
+				</div>
+			</aside>
+
+			<!-- ═══ MAIN CONTENT AREA ═══ -->
+			<main class="min-w-0">
+
+				<!-- ─── OVERVIEW PAGE ─── -->
+				<div id="v2-page-overview" data-v2-view="overview">
+
+					<!-- Hero -->
+					<section class="border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+						<div class="p-6 lg:p-8">
+							<p class="text-[11px] font-semibold tracking-[0.24em] text-blue-600 uppercase dark:text-blue-400">Portfolio</p>
+							<h1 class="mt-3 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl dark:text-white">
+								Selected Work
+							</h1>
+							<p class="mt-4 max-w-3xl text-base leading-7 text-slate-600 dark:text-slate-300">
+								Design and communications work spanning editorial systems, marketing campaigns, proposals, and motion. Select a project below or use the sidebar to navigate.
+							</p>
+						</div>
+						<div class="grid grid-cols-3 gap-px border-t border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800">
+							<div class="bg-white p-4 dark:bg-slate-900">
+								<p class="text-2xl font-black tracking-tight text-slate-950 dark:text-white">{totalPieces}</p>
+								<p class="mt-1 text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">Projects</p>
+							</div>
+							<div class="bg-white p-4 dark:bg-slate-900">
+								<p class="text-2xl font-black tracking-tight text-slate-950 dark:text-white">{caseStudies.length}</p>
+								<p class="mt-1 text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">Case studies</p>
+							</div>
+							<div class="bg-white p-4 dark:bg-slate-900">
+								<p class="text-2xl font-black tracking-tight text-slate-950 dark:text-white">10+</p>
+								<p class="mt-1 text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">Years</p>
+							</div>
+						</div>
+					</section>
+
+					<!-- Mobile quick-jump -->
+					<div class="xl:hidden mt-5 border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+						<p class="text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">Jump to</p>
+						<div class="mt-3 flex gap-2 overflow-x-auto v2-scrollbar-hide pb-1">
+							<button type="button" data-v2-scroll="overview-publishing" class="shrink-0 border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-600 hover:text-blue-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-blue-400 dark:hover:text-blue-300">Publishing</button>
+							<button type="button" data-v2-scroll="sec-marketing" class="shrink-0 border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-600 hover:text-blue-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-blue-400 dark:hover:text-blue-300">Marketing</button>
+							<button type="button" data-v2-scroll="sec-proposal" class="shrink-0 border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-600 hover:text-blue-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-blue-400 dark:hover:text-blue-300">Proposal</button>
+							<button type="button" data-v2-scroll="sec-contact" class="shrink-0 border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-600 hover:text-blue-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-blue-400 dark:hover:text-blue-300">Contact</button>
+						</div>
+					</div>
+
+					<!-- Publishing feature card -->
+					<section
+						id="overview-publishing"
+						class="v2-entrance mt-8 border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+					>
+						<div class="border-b border-slate-200 px-6 py-5 dark:border-slate-800 lg:px-8">
+							<p class="text-[11px] font-semibold tracking-[0.24em] text-blue-600 uppercase dark:text-blue-400">{publishing.kicker}</p>
+							<h2 class="mt-2 text-3xl font-black tracking-tight text-slate-950 dark:text-white">{publishing.title}</h2>
+						</div>
+						<div class="grid gap-px border-t border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800 lg:grid-cols-[minmax(0,1.25fr)_repeat(3,minmax(0,0.75fr))]">
+							<div class="bg-white p-6 dark:bg-slate-900 lg:p-8">
+								<p class="max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">{publishing.summary}</p>
+								<ul class="mt-5 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
+									{publishing.points.map((point) => (
+										<li class="flex gap-3">
+											<span class="mt-2 h-2 w-2 shrink-0 bg-blue-600 dark:bg-blue-400"></span>
+											<span>{point}</span>
+										</li>
+									))}
+								</ul>
+							</div>
+							{publishing.stats.map((stat) => (
+								<div class="bg-white p-6 dark:bg-slate-900">
+									<p class="text-3xl font-black tracking-tight text-slate-950 dark:text-white">{stat.value}</p>
+									<p class="mt-2 text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">{stat.label}</p>
+								</div>
+							))}
+						</div>
+						<div class="grid grid-cols-3 gap-px border-t border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800">
+							{publishing.highlights.map((h) => (
+								<div class="bg-slate-50 p-5 dark:bg-slate-900">
+									<p class="text-xl font-black tracking-tight text-slate-950 dark:text-white">{h.value}</p>
+									<p class="mt-1 text-xs font-semibold text-slate-400 uppercase tracking-[0.18em]">{h.label}</p>
+								</div>
+							))}
+						</div>
+					</section>
+
+					<!-- Marketing directory -->
+					<section id="sec-marketing" class="v2-entrance mt-8 border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+						<div class="border-b border-slate-200 px-6 py-5 dark:border-slate-800 lg:px-8">
+							<div class="flex items-end justify-between gap-4">
+								<div>
+									<p class="text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">Section 01</p>
+									<h2 class="mt-2 text-3xl font-black tracking-tight text-slate-950 dark:text-white">Marketing</h2>
+								</div>
+								<p class="text-sm text-slate-400">{marketingItems.length} projects</p>
+							</div>
+						</div>
+						<div class="divide-y divide-slate-200 dark:divide-slate-800">
+							{marketingItems.map((item, i) => (
+								<div class="v2-dir-row group grid items-center gap-4 px-6 py-4 transition grid-cols-[4rem_minmax(0,1fr)_auto] lg:grid-cols-[4rem_minmax(0,1fr)_minmax(0,1.2fr)_10rem_auto] lg:px-8 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+									<!-- Thumbnail placeholder -->
+									<div class="v2-thumb h-14 w-16 border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800 overflow-hidden flex items-center justify-center">
+										<div class="grid h-8 w-10 grid-cols-2 gap-0.5">
+											<div class="bg-slate-200 dark:bg-slate-600"></div>
+											<div class="bg-slate-200 dark:bg-slate-600"></div>
+											<div class="col-span-2 bg-blue-600/15 dark:bg-blue-400/20"></div>
+										</div>
+									</div>
+									<div>
+										<h3 class="text-base font-bold tracking-tight text-slate-950 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-300">
+											{item.title}
+										</h3>
+										<p class="mt-0.5 text-xs font-semibold tracking-[0.18em] text-slate-400 uppercase">
+											{item.kind}
+										</p>
+									</div>
+									<p class="hidden text-sm leading-6 text-slate-500 dark:text-slate-400 lg:block">{item.summary}</p>
+									<span class="hidden text-xs font-semibold tracking-[0.18em] text-slate-400 uppercase lg:block">
+										{String(i + 1).padStart(2, "0")}
+									</span>
+									{item.detailPage ? (
+										<button
+											type="button"
+											data-v2-page={item.detailPage}
+											class="text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200"
+										>
+											View &rarr;
+										</button>
+									) : (
+										<span class="text-xs text-slate-300 dark:text-slate-600">&mdash;</span>
+									)}
+								</div>
+							))}
+						</div>
+					</section>
+
+					<!-- Proposal directory -->
+					<section id="sec-proposal" class="v2-entrance mt-8 border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+						<div class="border-b border-slate-200 px-6 py-5 dark:border-slate-800 lg:px-8">
+							<div class="flex items-end justify-between gap-4">
+								<div>
+									<p class="text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">Section 02</p>
+									<h2 class="mt-2 text-3xl font-black tracking-tight text-slate-950 dark:text-white">Proposal</h2>
+								</div>
+								<p class="text-sm text-slate-400">{proposalItems.length} projects</p>
+							</div>
+						</div>
+						<div class="divide-y divide-slate-200 dark:divide-slate-800">
+							{proposalItems.map((item, i) => (
+								<div class="v2-dir-row group grid items-center gap-4 px-6 py-4 transition grid-cols-[4rem_minmax(0,1fr)_auto] lg:grid-cols-[4rem_minmax(0,1fr)_minmax(0,1.2fr)_10rem_auto] lg:px-8 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+									<!-- Thumbnail placeholder -->
+									<div class="v2-thumb h-14 w-16 border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800 overflow-hidden flex items-center justify-center">
+										<div class="grid h-8 w-10 grid-cols-2 gap-0.5">
+											<div class="col-span-2 bg-slate-200 dark:bg-slate-600"></div>
+											<div class="bg-slate-200 dark:bg-slate-600"></div>
+											<div class="bg-blue-600/15 dark:bg-blue-400/20"></div>
+										</div>
+									</div>
+									<div>
+										<h3 class="text-base font-bold tracking-tight text-slate-950 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-300">
+											{item.title}
+										</h3>
+										<p class="mt-0.5 text-xs font-semibold tracking-[0.18em] text-slate-400 uppercase">
+											{item.kind}
+										</p>
+									</div>
+									<p class="hidden text-sm leading-6 text-slate-500 dark:text-slate-400 lg:block">{item.summary}</p>
+									<span class="hidden text-xs font-semibold tracking-[0.18em] text-slate-400 uppercase lg:block">
+										{String(i + 1).padStart(2, "0")}
+									</span>
+									{item.detailPage ? (
+										<button
+											type="button"
+											data-v2-page={item.detailPage}
+											class="text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200"
+										>
+											View &rarr;
+										</button>
+									) : (
+										<span class="text-xs text-slate-300 dark:text-slate-600">&mdash;</span>
+									)}
+								</div>
+							))}
+						</div>
+					</section>
+
+					<!-- Contact -->
+					<section id="sec-contact" class="v2-entrance mt-8 border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+						<div class="grid gap-px bg-slate-200 dark:bg-slate-800 lg:grid-cols-[minmax(0,1fr)_18rem]">
+							<div class="bg-white p-6 dark:bg-slate-900 lg:p-8">
+								<p class="text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">Contact</p>
+								<h2 class="mt-2 text-3xl font-black tracking-tight text-slate-950 dark:text-white">Let's talk.</h2>
+								<p class="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">
+									Available for design systems, editorial operations, and communications work. Based in Minneapolis.
+								</p>
+							</div>
+							<div class="grid gap-px bg-slate-200 dark:bg-slate-800">
+								<a href="mailto:anthonyrosen@gmail.com" class="bg-white px-5 py-4 text-sm font-semibold text-slate-700 transition hover:text-blue-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:text-blue-300">anthonyrosen@gmail.com</a>
+								<a href="https://linkedin.com/in/anthonyrosen" target="_blank" rel="noreferrer" class="bg-white px-5 py-4 text-sm font-semibold text-slate-700 transition hover:text-blue-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:text-blue-300">linkedin.com/in/anthonyrosen</a>
+								<div class="bg-white px-5 py-4 text-sm font-semibold text-slate-700 dark:bg-slate-900 dark:text-slate-200">Hopkins, MN</div>
+							</div>
+						</div>
+					</section>
+				</div>
+
+				<!-- ─── CASE STUDY DETAIL PAGES ─── -->
+				{caseStudies.map((study) => (
+					<div id={`v2-page-${study.id}`} data-v2-view={study.id} class="hidden">
+						<div class="mb-6 flex items-center gap-3">
+							<button type="button" data-v2-page="overview" class="text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200">&larr; Back to overview</button>
+						</div>
+
+						<!-- Header -->
+						<section class="border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+							<div class="p-6 lg:p-8">
+								<div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto]">
+									<div>
+										<p class="text-[11px] font-semibold tracking-[0.24em] text-blue-600 uppercase dark:text-blue-400">{study.kind}</p>
+										<h1 class="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl dark:text-white">{study.title}</h1>
+										<p class="mt-4 max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-300">{study.intro}</p>
+									</div>
+									<div class="grid gap-px border border-slate-200 bg-slate-200 self-start text-sm dark:border-slate-800 dark:bg-slate-800 sm:grid-cols-3">
+										{study.meta.map((m) => (
+											<div class="bg-white p-4 dark:bg-slate-900">
+												<p class="text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">{m.label}</p>
+												<p class="mt-2 text-sm font-semibold text-slate-700 dark:text-slate-200">{m.value}</p>
+											</div>
+										))}
+									</div>
+								</div>
+							</div>
+						</section>
+
+						<!-- Media sections -->
+						<div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_14rem]">
+							<div class="space-y-8">
+								{study.mediaSections.map((ms) => (
+									<section class="border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+										<div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+											<h2 class="text-lg font-bold tracking-tight text-slate-950 dark:text-white">{ms.title}</h2>
+											<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{ms.description}</p>
+										</div>
+										<div class="grid gap-3 p-5 sm:grid-cols-2">
+											{ms.items.map((item, idx) => (
+												<button
+													type="button"
+													data-v2-lightbox
+													data-v2-group={study.id}
+													data-v2-index={String(idx)}
+													data-v2-title={item.title}
+													data-v2-caption={item.caption}
+													data-v2-type={item.type}
+													data-v2-src={item.src ?? ""}
+													data-v2-embed={item.embedUrl ?? ""}
+													data-v2-badge={item.badge ?? ""}
+													class:list={[
+														"v2-media-tile group border border-slate-200 text-left transition hover:border-blue-600 dark:border-slate-800 dark:hover:border-blue-400",
+														item.aspectClass,
+													]}
+												>
+													<div class="flex h-full flex-col">
+														{item.src ? (
+															<div class="flex-1 bg-slate-100 dark:bg-slate-900">
+																<img src={item.src} alt={item.title} class="h-full w-full object-cover" loading="lazy" />
+															</div>
+														) : (
+															<div class="v2-placeholder flex flex-1 items-center justify-center bg-slate-50 p-6 dark:bg-slate-900/50">
+																<div class="text-center">
+																	<div class="mx-auto mb-3 h-px w-10 bg-blue-600 dark:bg-blue-400"></div>
+																	{item.type === "video" ? (
+																		<div class="mx-auto flex h-10 w-10 items-center justify-center border border-slate-300 dark:border-slate-600">
+																			<div class="h-0 w-0 border-y-[6px] border-l-[10px] border-y-transparent border-l-slate-400 dark:border-l-slate-500 ml-0.5"></div>
+																		</div>
+																	) : (
+																		<div class="mx-auto grid h-10 w-14 grid-cols-2 gap-1">
+																			<div class="bg-slate-200 dark:bg-slate-700"></div>
+																			<div class="bg-slate-200 dark:bg-slate-700"></div>
+																			<div class="col-span-2 bg-slate-200 dark:bg-slate-700"></div>
+																		</div>
+																	)}
+																</div>
+															</div>
+														)}
+														<div class="border-t border-slate-200 px-4 py-3 dark:border-slate-800">
+															<p class="text-sm font-semibold text-slate-700 group-hover:text-blue-600 dark:text-slate-200 dark:group-hover:text-blue-300">{item.title}</p>
+															<p class="mt-0.5 text-xs text-slate-400">{item.caption}</p>
+														</div>
+													</div>
+												</button>
+											))}
+										</div>
+									</section>
+								))}
+							</div>
+
+							<!-- Deliverables sidebar -->
+							<aside class="hidden border border-slate-200 bg-white p-5 self-start dark:border-slate-800 dark:bg-slate-900 lg:block">
+								<p class="text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase">Deliverables</p>
+								<ul class="mt-4 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
+									{study.deliverables.map((d) => (
+										<li class="flex gap-3">
+											<span class="mt-2 h-2 w-2 shrink-0 bg-blue-600 dark:bg-blue-400"></span>
+											<span>{d}</span>
+										</li>
+									))}
+								</ul>
+							</aside>
+						</div>
+					</div>
+				))}
+			</main>
+		</div>
+	</div>
+
+	<!-- ═══ LIGHTBOX ═══ -->
+	<div
+		id="v2-lightbox"
+		class="v2-lightbox hidden fixed inset-0 z-[80] bg-slate-950/70 p-4 backdrop-blur-sm sm:p-8"
+		role="dialog"
+		aria-modal="true"
+		aria-label="Portfolio viewer"
+	>
+		<button id="v2-lightbox-overlay" type="button" class="absolute inset-0" aria-label="Close viewer"></button>
+		<div class="v2-lightbox-panel relative mx-auto flex h-full max-w-5xl items-center">
+			<div class="grid max-h-full w-full overflow-hidden border border-slate-700 bg-white dark:bg-slate-950 lg:grid-cols-[minmax(0,1fr)_18rem]">
+				<div class="border-b border-slate-200 bg-slate-100 dark:border-slate-800 dark:bg-slate-900 lg:border-r lg:border-b-0">
+					<div id="v2-lightbox-frame" class="flex min-h-[50vh] items-center justify-center p-4 sm:p-8 transition-opacity duration-200">
+						<img id="v2-lightbox-img" class="hidden max-h-[72vh] w-auto max-w-full object-contain" alt="" />
+						<iframe id="v2-lightbox-video" class="hidden aspect-video w-full max-w-4xl border-0 bg-black" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Portfolio video"></iframe>
+						<div id="v2-lightbox-empty" class="hidden w-full max-w-md border border-dashed border-slate-300 bg-white p-8 text-center dark:border-slate-700 dark:bg-slate-950">
+							<div class="mx-auto mb-4 h-px w-10 bg-blue-600 dark:bg-blue-400"></div>
+							<p id="v2-lightbox-empty-badge" class="text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase"></p>
+							<p id="v2-lightbox-empty-note" class="mt-3 text-sm leading-7 text-slate-500 dark:text-slate-400"></p>
+						</div>
+					</div>
+				</div>
+				<div class="grid">
+					<div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+						<div class="flex items-start justify-between gap-4">
+							<div>
+								<p id="v2-lightbox-badge" class="text-[11px] font-semibold tracking-[0.24em] text-slate-400 uppercase"></p>
+								<h3 id="v2-lightbox-title" class="mt-2 text-xl font-bold tracking-tight text-slate-950 dark:text-white"></h3>
+							</div>
+							<button id="v2-lightbox-close" type="button" class="border border-slate-200 px-2.5 py-1 text-[11px] font-semibold tracking-[0.24em] text-slate-500 uppercase transition hover:border-blue-600 hover:text-blue-600 dark:border-slate-700 dark:text-slate-300 dark:hover:border-blue-400 dark:hover:text-blue-300">Close</button>
+						</div>
+					</div>
+					<div class="px-5 py-5">
+						<p id="v2-lightbox-caption" class="text-sm leading-7 text-slate-600 dark:text-slate-300"></p>
+					</div>
+					<div class="mt-auto grid gap-px border-t border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800">
+						<div class="bg-white px-5 py-3 text-xs font-semibold tracking-[0.24em] text-slate-400 uppercase dark:bg-slate-950">
+							<span id="v2-lightbox-count"></span>
+						</div>
+						<div class="grid grid-cols-2 gap-px bg-slate-200 dark:bg-slate-800">
+							<button id="v2-lightbox-prev" type="button" class="bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:text-blue-600 disabled:cursor-not-allowed disabled:text-slate-300 dark:bg-slate-950 dark:text-slate-200 dark:hover:text-blue-300 dark:disabled:text-slate-600">Previous</button>
+							<button id="v2-lightbox-next" type="button" class="bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:text-blue-600 disabled:cursor-not-allowed disabled:text-slate-300 dark:bg-slate-950 dark:text-slate-200 dark:hover:text-blue-300 dark:disabled:text-slate-600">Next</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	function initPortfolioV2() {
+		const root = document.getElementById("portfolio-view");
+		if (!root || root.dataset.v2Init === "true") return;
+		root.dataset.v2Init = "true";
+
+		const $$ = (sel: string): HTMLButtonElement[] =>
+			Array.from(root.querySelectorAll(sel)).filter(
+				(el) => el instanceof HTMLButtonElement
+			) as HTMLButtonElement[];
+
+		const views = root.querySelectorAll<HTMLElement>("[data-v2-view]");
+		let currentView = "overview";
+
+		/* ─── Page switching ─── */
+
+		const showPage = (pageId: string) => {
+			currentView = pageId;
+			views.forEach((v) => {
+				const isTarget = v.dataset.v2View === pageId;
+				v.classList.toggle("hidden", !isTarget);
+			});
+
+			// Scroll to top of portfolio
+			const portfolioTop = root.getBoundingClientRect().top + window.scrollY - 80;
+			window.scrollTo({ top: portfolioTop, behavior: "smooth" });
+
+			// Update TOC active states
+			root.querySelectorAll(".v2-toc-item").forEach((item) => {
+				const el = item as HTMLElement;
+				const target = el.dataset.v2Page ?? el.dataset.v2Scroll;
+				const isActive = target === pageId;
+				el.classList.toggle("v2-toc-active", isActive);
+			});
+
+			// Re-observe entrance animations on the new page
+			if (!prefersReduced) {
+				const pageEl = root.querySelector(`[data-v2-view="${pageId}"]`);
+				if (pageEl) {
+					pageEl.querySelectorAll(".v2-entrance:not(.v2-visible)").forEach((el) => {
+						entranceObserver.observe(el);
+					});
+				}
+			}
+		};
+
+		$$("[data-v2-page]").forEach((btn) => {
+			btn.addEventListener("click", () => {
+				const pageId = btn.dataset.v2Page;
+				if (pageId) showPage(pageId);
+			});
+		});
+
+		/* ─── Scroll within overview ─── */
+
+		$$("[data-v2-scroll]").forEach((btn) => {
+			btn.addEventListener("click", () => {
+				const targetId = btn.dataset.v2Scroll;
+				if (!targetId) return;
+
+				// If we're not on overview and the target is an overview section, go to overview first
+				if (currentView !== "overview" && !document.getElementById(`v2-page-${targetId}`)) {
+					showPage("overview");
+					setTimeout(() => {
+						const el = document.getElementById(targetId);
+						if (el) {
+							const top = el.getBoundingClientRect().top + window.scrollY - 128;
+							window.scrollTo({ top, behavior: "smooth" });
+						}
+					}, 100);
+				} else {
+					const el = document.getElementById(targetId);
+					if (el) {
+						const top = el.getBoundingClientRect().top + window.scrollY - 128;
+						window.scrollTo({ top, behavior: "smooth" });
+					}
+				}
+			});
+		});
+
+		/* ─── Back to home ─── */
+
+		$$("[data-v2-nav]").forEach((btn) => {
+			btn.addEventListener("click", () => {
+				const target = btn.dataset.v2Nav;
+				if (target) window.dispatchEvent(new CustomEvent("view-change", { detail: target }));
+			});
+		});
+
+		/* ─── Entrance animations ─── */
+
+		const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		let entranceObserver: IntersectionObserver;
+
+		if (!prefersReduced) {
+			entranceObserver = new IntersectionObserver(
+				(entries) => {
+					entries.forEach((entry) => {
+						if (entry.isIntersecting) {
+							(entry.target as HTMLElement).classList.add("v2-visible");
+							entranceObserver.unobserve(entry.target);
+						}
+					});
+				},
+				{ threshold: 0.08, rootMargin: "0px 0px -30px 0px" }
+			);
+			root.querySelectorAll(".v2-entrance").forEach((el) => entranceObserver.observe(el));
+		} else {
+			root.querySelectorAll(".v2-entrance").forEach((el) => el.classList.add("v2-visible"));
+		}
+
+		/* ─── Lightbox ─── */
+
+		const modal = document.getElementById("v2-lightbox");
+		const overlay = document.getElementById("v2-lightbox-overlay");
+		const closeBtn = document.getElementById("v2-lightbox-close");
+		const prevBtn = document.getElementById("v2-lightbox-prev") as HTMLButtonElement | null;
+		const nextBtn = document.getElementById("v2-lightbox-next") as HTMLButtonElement | null;
+		const lbBadge = document.getElementById("v2-lightbox-badge");
+		const lbTitle = document.getElementById("v2-lightbox-title");
+		const lbCaption = document.getElementById("v2-lightbox-caption");
+		const lbCount = document.getElementById("v2-lightbox-count");
+		const lbImg = document.getElementById("v2-lightbox-img") as HTMLImageElement | null;
+		const lbVideo = document.getElementById("v2-lightbox-video") as HTMLIFrameElement | null;
+		const lbEmpty = document.getElementById("v2-lightbox-empty");
+		const lbEmptyBadge = document.getElementById("v2-lightbox-empty-badge");
+		const lbEmptyNote = document.getElementById("v2-lightbox-empty-note");
+		const lbFrame = document.getElementById("v2-lightbox-frame");
+
+		if (!modal || !overlay || !closeBtn || !prevBtn || !nextBtn || !lbBadge || !lbTitle || !lbCaption || !lbCount || !lbImg || !lbVideo || !lbEmpty || !lbEmptyBadge || !lbEmptyNote || !lbFrame) return;
+
+		let groupButtons: HTMLButtonElement[] = [];
+		let activeIdx = 0;
+		let triggerButton: HTMLButtonElement | null = null;
+
+		const getGroup = (name: string) => $$(`[data-v2-lightbox][data-v2-group="${name}"]`);
+
+		const render = () => {
+			const btn = groupButtons[activeIdx];
+			if (!btn) return;
+
+			lbBadge.textContent = btn.dataset.v2Badge ?? "";
+			lbTitle.textContent = btn.dataset.v2Title ?? "";
+			lbCaption.textContent = btn.dataset.v2Caption ?? "";
+			lbCount.textContent = `${activeIdx + 1} / ${groupButtons.length}`;
+
+			lbFrame.style.opacity = "0";
+			setTimeout(() => {
+				lbImg.classList.add("hidden");
+				lbVideo.classList.add("hidden");
+				lbEmpty.classList.add("hidden");
+				lbImg.src = "";
+				lbVideo.src = "";
+
+				const type = btn.dataset.v2Type ?? "image";
+				const src = btn.dataset.v2Src ?? "";
+				const embed = btn.dataset.v2Embed ?? "";
+
+				if (type === "image" && src) {
+					lbImg.src = src;
+					lbImg.alt = btn.dataset.v2Title ?? "";
+					lbImg.classList.remove("hidden");
+				} else if (type === "video" && embed) {
+					lbVideo.src = embed;
+					lbVideo.classList.remove("hidden");
+				} else {
+					lbEmpty.classList.remove("hidden");
+					lbEmptyBadge.textContent = btn.dataset.v2Badge ?? "";
+					lbEmptyNote.textContent = type === "video"
+						? "Video embed will appear here once the final URL is added."
+						: "Image will appear here once the portfolio asset is added.";
+				}
+				lbFrame.style.opacity = "1";
+			}, 150);
+
+			prevBtn.disabled = activeIdx === 0;
+			nextBtn.disabled = activeIdx === groupButtons.length - 1;
+		};
+
+		const openLightbox = (btn: HTMLButtonElement) => {
+			const group = btn.dataset.v2Group;
+			if (!group) return;
+			triggerButton = btn;
+			groupButtons = getGroup(group);
+			activeIdx = groupButtons.indexOf(btn);
+			if (activeIdx < 0) activeIdx = 0;
+			render();
+			modal.classList.remove("hidden");
+			modal.classList.add("v2-lightbox-entering");
+			document.documentElement.classList.add("overflow-hidden");
+			setTimeout(() => {
+				modal.classList.remove("v2-lightbox-entering");
+				closeBtn?.focus();
+			}, 280);
+		};
+
+		const closeLightbox = () => {
+			modal.classList.add("v2-lightbox-leaving");
+			setTimeout(() => {
+				modal.classList.add("hidden");
+				modal.classList.remove("v2-lightbox-leaving");
+				document.documentElement.classList.remove("overflow-hidden");
+				lbVideo.src = "";
+				triggerButton?.focus();
+			}, 220);
+		};
+
+		$$("[data-v2-lightbox]").forEach((btn) => {
+			btn.addEventListener("click", () => openLightbox(btn));
+		});
+
+		prevBtn.addEventListener("click", () => { if (activeIdx > 0) { activeIdx--; render(); } });
+		nextBtn.addEventListener("click", () => { if (activeIdx < groupButtons.length - 1) { activeIdx++; render(); } });
+		closeBtn.addEventListener("click", closeLightbox);
+		overlay.addEventListener("click", closeLightbox);
+
+		modal.addEventListener("keydown", (e: KeyboardEvent) => {
+			if (e.key === "Escape") { closeLightbox(); return; }
+			if (e.key === "ArrowLeft" && !prevBtn.disabled) { activeIdx--; render(); return; }
+			if (e.key === "ArrowRight" && !nextBtn.disabled) { activeIdx++; render(); return; }
+			if (e.key === "Tab") {
+				const focusable = Array.from(modal.querySelectorAll<HTMLElement>(
+					'button:not([disabled]):not(.hidden), [href], [tabindex]:not([tabindex="-1"])'
+				)).filter((el) => !el.closest(".hidden") && el.offsetParent !== null);
+				if (focusable.length === 0) return;
+				const first = focusable[0];
+				const last = focusable[focusable.length - 1];
+				if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+				else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+			}
+		});
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initPortfolioV2, { once: true });
+	} else {
+		initPortfolioV2();
+	}
+	document.addEventListener("astro:page-load", initPortfolioV2);
+</script>
+
+<style>
+	/* ─── Entrance animations ─── */
+
+	.v2-entrance {
+		opacity: 0;
+		transform: translateY(16px);
+		transition:
+			opacity 500ms cubic-bezier(0.2, 0.8, 0.2, 1),
+			transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	.v2-entrance.v2-visible {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	/* ─── TOC ─── */
+
+	.v2-toc-scroll {
+		scrollbar-gutter: stable;
+		scrollbar-width: thin;
+		scrollbar-color: rgb(37 99 235) transparent;
+	}
+
+	.v2-toc-scroll::-webkit-scrollbar {
+		width: 12px;
+	}
+
+	.v2-toc-scroll::-webkit-scrollbar-track {
+		background: linear-gradient(180deg, rgba(226, 232, 240, 0.7), rgba(226, 232, 240, 0.15));
+		border-left: 1px solid rgba(226, 232, 240, 0.9);
+	}
+
+	.v2-toc-scroll::-webkit-scrollbar-thumb {
+		background: linear-gradient(180deg, rgb(30 41 59), rgb(37 99 235));
+		border: 3px solid rgb(255 255 255);
+		border-radius: 2px;
+	}
+
+	.dark .v2-toc-scroll {
+		scrollbar-color: rgb(96 165 250) transparent;
+	}
+
+	.dark .v2-toc-scroll::-webkit-scrollbar-track {
+		background: linear-gradient(180deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.25));
+		border-left-color: rgba(51, 65, 85, 0.95);
+	}
+
+	.dark .v2-toc-scroll::-webkit-scrollbar-thumb {
+		background: linear-gradient(180deg, rgb(71 85 105), rgb(96 165 250));
+		border-color: rgb(15 23 42);
+	}
+
+	.v2-toc-item {
+		position: relative;
+	}
+
+	.v2-toc-item::before {
+		content: "";
+		position: absolute;
+		left: -1rem;
+		top: 0.6rem;
+		width: 0;
+		height: 2px;
+		background: rgb(37 99 235);
+		transition: width 180ms ease;
+	}
+
+	.v2-toc-item:hover::before {
+		width: 0.6rem;
+	}
+
+	.v2-toc-active {
+		color: rgb(37 99 235) !important;
+	}
+
+	.v2-toc-active::before {
+		width: 0.6rem !important;
+	}
+
+	.dark .v2-toc-active {
+		color: rgb(96 165 250) !important;
+	}
+
+	.dark .v2-toc-item::before {
+		background: rgb(96 165 250);
+	}
+
+	/* ─── Cards ─── */
+
+	.v2-card {
+		transition:
+			border-color 200ms ease,
+			box-shadow 250ms ease,
+			transform 250ms ease;
+	}
+
+	.v2-card:hover {
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+		transform: translateY(-2px);
+	}
+
+	.dark .v2-card:hover {
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+	}
+
+	/* ─── Media tiles ─── */
+
+	.v2-media-tile {
+		transition:
+			border-color 180ms ease,
+			box-shadow 250ms ease,
+			transform 250ms ease;
+	}
+
+	.v2-media-tile:hover {
+		box-shadow: 0 4px 16px rgba(37, 99, 235, 0.08);
+		transform: translateY(-2px);
+	}
+
+	.dark .v2-media-tile:hover {
+		box-shadow: 0 4px 16px rgba(96, 165, 250, 0.1);
+	}
+
+	.v2-placeholder {
+		min-height: 140px;
+	}
+
+	/* ─── Lightbox ─── */
+
+	.v2-lightbox-entering {
+		animation: v2-fade-in 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+	}
+
+	.v2-lightbox-entering .v2-lightbox-panel {
+		animation: v2-scale-in 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+	}
+
+	.v2-lightbox-leaving {
+		animation: v2-fade-out 220ms ease both;
+	}
+
+	.v2-lightbox-leaving .v2-lightbox-panel {
+		animation: v2-scale-out 220ms ease both;
+	}
+
+	@keyframes v2-fade-in {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+
+	@keyframes v2-fade-out {
+		from { opacity: 1; }
+		to { opacity: 0; }
+	}
+
+	@keyframes v2-scale-in {
+		from { opacity: 0; transform: scale(0.97); }
+		to { opacity: 1; transform: scale(1); }
+	}
+
+	@keyframes v2-scale-out {
+		from { opacity: 1; transform: scale(1); }
+		to { opacity: 0; transform: scale(0.97); }
+	}
+
+	/* ─── Scrollbar hide utility ─── */
+
+	.v2-scrollbar-hide {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+
+	.v2-scrollbar-hide::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* ─── Reduced motion ─── */
+
+	@media (prefers-reduced-motion: reduce) {
+		.v2-entrance {
+			opacity: 1;
+			transform: none;
+			transition: none;
+		}
+
+		.v2-lightbox-entering,
+		.v2-lightbox-leaving,
+		.v2-lightbox-entering .v2-lightbox-panel,
+		.v2-lightbox-leaving .v2-lightbox-panel {
+			animation: none;
+		}
+
+		.v2-card,
+		.v2-media-tile {
+			transition: border-color 180ms ease;
+			transform: none;
+		}
+
+		.v2-card:hover,
+		.v2-media-tile:hover {
+			transform: none;
+		}
+	}
+</style>
