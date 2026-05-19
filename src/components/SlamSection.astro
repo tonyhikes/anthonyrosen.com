@@ -37,35 +37,24 @@
 				let hasSlammed = false;
 				let isAnimating = false;
 
+				// Performance: Cache DOM elements to avoid querying them on every scroll
+				const container = document.getElementById("hire-section");
+				const title = document.getElementById("slam-target");
+				const subtitle = document.getElementById("subtitle");
+				const heroContent = document.getElementById("hero-content");
+				const canvasContainer = document.getElementById("canvas-container");
+
+				// Early return if critical elements are missing
+				if (!container || !title || !heroContent || !canvasContainer) {
+					console.log("Debug: Missing critical elements for SlamSection");
+					return;
+				}
+
 				function checkScroll() {
 					// If currently animating, don't check scroll triggers
 					if (isAnimating) return;
 
 					const windowHeight = window.innerHeight;
-
-					const container = document.getElementById("hire-section");
-					const title = document.getElementById("slam-target");
-					const subtitle = document.getElementById("subtitle");
-					const heroContent = document.getElementById("hero-content");
-					const canvasContainer = document.getElementById("canvas-container");
-
-					if (!container) {
-						console.log("Debug: Missing container");
-						return;
-					}
-					if (!title) {
-						console.log("Debug: Missing title");
-						return;
-					}
-					if (!heroContent) {
-						console.log("Debug: Missing heroContent");
-						return;
-					}
-					if (!canvasContainer) {
-						console.log("Debug: Missing canvasContainer");
-						return;
-					}
-
 					const rect = container.getBoundingClientRect();
 
 					// Trigger when the top of the section hits the top of the viewport (or very close)
@@ -203,9 +192,23 @@
 					}
 				}
 
-				window.addEventListener("scroll", checkScroll, {
-					passive: true,
-				});
+				// Performance: Throttle scroll event to run at most once per frame
+				let isTicking = false;
+				window.addEventListener(
+					"scroll",
+					() => {
+						if (!isTicking) {
+							window.requestAnimationFrame(() => {
+								checkScroll();
+								isTicking = false;
+							});
+							isTicking = true;
+						}
+					},
+					{
+						passive: true,
+					}
+				);
 				// Check once on load
 				setTimeout(() => checkScroll(), 100);
 			}
