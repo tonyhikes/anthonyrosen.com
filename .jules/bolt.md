@@ -1,0 +1,3 @@
+## 2024-10-27 - [Astro Inline Script Execution]
+**Learning:** `is:inline` scripts in Astro components execute every time the component is inserted into the DOM (including on client-side navigation). Adding `document.addEventListener('astro:page-load', ...)` inside such scripts causes duplicate execution (once immediately, once on event) and listener accumulation if not cleaned up.
+**Action:** For per-page logic in inline scripts, rely on immediate execution or check `document.readyState`. Avoid adding `astro:page-load` listeners unless specifically needed for global side effects, and always implement cleanup.
