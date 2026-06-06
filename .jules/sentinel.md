@@ -1,0 +1,4 @@
+## 2025-05-15 - Dynamic Import of Unverified CDN Resource
+**Vulnerability:** The application dynamically imports `animejs` from `cdn.jsdelivr.net` within `SlamSection.astro` using `import()`. This bypasses SRI checks, exposing users to potential supply chain attacks if the CDN is compromised.
+**Learning:** Dynamic imports in browser-side JS (via `is:inline` scripts in Astro) make traditional SRI attributes on `<script>` tags impossible to use. The corresponding `modulepreload` in `Layout.astro` points to a different file (`anime.min.js` vs `anime.es.js`), failing to provide integrity protection.
+**Prevention:** Prefer bundling dependencies or using a loader that supports integrity checks. If CDN is required, ensure the exact resource is preloaded with integrity in `<head>` and the import matches it perfectly.
