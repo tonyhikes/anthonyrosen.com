@@ -97,23 +97,47 @@ function animate() {
 		return;
 	}
 
-	animationFrameId = requestAnimationFrame(animate);
+	let settled = false;
 
 	if (group) {
 		const targetRotY = mouseX * Math.PI;
 		const targetRotX = mouseY * 0.5;
 
-		group.rotation.y += 0.05 * (targetRotY - group.rotation.y);
-		group.rotation.x += 0.05 * (targetRotX - group.rotation.x);
+		// Calculate deltas to check if movement has settled
+		const diffRotY = targetRotY - group.rotation.y;
+		const diffRotX = targetRotX - group.rotation.x;
+
+		group.rotation.y += 0.05 * diffRotY;
+		group.rotation.x += 0.05 * diffRotX;
 
 		const targetPosX = -mouseX * 0.6;
 		const targetPosY = mouseY * 0.6;
 
-		group.position.x += 0.05 * (targetPosX - group.position.x);
-		group.position.y += 0.05 * (targetPosY - group.position.y);
+		const diffPosX = targetPosX - group.position.x;
+		const diffPosY = targetPosY - group.position.y;
+
+		group.position.x += 0.05 * diffPosX;
+		group.position.y += 0.05 * diffPosY;
+
+		// PERFORMANCE OPTIMIZATION: Stop animation loop if movement is negligible
+		// This saves significant CPU/GPU usage when user is idle
+		if (
+			Math.abs(diffRotY) < 0.001 &&
+			Math.abs(diffRotX) < 0.001 &&
+			Math.abs(diffPosX) < 0.001 &&
+			Math.abs(diffPosY) < 0.001
+		) {
+			settled = true;
+		}
 	}
 
 	renderer.render(scene, camera);
+
+	if (settled && group) {
+		animationFrameId = null;
+	} else {
+		animationFrameId = requestAnimationFrame(animate);
+	}
 }
 
 function startAnimation() {
@@ -140,6 +164,8 @@ self.onmessage = (e: MessageEvent) => {
 		case "mouse":
 			mouseX = data.x;
 			mouseY = data.y;
+			// Restart loop if it was settled
+			startAnimation();
 			break;
 
 		case "resize":
@@ -147,6 +173,8 @@ self.onmessage = (e: MessageEvent) => {
 				camera.aspect = data.width / data.height;
 				camera.updateProjectionMatrix();
 				renderer.setSize(data.width, data.height, false);
+				// Restart loop on resize
+				startAnimation();
 			}
 			break;
 
