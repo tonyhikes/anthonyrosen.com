@@ -105,6 +105,7 @@ if (container && canvas) {
 			lastMouseTime = now;
 			mouseX = (e.clientX - halfX) / halfX;
 			mouseY = (e.clientY - halfY) / halfY;
+			startAnimation();
 		},
 		{ passive: true }
 	);
@@ -124,15 +125,39 @@ if (container && canvas) {
 			animationFrameId = null;
 			return;
 		}
-		animationFrameId = requestAnimationFrame(animate);
+
+		let isSettled = false;
 
 		if (group) {
+			const oldRotY = group.rotation.y;
+			const oldRotX = group.rotation.x;
 			group.rotation.y += 0.05 * (mouseX * Math.PI - group.rotation.y);
 			group.rotation.x += 0.05 * (mouseY * 0.5 - group.rotation.x);
+
+			const oldPosX = group.position.x;
+			const oldPosY = group.position.y;
 			group.position.x += 0.05 * (-mouseX * 0.6 - group.position.x);
 			group.position.y += 0.05 * (mouseY * 0.6 - group.position.y);
+
+			// PERFORMANCE OPTIMIZATION: Check if movement is negligible
+			const delta = Math.max(
+				Math.abs(group.rotation.y - oldRotY),
+				Math.abs(group.rotation.x - oldRotX),
+				Math.abs(group.position.x - oldPosX),
+				Math.abs(group.position.y - oldPosY)
+			);
+
+			if (delta < 0.001) {
+				isSettled = true;
+			}
 		}
 		renderer.render(scene, camera);
+
+		if (!isSettled || !group) {
+			animationFrameId = requestAnimationFrame(animate);
+		} else {
+			animationFrameId = null;
+		}
 	}
 
 	function startAnimation() {
@@ -178,6 +203,7 @@ if (container && canvas) {
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 				renderer.setSize(window.innerWidth, window.innerHeight);
+				startAnimation();
 			}, 100);
 		},
 		{ passive: true }

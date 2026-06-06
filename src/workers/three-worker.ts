@@ -97,23 +97,48 @@ function animate() {
 		return;
 	}
 
-	animationFrameId = requestAnimationFrame(animate);
+	let isSettled = false;
 
 	if (group) {
 		const targetRotY = mouseX * Math.PI;
 		const targetRotX = mouseY * 0.5;
 
-		group.rotation.y += 0.05 * (targetRotY - group.rotation.y);
-		group.rotation.x += 0.05 * (targetRotX - group.rotation.x);
+		const oldRotY = group.rotation.y;
+		const oldRotX = group.rotation.x;
+
+		group.rotation.y += 0.05 * (targetRotY - oldRotY);
+		group.rotation.x += 0.05 * (targetRotX - oldRotX);
 
 		const targetPosX = -mouseX * 0.6;
 		const targetPosY = mouseY * 0.6;
 
-		group.position.x += 0.05 * (targetPosX - group.position.x);
-		group.position.y += 0.05 * (targetPosY - group.position.y);
+		const oldPosX = group.position.x;
+		const oldPosY = group.position.y;
+
+		group.position.x += 0.05 * (targetPosX - oldPosX);
+		group.position.y += 0.05 * (targetPosY - oldPosY);
+
+		// PERFORMANCE OPTIMIZATION: Check if movement is negligible
+		// If the object has settled, we can stop the render loop to save CPU/GPU
+		const delta = Math.max(
+			Math.abs(group.rotation.y - oldRotY),
+			Math.abs(group.rotation.x - oldRotX),
+			Math.abs(group.position.x - oldPosX),
+			Math.abs(group.position.y - oldPosY)
+		);
+
+		if (delta < 0.001) {
+			isSettled = true;
+		}
 	}
 
 	renderer.render(scene, camera);
+
+	if (!isSettled || !group) {
+		animationFrameId = requestAnimationFrame(animate);
+	} else {
+		animationFrameId = null;
+	}
 }
 
 function startAnimation() {
@@ -140,6 +165,7 @@ self.onmessage = (e: MessageEvent) => {
 		case "mouse":
 			mouseX = data.x;
 			mouseY = data.y;
+			startAnimation();
 			break;
 
 		case "resize":
@@ -147,6 +173,7 @@ self.onmessage = (e: MessageEvent) => {
 				camera.aspect = data.width / data.height;
 				camera.updateProjectionMatrix();
 				renderer.setSize(data.width, data.height, false);
+				startAnimation();
 			}
 			break;
 
