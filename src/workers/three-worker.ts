@@ -97,23 +97,42 @@ function animate() {
 		return;
 	}
 
-	animationFrameId = requestAnimationFrame(animate);
+	let needsUpdate = false;
 
 	if (group) {
 		const targetRotY = mouseX * Math.PI;
 		const targetRotX = mouseY * 0.5;
 
-		group.rotation.y += 0.05 * (targetRotY - group.rotation.y);
-		group.rotation.x += 0.05 * (targetRotX - group.rotation.x);
+		const deltaRotY = targetRotY - group.rotation.y;
+		const deltaRotX = targetRotX - group.rotation.x;
+
+		// Threshold for stopping animation (0.001 radian is ~0.05 degrees)
+		if (Math.abs(deltaRotY) > 0.001 || Math.abs(deltaRotX) > 0.001) {
+			group.rotation.y += 0.05 * deltaRotY;
+			group.rotation.x += 0.05 * deltaRotX;
+			needsUpdate = true;
+		}
 
 		const targetPosX = -mouseX * 0.6;
 		const targetPosY = mouseY * 0.6;
 
-		group.position.x += 0.05 * (targetPosX - group.position.x);
-		group.position.y += 0.05 * (targetPosY - group.position.y);
+		const deltaPosX = targetPosX - group.position.x;
+		const deltaPosY = targetPosY - group.position.y;
+
+		if (Math.abs(deltaPosX) > 0.001 || Math.abs(deltaPosY) > 0.001) {
+			group.position.x += 0.05 * deltaPosX;
+			group.position.y += 0.05 * deltaPosY;
+			needsUpdate = true;
+		}
 	}
 
 	renderer.render(scene, camera);
+
+	if (needsUpdate) {
+		animationFrameId = requestAnimationFrame(animate);
+	} else {
+		animationFrameId = null;
+	}
 }
 
 function startAnimation() {
@@ -140,6 +159,7 @@ self.onmessage = (e: MessageEvent) => {
 		case "mouse":
 			mouseX = data.x;
 			mouseY = data.y;
+			startAnimation();
 			break;
 
 		case "resize":
@@ -147,6 +167,7 @@ self.onmessage = (e: MessageEvent) => {
 				camera.aspect = data.width / data.height;
 				camera.updateProjectionMatrix();
 				renderer.setSize(data.width, data.height, false);
+				startAnimation();
 			}
 			break;
 
