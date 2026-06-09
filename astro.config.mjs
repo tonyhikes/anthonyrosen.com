@@ -14,7 +14,13 @@ export default defineConfig({
         plugins: [tailwindcss()],
     },
 
-    integrations: [react(), sitemap()],
+    integrations: [
+        react(),
+        sitemap({
+            // Draft pages are noindexed and shouldn't appear in the sitemap
+            filter: (page) => !page.includes("/homepage-v2"),
+        }),
+    ],
 
     // Performance optimizations
     build: {

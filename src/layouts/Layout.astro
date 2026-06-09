@@ -10,9 +10,10 @@ import RB2B from "../components/RB2B.astro";
 
 interface Props {
 	title: string;
+	noindex?: boolean;
 }
 
-const { title } = Astro.props;
+const { title, noindex = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -24,6 +25,7 @@ const { title } = Astro.props;
 		<SEO
 			title={title}
 			description="Tony Rosen - Marketing & Creative Project Manager. Specialized in product marketing, satellite communications, and creative team leadership."
+			noindex={noindex}
 		/>
 		<link
 			rel="icon"
