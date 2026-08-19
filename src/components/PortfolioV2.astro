@@ -92,6 +92,22 @@ const publishing = {
 	],
 };
 
+const publishingMedia = folder(
+	"publishing-operations",
+	["1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg"],
+	[
+		"Science Magazine cover",
+		"Publishing audience metrics",
+		"Science Magazine feature spread",
+		"Science Magazine editorial spread",
+		"Six weekly journals",
+		"Magazine app management",
+		"Digital media operations",
+		"Publishing workflow map",
+		"Production scale",
+	]
+);
+
 /* ─── Marketing directory ─── */
 
 const marketingItems: DirectoryItem[] = [
@@ -928,6 +944,51 @@ const { portfolioVersion } = Astro.props;
 									<p class="mt-1 text-xs font-semibold text-slate-400 uppercase tracking-[0.18em]">{h.label}</p>
 								</div>
 							))}
+						</div>
+						<div class="border-t border-slate-200 dark:border-slate-800">
+							<div class="flex items-end justify-between gap-4 px-6 py-5 dark:border-slate-800 lg:px-8">
+								<div>
+									<h3 class="text-lg font-bold tracking-tight text-slate-950 dark:text-white">Science Magazine work</h3>
+									<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Selected editorial, digital, and publishing-operations work.</p>
+								</div>
+								<p class="text-xs font-semibold tracking-[0.18em] text-slate-400 uppercase">{publishingMedia.length} images</p>
+							</div>
+							<div class="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-3">
+								{publishingMedia.map((item, idx) => (
+									<button
+										type="button"
+										data-v2-lightbox
+										data-v2-group={publishing.id}
+										data-v2-index={String(idx)}
+										data-v2-title={item.title}
+										data-v2-caption={item.caption}
+										data-v2-type={item.type}
+										data-v2-src={item.src ?? ""}
+										data-v2-embed={item.embedUrl ?? ""}
+										data-v2-badge={item.badge ?? ""}
+										class:list={[
+											"v2-media-tile group border border-slate-200 text-left transition hover:border-blue-600 dark:border-slate-800 dark:hover:border-blue-400",
+											item.aspectClass,
+										]}
+									>
+										<div class="flex h-full flex-col">
+											<div class="flex min-h-44 flex-1 items-center justify-center bg-slate-100 p-2 dark:bg-slate-900">
+												<img
+													src={item.src}
+												alt={item.title}
+												class="max-h-72 w-full object-contain"
+												loading="lazy"
+												decoding="async"
+												fetchpriority="low"
+											/>
+											</div>
+											<div class="border-t border-slate-200 px-4 py-3 dark:border-slate-800">
+												<p class="text-sm font-semibold text-slate-700 group-hover:text-blue-600 dark:text-slate-200 dark:group-hover:text-blue-300">{item.title}</p>
+											</div>
+										</div>
+									</button>
+								))}
+							</div>
 						</div>
 					</section>
 
