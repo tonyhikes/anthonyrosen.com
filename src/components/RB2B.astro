@@ -6,18 +6,20 @@
 		let rb2bScheduled = false;
 		let rb2bWaitingForReady = false;
 
+		function injectRB2B(key) {
+			if (window.reb2b) return;
+			window.reb2b = { loaded: true };
+			var s = document.createElement("script");
+			s.async = true;
+			s.src =
+				"https://b2bjsstore.s3.us-west-2.amazonaws.com/b/" + key + "/" + key + ".js.gz";
+			document
+				.getElementsByTagName("script")[0]
+				.parentNode.insertBefore(s, document.getElementsByTagName("script")[0]);
+		}
+
 		function initRB2B() {
-			!(function (key) {
-				if (window.reb2b) return;
-				window.reb2b = { loaded: true };
-				var s = document.createElement("script");
-				s.async = true;
-				s.src =
-					"https://ddwl4m2hdecbv.cloudfront.net/b/" + key + "/" + key + ".js.gz";
-				document
-					.getElementsByTagName("script")[0]
-					.parentNode.insertBefore(s, document.getElementsByTagName("script")[0]);
-			})("W6Z57HZZ9POX");
+			injectRB2B("W6Z57HZZ9POX");
 		}
 
 		function scheduleRB2B() {
