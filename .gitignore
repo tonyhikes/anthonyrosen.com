@@ -20,5 +20,18 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
+# Local design exploration exports and checkpoints
+homepage-concept-*.png
+live-*.png
+nav-*.png
+portfolio-*.png
+toc-*.png
+
+# Local prototypes and agent/browser work products
+replit portfolio template/
+.claude/
+.playwright-mcp/
+AGENTS.md
+
 # jetbrains setting folder
 .idea/
