@@ -95,7 +95,7 @@ import Colophon from "../components/Colophon.astro";
 
 		// Update URL without reloading
 		if (viewId === "home") {
-			history.pushState(null, "", window.location.pathname); // Clear hash for home
+			history.pushState(null, "", `${window.location.pathname}${window.location.search}`); // Clear hash for home
 		} else {
 			history.pushState(null, "", `#${viewId}`);
 		}
