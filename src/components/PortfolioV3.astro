@@ -107,7 +107,14 @@ const previewImages: Record<string, string> = {
 			bindImageFallbacks();
 		};
 
-		if (window.location.hash === "#portfolio" || !root.classList.contains("hidden")) {
+		if (
+			window.location.hash === "#portfolio" ||
+			window.location.hash.startsWith("#portfolio/") ||
+			["#publishing", "#marketing", "#proposal"].includes(
+				window.location.hash
+			) ||
+			!root.classList.contains("hidden")
+		) {
 			hydratePortfolioVisuals();
 		}
 

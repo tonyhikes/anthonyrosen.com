@@ -93,11 +93,15 @@ import Colophon from "../components/Colophon.astro";
 			colophonView,
 		];
 
-		// Update URL without reloading
-		if (viewId === "home") {
-			history.pushState(null, "", `${window.location.pathname}${window.location.search}`); // Clear hash for home
-		} else {
-			history.pushState(null, "", `#${viewId}`);
+		// Update URL without reloading. Portfolio deep links manage their own
+		// section/project hash after the portfolio view is visible.
+		if (!skipHistoryUpdate) {
+			const baseUrl = `${window.location.pathname}${window.location.search}`;
+			if (viewId === "home") {
+				history.pushState(null, "", baseUrl); // Clear hash for home
+			} else {
+				history.pushState(null, "", `${baseUrl}#${viewId}`);
+			}
 		}
 
 		// Hide all views first
@@ -147,6 +151,36 @@ import Colophon from "../components/Colophon.astro";
 		}
 	}
 
+	const mainViews = new Set([
+		"resume",
+		"portfolio",
+		"styleguide",
+		"colophon",
+	]);
+	const portfolioSectionShortLinks = new Set([
+		"publishing",
+		"marketing",
+		"proposal",
+	]);
+	let skipHistoryUpdate = false;
+
+	function getViewFromLocation() {
+		const hash = window.location.hash.replace(/^#/, "").toLowerCase();
+		const primaryRoute = hash.split("/")[0];
+
+		if (mainViews.has(primaryRoute)) return primaryRoute;
+		if (portfolioSectionShortLinks.has(hash)) return "portfolio";
+		return "home";
+	}
+
+	function navigateFromLocation() {
+		skipHistoryUpdate = true;
+		window.dispatchEvent(
+			new CustomEvent("view-change", { detail: getViewFromLocation() })
+		);
+		skipHistoryUpdate = false;
+	}
+
 	// Wait for DOM to be ready
 	function initViewSwitching() {
 		// Listen for custom event from Navbar
@@ -155,13 +189,9 @@ import Colophon from "../components/Colophon.astro";
 			navigateTo(customEvent.detail);
 		});
 
-		// Check initial hash
-		const hash = window.location.hash.replace("#", "");
-		if (["resume", "portfolio", "styleguide", "colophon"].includes(hash)) {
-			navigateTo(hash);
-		} else {
-			navigateTo("home");
-		}
+		// Open the shared URL on first load, then keep Back/Forward in sync.
+		navigateFromLocation();
+		window.addEventListener("popstate", navigateFromLocation);
 	}
 
 	// Initialize when DOM is ready

@@ -725,6 +725,11 @@ const visibleMarketingItems = marketingItems.filter(
 const visibleCaseStudies = caseStudies.filter(
 	(study) => !hiddenCaseStudyIds.has(study.id)
 );
+const caseStudyRoutes = new Map(
+	[...visibleMarketingItems, ...proposalItems].flatMap((item) =>
+		item.detailPage ? [[item.detailPage, item.id] as const] : []
+	)
+);
 
 /* ─── TOC structure ─── */
 
@@ -1113,7 +1118,12 @@ const { portfolioVersion } = Astro.props;
 
 				<!-- ─── CASE STUDY DETAIL PAGES ─── -->
 				{visibleCaseStudies.map((study) => (
-					<div id={`v2-page-${study.id}`} data-v2-view={study.id} class="hidden">
+					<div
+						id={`v2-page-${study.id}`}
+						data-v2-view={study.id}
+						data-v2-route={caseStudyRoutes.get(study.id) ?? study.id.replace(/-study$/, "")}
+						class="hidden"
+					>
 						<div class="mb-6 flex items-center gap-3">
 							<button type="button" data-v2-page="overview" class="text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200">&larr; Back to overview</button>
 						</div>
@@ -1306,6 +1316,15 @@ const { portfolioVersion } = Astro.props;
 
 		const views = root.querySelectorAll<HTMLElement>("[data-v2-view]");
 		const tocScroll = root.querySelector(".v2-toc-scroll");
+		const sectionRoutes: Record<string, string> = {
+			publishing: "overview-publishing",
+			marketing: "sec-marketing",
+			proposal: "sec-proposal",
+			contact: "sec-contact",
+		};
+		const routeForSection = Object.fromEntries(
+			Object.entries(sectionRoutes).map(([route, target]) => [target, route])
+		);
 		let currentView = "overview";
 		let lastTocScrollTop = tocScroll instanceof HTMLElement ? tocScroll.scrollTop : 0;
 		const isDesktopTocButton = (button: HTMLButtonElement) =>
@@ -1331,9 +1350,27 @@ const { portfolioVersion } = Astro.props;
 
 		/* ─── Page switching ─── */
 
+		const updatePortfolioUrl = (route = "") => {
+			const baseUrl = `${window.location.pathname}${window.location.search}`;
+			const hash = route ? `#portfolio/${route}` : "#portfolio";
+			history.pushState(null, "", `${baseUrl}${hash}`);
+		};
+
+		const routeForPage = (pageId: string) => {
+			if (pageId === "overview") return "";
+			const page = root.querySelector<HTMLElement>(
+				`[data-v2-view="${pageId}"]`
+			);
+			return page?.dataset.v2Route ?? pageId.replace(/-study$/, "");
+		};
+
 		const showPage = (
 			pageId: string,
-			options: { tocScrollTop?: number | null } = {}
+			options: {
+				tocScrollTop?: number | null;
+				updateUrl?: boolean;
+				scrollBehavior?: ScrollBehavior;
+			} = {}
 		) => {
 			hydrateStudyMedia(pageId);
 			currentView = pageId;
@@ -1344,7 +1381,14 @@ const { portfolioVersion } = Astro.props;
 
 			// Scroll to top of portfolio
 			const portfolioTop = root.getBoundingClientRect().top + window.scrollY - 80;
-			window.scrollTo({ top: portfolioTop, behavior: "smooth" });
+			window.scrollTo({
+				top: portfolioTop,
+				behavior: options.scrollBehavior ?? "smooth",
+			});
+
+			if (options.updateUrl !== false) {
+				updatePortfolioUrl(routeForPage(pageId));
+			}
 
 			// Update TOC active states
 			root.querySelectorAll(".v2-toc-item").forEach((item) => {
@@ -1403,6 +1447,42 @@ const { portfolioVersion } = Astro.props;
 
 		/* ─── Scroll within overview ─── */
 
+		const showOverviewSection = (
+			targetId: string,
+			options: {
+				tocScrollTop?: number | null;
+				updateUrl?: boolean;
+				scrollBehavior?: ScrollBehavior;
+			} = {}
+		) => {
+			const scrollToSection = () => {
+				const el = document.getElementById(targetId);
+				if (el) {
+					const top = el.getBoundingClientRect().top + window.scrollY - 128;
+					window.scrollTo({
+						top,
+						behavior: options.scrollBehavior ?? "smooth",
+					});
+				}
+				restoreTocScrollTop(options.tocScrollTop ?? null);
+			};
+
+			if (currentView !== "overview") {
+				showPage("overview", {
+					tocScrollTop: options.tocScrollTop,
+					updateUrl: false,
+					scrollBehavior: options.scrollBehavior,
+				});
+				window.setTimeout(scrollToSection, 100);
+			} else {
+				scrollToSection();
+			}
+
+			if (options.updateUrl !== false) {
+				updatePortfolioUrl(routeForSection[targetId] ?? "");
+			}
+		};
+
 		$$("[data-v2-scroll]").forEach((btn) => {
 			btn.addEventListener("pointerdown", () => {
 				if (tocScroll instanceof HTMLElement && isDesktopTocButton(btn)) {
@@ -1414,28 +1494,54 @@ const { portfolioVersion } = Astro.props;
 				const targetId = btn.dataset.v2Scroll;
 				if (!targetId) return;
 				const tocScrollTop = getTocScrollTop(btn);
-
-				// If we're not on overview and the target is an overview section, go to overview first
-				if (currentView !== "overview" && !document.getElementById(`v2-page-${targetId}`)) {
-					showPage("overview", { tocScrollTop });
-					setTimeout(() => {
-						const el = document.getElementById(targetId);
-						if (el) {
-							const top = el.getBoundingClientRect().top + window.scrollY - 128;
-							window.scrollTo({ top, behavior: "smooth" });
-						}
-						restoreTocScrollTop(tocScrollTop);
-					}, 100);
-				} else {
-					const el = document.getElementById(targetId);
-					if (el) {
-						const top = el.getBoundingClientRect().top + window.scrollY - 128;
-						window.scrollTo({ top, behavior: "smooth" });
-					}
-					restoreTocScrollTop(tocScrollTop);
-				}
+				showOverviewSection(targetId, { tocScrollTop });
 				btn.blur();
 			});
+		});
+
+		/* ─── Shared links and browser history ─── */
+
+		const getPortfolioRoute = () => {
+			const hash = window.location.hash.replace(/^#/, "").toLowerCase();
+			if (hash === "portfolio") return "";
+			if (hash.startsWith("portfolio/")) return hash.slice("portfolio/".length);
+			if (hash in sectionRoutes) return hash; // Short aliases such as #proposal
+			return null;
+		};
+
+		const applyPortfolioRoute = () => {
+			const route = getPortfolioRoute();
+			if (route === null) return;
+
+			if (!route) {
+				showPage("overview", { updateUrl: false, scrollBehavior: "auto" });
+				return;
+			}
+
+			const sectionTarget = sectionRoutes[route];
+			if (sectionTarget) {
+				showOverviewSection(sectionTarget, {
+					updateUrl: false,
+					scrollBehavior: "auto",
+				});
+				return;
+			}
+
+			const page = Array.from(views).find(
+				(view) => view.dataset.v2Route === route
+			);
+			if (page?.dataset.v2View) {
+				showPage(page.dataset.v2View, {
+					updateUrl: false,
+					scrollBehavior: "auto",
+				});
+			}
+		};
+
+		window.addEventListener("view-change", (event) => {
+			if ((event as CustomEvent).detail === "portfolio") {
+				window.setTimeout(applyPortfolioRoute, 0);
+			}
 		});
 
 		/* ─── Back to home ─── */
@@ -1467,6 +1573,10 @@ const { portfolioVersion } = Astro.props;
 			root.querySelectorAll(".v2-entrance").forEach((el) => entranceObserver.observe(el));
 		} else {
 			root.querySelectorAll(".v2-entrance").forEach((el) => el.classList.add("v2-visible"));
+		}
+
+		if (!root.classList.contains("hidden")) {
+			applyPortfolioRoute();
 		}
 
 		/* ─── Lightbox ─── */

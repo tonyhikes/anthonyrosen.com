@@ -309,7 +309,11 @@
 
 	// Initial check
 	const initialHash = window.location.hash.replace("#", "");
-	if (initialHash === "portfolio") {
+	if (
+		initialHash === "portfolio" ||
+		initialHash.startsWith("portfolio/") ||
+		["publishing", "marketing", "proposal"].includes(initialHash)
+	) {
 		updateNavbarTransparency("portfolio");
 	}
 </script>
