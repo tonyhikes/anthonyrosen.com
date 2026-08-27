@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import {
 	TrendingUp,
 	ArrowUpRight,
@@ -13,64 +13,84 @@ import {
 
 // --- Reusable Chart Components (SVG based for zero-dependency) ---
 
-const AreaChart = ({ color = "text-blue-600", fill = "bg-blue-600" }) => (
-	<div className="relative h-16 w-full overflow-hidden pt-2">
-		<svg
-			viewBox="0 0 100 40"
-			className="preserve-3d h-full w-full"
-			preserveAspectRatio="none"
-		>
-			<defs>
-				<linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-					<stop
-						offset="0%"
-						stopColor="currentColor"
-						stopOpacity="0.3"
-						className={color}
-					/>
-					<stop
-						offset="100%"
-						stopColor="currentColor"
-						stopOpacity="0"
-						className={color}
-					/>
-				</linearGradient>
-			</defs>
-			<path
-				d="M0 40 L0 25 C20 20, 40 30, 60 15 S 80 5, 100 0 L100 40 Z"
-				fill="url(#areaGradient)"
-				className={color}
-			/>
-			<path
-				d="M0 25 C20 20, 40 30, 60 15 S 80 5, 100 0"
-				fill="none"
-				stroke="currentColor"
-				strokeWidth="2"
-				strokeLinecap="round"
-				className={color}
-			/>
-		</svg>
-	</div>
-);
+// Charts stretch to the width of their card, which is much wider on mobile
+// (single column) than on desktop. `preserveAspectRatio="none"` is what makes
+// the sparkline fill that width, so every stroke needs `non-scaling-stroke` to
+// avoid being squashed along with the geometry, and round dots are drawn in
+// HTML rather than as <circle> so they can't turn into ellipses.
+const CHART_FRAME = "relative h-20 w-full pt-2 sm:h-16";
+
+// Six evenly spaced columns: centers sit at (i + 0.5) / 6 of the plot area.
+const COLUMN_CENTERS = [8.333, 25, 41.667, 58.333, 75, 91.667];
+
+const AreaChart = ({ color = "text-blue-600" }) => {
+	const gradientId = useId();
+
+	return (
+		<div className={`${CHART_FRAME} overflow-hidden`}>
+			<svg
+				viewBox="0 0 100 40"
+				className="h-full w-full"
+				preserveAspectRatio="none"
+				aria-hidden="true"
+				focusable="false"
+			>
+				<defs>
+					<linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+						<stop
+							offset="0%"
+							stopColor="currentColor"
+							stopOpacity="0.3"
+							className={color}
+						/>
+						<stop
+							offset="100%"
+							stopColor="currentColor"
+							stopOpacity="0"
+							className={color}
+						/>
+					</linearGradient>
+				</defs>
+				<path
+					d="M0 40 L0 25 C20 20, 40 30, 60 15 S 80 5, 100 0 L100 40 Z"
+					fill={`url(#${gradientId})`}
+					className={color}
+				/>
+				<path
+					d="M0 25 C20 20, 40 30, 60 15 S 80 5, 100 0"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="2"
+					strokeLinecap="round"
+					vectorEffect="non-scaling-stroke"
+					className={color}
+				/>
+			</svg>
+		</div>
+	);
+};
 
 const BarChart = ({ color = "bg-blue-600" }) => (
-	<div className="flex h-16 w-full items-end justify-between gap-1 px-2 pt-2">
+	<div className={`${CHART_FRAME} flex items-end gap-1.5 px-2`}>
 		{[48, 84, 60, 100, 72, 100].map((height, i) => (
-			<div
-				key={i}
-				className={`w-1/6 rounded-t-sm opacity-80 transition-opacity hover:opacity-100 ${color}`}
-				style={{ height: `${height}%` }}
-			/>
+			<div key={i} className="flex h-full flex-1 items-end">
+				<div
+					className={`mx-auto w-full max-w-[22px] rounded-t-sm opacity-80 transition-opacity group-hover:opacity-100 ${color}`}
+					style={{ height: `${height}%` }}
+				/>
+			</div>
 		))}
 	</div>
 );
 
 const LineChart = ({ color = "text-blue-600", inverse = false }) => (
-	<div className="relative h-16 w-full pt-2">
+	<div className={CHART_FRAME}>
 		<svg
 			viewBox="0 0 100 40"
 			className="h-full w-full"
 			preserveAspectRatio="none"
+			aria-hidden="true"
+			focusable="false"
 		>
 			<path
 				d={
@@ -82,63 +102,77 @@ const LineChart = ({ color = "text-blue-600", inverse = false }) => (
 				stroke="currentColor"
 				strokeWidth="2.5"
 				strokeLinecap="round"
+				vectorEffect="non-scaling-stroke"
 				className={color}
 			/>
 		</svg>
 	</div>
 );
 
-const MixedChart = () => (
-	<div className="relative h-16 w-full pt-2">
-		{/* Bars */}
-		<div className="absolute inset-0 flex items-end justify-between gap-2 px-2">
-			{[36, 54, 42, 72, 60, 84].map((h, i) => (
-				<div
-					key={i}
-					className="w-2 rounded-t-sm bg-slate-200"
-					style={{ height: `${h}%` }}
-				/>
-			))}
+const MixedChart = () => {
+	const bars = [36, 54, 42, 72, 60, 84];
+	const points = [30, 20, 25, 10, 15, 5].map((y, i) => ({
+		x: COLUMN_CENTERS[i],
+		y,
+	}));
+	const linePath = points
+		.map((p, i) => `${i === 0 ? "M" : "L"}${p.x} ${p.y}`)
+		.join(" ");
+
+	return (
+		<div className={CHART_FRAME}>
+			{/* Bars — each column is full width so its centre lines up with a dot */}
+			<div className="absolute inset-0 flex items-end gap-1.5 px-2">
+				{bars.map((h, i) => (
+					<div key={i} className="flex h-full flex-1 items-end">
+						<div
+							className="mx-auto w-full max-w-[10px] rounded-t-sm bg-slate-200"
+							style={{ height: `${h}%` }}
+						/>
+					</div>
+				))}
+			</div>
+			{/* Line + dot overlay, sharing the bars' padding box */}
+			<div className="absolute inset-0 z-10 px-2">
+				<div className="relative h-full w-full">
+					<svg
+						viewBox="0 0 100 40"
+						className="h-full w-full"
+						preserveAspectRatio="none"
+						aria-hidden="true"
+						focusable="false"
+					>
+						<path
+							d={linePath}
+							fill="none"
+							stroke="#2563eb" // Blue-600
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							vectorEffect="non-scaling-stroke"
+						/>
+					</svg>
+					{points.map((p, i) => (
+						<span
+							key={i}
+							className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white bg-blue-600"
+							style={{ left: `${p.x}%`, top: `${(p.y / 40) * 100}%` }}
+						/>
+					))}
+				</div>
+			</div>
 		</div>
-		{/* Line Overlay */}
-		<svg
-			viewBox="0 0 100 40"
-			className="absolute inset-0 z-10 h-full w-full"
-			preserveAspectRatio="none"
-		>
-			<path
-				d="M5 30 L20 20 L40 25 L60 10 L80 15 L95 5"
-				fill="none"
-				stroke="#2563eb" // Blue-600
-				strokeWidth="2"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-			/>
-			{[
-				{ cx: 5, cy: 30 },
-				{ cx: 20, cy: 20 },
-				{ cx: 40, cy: 25 },
-				{ cx: 60, cy: 10 },
-				{ cx: 80, cy: 15 },
-				{ cx: 95, cy: 5 },
-			].map((p, i) => (
-				<circle
-					key={i}
-					cx={p.cx}
-					cy={p.cy}
-					r="2"
-					fill="#2563eb"
-					className="stroke-white"
-					strokeWidth="1"
-				/>
-			))}
-		</svg>
-	</div>
-);
+	);
+};
 
 const RadialChart = ({ percentage, color = "text-blue-600" }) => (
-	<div className="relative flex h-16 w-16 items-center justify-center">
-		<svg className="h-full w-full -rotate-90 transform" viewBox="0 0 36 36">
+	<div className="relative flex h-16 w-16 shrink-0 items-center justify-center">
+		<svg
+			className="h-full w-full -rotate-90 transform"
+			viewBox="0 0 36 36"
+			aria-hidden="true"
+			focusable="false"
+		>
 			<path
 				className="text-slate-100"
 				d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -170,9 +204,9 @@ const MetricCard = ({
 	icon: Icon,
 	accentColor,
 }) => (
-	<div className="group flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:border-blue-200 hover:shadow-lg">
-		<div className="mb-4 flex items-start justify-between">
-			<div className={`rounded-lg p-2 ${accentColor}`}>
+	<div className="group flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-blue-200 hover:shadow-lg sm:p-6">
+		<div className="mb-4 flex items-start justify-between gap-3">
+			<div className={`shrink-0 rounded-lg p-2 ${accentColor}`}>
 				<Icon size={20} className="text-white" strokeWidth={2.5} />
 			</div>
 			{trend && (
@@ -184,11 +218,11 @@ const MetricCard = ({
 					}`}
 				>
 					{trend === "up" ? (
-						<ArrowUpRight size={12} className="mr-1" />
+						<ArrowUpRight size={12} className="mr-1 shrink-0" />
 					) : (
-						<ArrowDownRight size={12} className="mr-1" />
+						<ArrowDownRight size={12} className="mr-1 shrink-0" />
 					)}
-					{trendLabel}
+					<span className="whitespace-nowrap">{trendLabel}</span>
 				</div>
 			)}
 		</div>
@@ -200,7 +234,7 @@ const MetricCard = ({
 			<p className="mt-1 text-sm font-medium tracking-wide text-slate-500 uppercase">
 				{title}
 			</p>
-			<p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-400">
+			<p className="mt-2 text-sm leading-relaxed text-slate-400 sm:line-clamp-2">
 				{subtext}
 			</p>
 		</div>
@@ -215,9 +249,14 @@ const ImpactMetrics = () => {
 	const [activeTab, setActiveTab] = useState("growth");
 
 	const tabs = [
-		{ id: "growth", label: "Growth & Revenue", icon: TrendingUp },
-		{ id: "ops", label: "Ops & Efficiency", icon: Zap },
-		{ id: "scale", label: "Scale & Reach", icon: Globe },
+		{
+			id: "growth",
+			label: "Growth & Revenue",
+			shortLabel: "Growth",
+			icon: TrendingUp,
+		},
+		{ id: "ops", label: "Ops & Efficiency", shortLabel: "Ops", icon: Zap },
+		{ id: "scale", label: "Scale & Reach", shortLabel: "Scale", icon: Globe },
 	];
 
 	const data = {
@@ -278,7 +317,7 @@ const ImpactMetrics = () => {
 				icon: Users,
 				accentColor: "bg-blue-600",
 				ChartComponent: (
-					<div className="flex justify-center py-1">
+					<div className="flex h-20 items-center justify-center sm:h-16">
 						<RadialChart percentage={99} />
 					</div>
 				),
@@ -328,7 +367,7 @@ const ImpactMetrics = () => {
 				icon: Target,
 				accentColor: "bg-blue-600",
 				ChartComponent: (
-					<div className="flex justify-center py-1">
+					<div className="flex h-20 items-center justify-center sm:h-16">
 						<RadialChart percentage={100} color="text-blue-600" />
 					</div>
 				),
@@ -337,20 +376,20 @@ const ImpactMetrics = () => {
 	};
 
 	return (
-		<div className="mx-auto w-full max-w-6xl bg-slate-50/50 px-4 py-12 font-sans text-slate-900 transition-colors duration-300 dark:bg-slate-900 dark:text-white">
+		<div className="mx-auto w-full max-w-6xl bg-slate-50/50 px-4 py-8 font-sans text-slate-900 transition-colors duration-300 sm:px-6 sm:py-12 dark:bg-slate-900 dark:text-white">
 			{/* Header */}
-			<div className="mb-10 text-center">
-				<h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+			<div className="mb-8 text-center sm:mb-10">
+				<h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
 					By The Numbers
 				</h2>
-				<p className="mt-2 text-slate-500 dark:text-slate-400">
+				<p className="mt-2 text-sm text-slate-500 sm:text-base dark:text-slate-400">
 					Quantifiable impact across product, marketing, and operations.
 				</p>
 			</div>
 
 			{/* Custom Tab Navigation */}
-			<div className="mb-10 flex justify-center">
-				<div className="inline-flex rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+			<div className="mb-8 flex justify-center sm:mb-10">
+				<div className="flex w-full max-w-md rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm sm:w-auto sm:max-w-none dark:border-slate-700 dark:bg-slate-800">
 					{tabs.map((tab) => {
 						const Icon = tab.icon;
 						const isActive = activeTab === tab.id;
@@ -358,14 +397,18 @@ const ImpactMetrics = () => {
 							<button
 								key={tab.id}
 								onClick={() => setActiveTab(tab.id)}
-								className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all duration-200 ${
+								className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 sm:flex-none sm:gap-2 sm:px-5 ${
 									isActive
 										? "bg-slate-900 text-white shadow-md dark:bg-blue-600"
 										: "text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
 								} `}
 							>
-								<Icon size={16} />
-								<span>{tab.label}</span>
+								<Icon size={16} className="shrink-0" />
+								{/* `hidden sm:inline` cannot be used here: Layout.astro inlines an
+								    unconditional `.hidden { display: none }` in its critical CSS,
+								    which outranks the breakpoint utility. */}
+								<span className="sm:hidden">{tab.shortLabel}</span>
+								<span className="max-sm:hidden">{tab.label}</span>
 							</button>
 						);
 					})}
@@ -373,14 +416,14 @@ const ImpactMetrics = () => {
 			</div>
 
 			{/* Cards Grid */}
-			<div className="animate-in fade-in zoom-in grid grid-cols-1 gap-6 duration-300 md:grid-cols-3">
+			<div className="animate-in fade-in zoom-in grid grid-cols-1 gap-4 duration-300 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
 				{(data[activeTab] || []).map((item, index) => (
 					<MetricCard key={index} {...item} />
 				))}
 			</div>
 
 			{/* Resume Link */}
-			<div className="mt-12 text-center">
+			<div className="mt-10 text-center sm:mt-12">
 				<a
 					href="#resume"
 					onClick={(e) => {
