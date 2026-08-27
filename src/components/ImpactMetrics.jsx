@@ -237,10 +237,10 @@ const MetricCard = ({
 			<h3 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
 				{value}
 			</h3>
-			<p className="mt-1 text-sm font-medium tracking-wide text-slate-500 uppercase dark:text-slate-300">
+			<p className="mt-1 text-sm font-medium tracking-wide text-slate-600 uppercase dark:text-slate-300">
 				{title}
 			</p>
-			<p className="mt-2 text-sm leading-relaxed text-slate-400 sm:line-clamp-2 dark:text-slate-400">
+			<p className="mt-2 text-sm leading-relaxed text-slate-500 sm:line-clamp-2 dark:text-slate-400">
 				{subtext}
 			</p>
 		</div>
