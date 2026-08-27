@@ -20,11 +20,11 @@ Checked in the `anthonyrosen.com` GA4 property on August 27, 2026:
 - The **Anthony Rosen CV** web stream is active and receiving traffic.
 - The stream URL is `https://www.anthonyrosen.com` and its measurement ID matches the website: `G-7LRLJTJG4L`.
 - GA4 has recently received its standard events, including `page_view`, `first_visit`, `session_start`, `scroll`, and `user_engagement`.
-- The new job-search events have not appeared in the GA4 Recent Events list yet. They need one consented live test after this update is deployed.
+- The new job-search events have not appeared in the GA4 Recent Events list yet because the controlled test came from the excluded internal network. A future consented non-internal visit will provide the final reporting confirmation.
 - GA4’s browser-history pageview option is off. Normal page loads still count, while the site sends its own descriptive virtual pageviews for Home, Resume, Portfolio, Style Guide, and Colophon.
 - Event-scoped custom dimensions are registered for `link_location`, `contact_method`, and `file_format` so those details can be used in reports.
 - The Internal Traffic filter is active. Tests from Anthony’s internal network are intentionally excluded from Realtime and processed reports.
-- The currently marked key events are generic lead/purchase placeholders with no stream data. The job-search key events listed below should replace the useful part of that setup once GA4 has received them.
+- `contact_form_submit` and `schedule_click` are pre-registered as key events. The unused lead placeholders were unmarked; GA4’s locked `purchase` row remains but receives no site data.
 
 ## Events sent by the site
 
@@ -42,13 +42,13 @@ Checked in the `anthonyrosen.com` GA4 property on August 27, 2026:
 
 `link_location` separates actions taken in the `hero`, `contact_dialog`, `footer`, `navigation`, `resume`, `portfolio`, or general `page` area.
 
-## Recommended GA4 key events
+## GA4 key events
 
-In **Google Analytics → Admin → Events**, mark these as key events:
+In **Google Analytics → Admin → Events**, these are the intentional job-search key events:
 
 1. `contact_form_submit` — strongest signal that someone reached out.
 2. `schedule_click` — strong scheduling intent, but not proof that a meeting was booked.
-3. `resume_download` — useful job-search intent after real résumé files are connected.
+3. `resume_download` — add later, after real résumé files are connected.
 
 Keep `contact_dialog_open`, `contact_copy`, `contact_click`, `linkedin_click`, and `portfolio_open` as supporting events. They are valuable for understanding the path to a contact, but treating every small interaction as a conversion makes the report noisy.
 
@@ -95,7 +95,8 @@ Do not submit a fake contact form merely to test reporting; it sends a real emai
 - [x] A consented test generated popup, copy, scheduler, portfolio, and virtual-pageview events with the Google tag loaded and no browser errors.
 - [x] GA4’s active Internal Traffic filter correctly excluded the internal test visit from Realtime.
 - [ ] Confirm the custom events with the next consented non-internal visit.
-- [ ] Mark `contact_form_submit` and `schedule_click` as key events after GA4 receives them.
+- [x] `contact_form_submit` and `schedule_click` are pre-registered as key events.
+- [x] Unused `close_convert_lead` and `qualify_lead` key-event placeholders are unmarked.
 - [ ] Connect real PDF/DOCX résumé files before enabling `resume_download` as a key event.
 
 ## Maintenance note
