@@ -11,7 +11,6 @@ const contactEndpoint = "/api/contact";
 	id="contact-dialog"
 	class="contact-dialog"
 	aria-labelledby="contact-dialog-title"
-	aria-describedby="contact-dialog-description"
 >
 	<div class="contact-dialog-shell">
 		<button
@@ -25,12 +24,8 @@ const contactEndpoint = "/api/contact";
 		</button>
 
 		<section class="contact-dialog-details">
-			<p class="contact-dialog-eyebrow">Let’s make something useful</p>
+			<p class="contact-dialog-eyebrow">Let’s talk</p>
 			<h2 id="contact-dialog-title">Ready to get to work?</h2>
-			<p id="contact-dialog-description" class="contact-dialog-intro">
-				Choose the way that works for you. A short note is plenty—I’ll take it
-				from there.
-			</p>
 
 			<div class="contact-dialog-direct" data-copy-area>
 				<div class="contact-dialog-copy-group" data-copy-group>
@@ -110,13 +105,9 @@ const contactEndpoint = "/api/contact";
 			</div>
 		</section>
 
-		<section
-			class="contact-dialog-form-panel"
-			aria-labelledby="contact-form-title"
-		>
+		<section class="contact-dialog-form-panel" aria-label="Contact options">
 			<div class="contact-dialog-form-heading">
 				<p class="contact-dialog-form-kicker">Choose what works for you</p>
-				<h3 id="contact-form-title">Let’s connect</h3>
 			</div>
 
 			<div
@@ -785,15 +776,6 @@ const contactEndpoint = "/api/contact";
 		letter-spacing: -0.05em;
 	}
 
-	.contact-dialog-intro {
-		max-width: 34ch;
-		margin: 1.25rem 0 0;
-		color: #cbd5e1;
-		font-family: Inter, system-ui, sans-serif;
-		font-size: 0.95rem;
-		line-height: 1.65;
-	}
-
 	.contact-dialog-direct {
 		margin-top: 1.5rem;
 	}
@@ -802,6 +784,10 @@ const contactEndpoint = "/api/contact";
 		display: flex;
 		align-items: stretch;
 		gap: 0.45rem;
+	}
+
+	.contact-dialog-copy-group + .contact-dialog-copy-group {
+		margin-top: 1rem;
 	}
 
 	.contact-dialog-copy,
@@ -890,14 +876,6 @@ const contactEndpoint = "/api/contact";
 
 	.contact-dialog-form-kicker {
 		color: #315b89;
-	}
-
-	.contact-dialog-form-heading h3 {
-		margin: 0;
-		font-family: Georgia, "Times New Roman", serif;
-		font-size: clamp(1.8rem, 3vw, 2.45rem);
-		font-weight: 500;
-		letter-spacing: -0.035em;
 	}
 
 	.contact-tabs {

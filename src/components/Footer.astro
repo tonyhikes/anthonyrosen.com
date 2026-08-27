@@ -109,9 +109,8 @@ const contactEndpoint = "/api/contact";
 				</div>
 			</div>
 
-			<section class="footer-form-panel" aria-labelledby="footer-form-title">
+			<section class="footer-form-panel" aria-label="Contact options">
 				<p class="footer-form-kicker">Choose what works for you</p>
-				<h3 id="footer-form-title">Let’s connect</h3>
 
 				<div class="footer-tabs" data-contact-tabs id="footer-connect-tabs">
 					<div
@@ -453,6 +452,10 @@ const contactEndpoint = "/api/contact";
 		gap: 0.55rem;
 	}
 
+	.footer-copy-group + .footer-copy-group {
+		margin-top: 1rem;
+	}
+
 	.footer-copy-button,
 	.footer-contact-action,
 	.footer-socials a {
@@ -552,14 +555,6 @@ const contactEndpoint = "/api/contact";
 			sans-serif;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
-	}
-
-	.footer-form-panel h3 {
-		margin: 0;
-		font-family: Georgia, "Times New Roman", serif;
-		font-size: clamp(1.9rem, 3vw, 2.65rem);
-		font-weight: 500;
-		letter-spacing: -0.04em;
 	}
 
 	.footer-tabs {
