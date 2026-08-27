@@ -1,15 +1,6 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Self-hosted Inter Variable Font */
-@font-face {
-	font-family: "Inter";
-	src: url("/fonts/inter/Inter-Variable.ttf") format("truetype-variations");
-	font-weight: 400 700;
-	font-display: optional;
-	font-style: normal;
-}
-
 @theme {
 	--animate-shake: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 	--animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -55,26 +46,4 @@
 			transform: translate(0, 0);
 		}
 	}
-}
-
-/* Lenis Recommended Styles */
-html.lenis,
-html.lenis body {
-	height: auto;
-}
-
-.lenis.lenis-smooth {
-	scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-	overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-	overflow: hidden;
-}
-
-.lenis.lenis-scrolling iframe {
-	pointer-events: none;
 }

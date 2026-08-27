@@ -18,7 +18,7 @@ export default defineConfig({
 
     // Performance optimizations
     build: {
-        inlineStylesheets: "auto", // Inline small stylesheets automatically
+        inlineStylesheets: "always", // Remove stylesheet round trips on the critical path
     },
     compressHTML: true, // Minify HTML output
 });

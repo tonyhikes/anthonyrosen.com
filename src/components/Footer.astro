@@ -1,107 +1,243 @@
 ---
+import {
+	Check,
+	Copy,
+	FileText,
+	Linkedin,
+	Mail,
+	Maximize2,
+	Minimize2,
+	Phone,
+	Send,
+} from "lucide-react";
 
+const email = "anthonyrosen@gmail.com";
+const phoneDisplay = "612-281-2280";
+const phoneHref = "+16122812280";
+const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT ?? "";
 ---
 
-<footer
-	id="contact"
-	class="relative z-50 border-t border-slate-800 bg-slate-900 px-4 pt-20 pb-10"
->
-	<div class="mx-auto max-w-[85rem]">
-		<!-- CTA Section -->
-		<div class="mb-16 text-center">
-			<h2 class="mb-8 text-3xl font-bold text-white md:text-4xl">
-				Ready to get to work?
-			</h2>
-			<div class="flex justify-center gap-4">
-				<a
-					href="mailto:anthonyrosen@gmail.com"
-					class="inline-flex items-center justify-center gap-x-2 rounded-full border border-transparent bg-blue-600 px-8 py-3 text-base font-semibold text-white shadow-lg shadow-blue-900/50 transition hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-50"
-				>
-					Contact Me
-				</a>
-				<a
-					href="https://linkedin.com/in/anthonyrosen"
-					target="_blank"
-					class="inline-flex items-center justify-center gap-x-2 rounded-full border border-white/20 bg-white/5 px-8 py-3 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
-				>
-					LinkedIn
-				</a>
-			</div>
-		</div>
+<footer id="contact" class="site-footer">
+	<div class="site-footer-inner">
+		<section class="footer-contact" aria-labelledby="footer-contact-title">
+			<div class="footer-contact-copy">
+				<p class="footer-eyebrow">Let’s talk</p>
+				<h2 id="footer-contact-title">Ready to get to work?</h2>
+				<p>
+					A short note is plenty. Tell me what you’re working on and where I can
+					help.
+				</p>
 
-		<!-- Footer Columns -->
-		<div
-			class="mt-12 grid grid-cols-1 gap-12 border-t border-slate-800 pt-12 md:grid-cols-3"
-		>
-			<!-- Col 1: Brand -->
-			<div class="flex flex-col gap-4">
+				<div class="footer-contact-options" aria-label="Direct contact options">
+					<div class="footer-email-group" data-copy-email-group>
+						<div class="footer-email-row">
+							<button
+								type="button"
+								class="footer-email-copy"
+								data-copy-email={email}
+								data-copy-location="footer"
+								aria-describedby="footer-copy-status"
+							>
+								<span>{email}</span>
+								<span class="footer-email-icon" aria-hidden="true">
+									<Copy size={19} strokeWidth={1.8} data-copy-icon />
+									<Check size={19} strokeWidth={2} data-check-icon hidden />
+								</span>
+								<span class="sr-only">Copy email address</span>
+							</button>
+							<a
+								class="footer-mail-button"
+								href={`mailto:${email}`}
+								aria-label={`Open a new email to ${email}`}
+							>
+								<Mail size={20} strokeWidth={1.8} aria-hidden="true" />
+							</a>
+						</div>
+						<p
+							id="footer-copy-status"
+							class="footer-copy-status"
+							data-copy-status
+							aria-live="polite"
+						>
+							Click the address to copy it. The envelope opens your email app.
+						</p>
+					</div>
+
+					<div class="footer-contact-links">
+						<a href={`tel:${phoneHref}`}>
+							<Phone size={18} strokeWidth={1.8} aria-hidden="true" />
+							{phoneDisplay}
+						</a>
+						<a
+							href="https://linkedin.com/in/anthonyrosen"
+							target="_blank"
+							rel="noreferrer"
+						>
+							<Linkedin size={18} strokeWidth={1.8} aria-hidden="true" />
+							LinkedIn
+						</a>
+						<button type="button" class="footer-link" data-target="resume">
+							<FileText size={18} strokeWidth={1.8} aria-hidden="true" />
+							View résumé
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<section class="footer-form-panel" aria-labelledby="footer-form-title">
+				<p class="footer-form-kicker">Send a quick note</p>
+				<h3 id="footer-form-title">What can I help with?</h3>
+
+				<form
+					class="footer-form"
+					action={formspreeEndpoint || undefined}
+					method="POST"
+					data-contact-form
+					data-form-location="footer"
+					data-endpoint={formspreeEndpoint}
+				>
+					<div class="footer-form-field">
+						<label for="footer-contact-name">Name</label>
+						<input
+							id="footer-contact-name"
+							name="name"
+							type="text"
+							autocomplete="name"
+							maxlength="80"
+							required
+							placeholder="Your name"
+						/>
+					</div>
+
+					<div class="footer-form-field">
+						<label for="footer-contact-email">Email</label>
+						<input
+							id="footer-contact-email"
+							name="email"
+							type="email"
+							autocomplete="email"
+							inputmode="email"
+							maxlength="120"
+							required
+							placeholder="you@example.com"
+						/>
+					</div>
+
+					<div class="footer-form-field">
+						<div class="footer-message-label-row">
+							<label for="footer-contact-message">Message</label>
+							<button
+								type="button"
+								class="footer-expand-button"
+								data-expand-message
+								aria-controls="footer-contact-message"
+								aria-expanded="false"
+							>
+								<Maximize2
+									size={14}
+									strokeWidth={1.9}
+									data-expand-icon
+									aria-hidden="true"
+								/>
+								<Minimize2
+									size={14}
+									strokeWidth={1.9}
+									data-collapse-icon
+									aria-hidden="true"
+									hidden
+								/>
+								<span data-expand-label>Expand writing space</span>
+							</button>
+						</div>
+						<textarea
+							id="footer-contact-message"
+							name="message"
+							rows="5"
+							minlength="10"
+							maxlength="2000"
+							required
+							placeholder="A little context, a link, or simply what you’re hoping to do."
+							data-expandable-message></textarea>
+					</div>
+
+					<div class="footer-form-honeypot" aria-hidden="true">
+						<label for="footer-company-website">Leave this field blank</label>
+						<input
+							id="footer-company-website"
+							name="_gotcha"
+							type="text"
+							tabindex="-1"
+							autocomplete="off"
+						/>
+					</div>
+
+					<button
+						type="submit"
+						class="footer-form-submit"
+						disabled={!formspreeEndpoint}
+					>
+						<Send size={17} strokeWidth={1.8} aria-hidden="true" />
+						<span data-submit-label>
+							{formspreeEndpoint ? "Send message" : "Form setup pending"}
+						</span>
+					</button>
+					<p class="footer-form-privacy">
+						{
+							formspreeEndpoint
+								? "I’ll only use these details to reply."
+								: "The form is ready; it needs a Formspree endpoint before launch."
+						}
+					</p>
+					<p class="footer-form-status" data-form-status aria-live="polite"></p>
+				</form>
+			</section>
+		</section>
+
+		<div class="footer-bottom">
+			<div class="footer-brand">
 				<a
 					href="#home"
 					data-target="home"
-					class="footer-link group flex w-fit cursor-pointer items-center gap-2"
+					class="footer-link footer-brand-link"
 				>
-					<div
-						class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 font-black tracking-tighter text-white"
-					>
-						TR
-					</div>
-					<span class="text-lg font-bold text-white">Tony Rosen</span>
+					<span class="footer-mark" aria-hidden="true">TR</span>
+					<span>Tony Rosen</span>
 				</a>
-				<p class="text-sm leading-relaxed text-slate-400">
-					Marketing Project Manager & Creative Ops Specialist based in
+				<p>
+					Marketing Project Manager &amp; Creative Ops Specialist based in
 					Minneapolis, MN.
 				</p>
 			</div>
 
-			<!-- Col 2: Social -->
-			<div class="flex flex-col gap-4">
-				<p class="font-semibold text-white">Connect</p>
-				<ul class="space-y-2 text-sm text-slate-400">
+			<nav class="footer-column" aria-label="Footer navigation">
+				<p>Explore</p>
+				<ul>
+					<li><button class="footer-link" data-target="home">Home</button></li>
 					<li>
-						<a
-							href="mailto:anthonyrosen@gmail.com"
-							class="transition-colors hover:text-blue-400"
-							>anthonyrosen@gmail.com</a
+						<button class="footer-link" data-target="portfolio"
+							>Portfolio</button
 						>
 					</li>
 					<li>
-						<a
-							href="https://linkedin.com/in/anthonyrosen"
-							target="_blank"
-							class="transition-colors hover:text-blue-400">LinkedIn</a
-						>
+						<button class="footer-link" data-target="resume">Résumé</button>
 					</li>
-					<li>612-281-2280</li>
 				</ul>
-			</div>
+			</nav>
 
-			<!-- Col 3: Site -->
-			<div class="flex flex-col gap-4">
-				<p class="font-semibold text-white">Site Info</p>
-				<ul class="space-y-2 text-sm text-slate-400">
+			<div class="footer-column">
+				<p>Site info</p>
+				<ul>
 					<li>
-						<button
-							data-target="styleguide"
-							class="footer-link text-left transition-colors hover:text-blue-400"
+						<button class="footer-link" data-target="styleguide"
 							>Style Guide</button
 						>
 					</li>
 					<li>
-						<button
-							data-target="colophon"
-							class="footer-link text-left transition-colors hover:text-blue-400"
-							>Colophon</button
-						>
+						<button class="footer-link" data-target="colophon">Colophon</button>
 					</li>
-					<li>
-						<a href="/privacy" class="transition-colors hover:text-blue-400"
-							>Privacy Policy</a
-						>
-					</li>
-					<li>
-						<span class="text-slate-500"
-							>&copy; <span id="year"></span> Tony Rosen.</span
-						>
+					<li><a href="/privacy">Privacy Policy</a></li>
+					<li class="footer-copyright">
+						&copy; <span id="year"></span> Tony Rosen.
 					</li>
 				</ul>
 			</div>
@@ -110,33 +246,550 @@
 </footer>
 
 <script>
-	const yearSpan = document.getElementById("year");
-	if (yearSpan) {
-		yearSpan.textContent = new Date().getFullYear().toString();
-	}
+	function initFooter() {
+		const yearSpan = document.getElementById("year");
+		if (yearSpan) yearSpan.textContent = new Date().getFullYear().toString();
 
-	const footerLinks = document.querySelectorAll(".footer-link");
-	footerLinks.forEach((link) => {
-		link.addEventListener("click", (e) => {
-			e.preventDefault();
-			const target = (e.currentTarget as HTMLElement).dataset.target;
-			if (target) {
-				// Check if we're on the home page (/ or /index.html)
+		const footerLinks = document.querySelectorAll<HTMLElement>(".footer-link");
+		footerLinks.forEach((link) => {
+			if (link.dataset.footerInitialized === "true") return;
+			link.dataset.footerInitialized = "true";
+
+			link.addEventListener("click", (event) => {
+				event.preventDefault();
+				const target = link.dataset.target;
+				if (!target) return;
+
 				const isHomePage =
 					window.location.pathname === "/" ||
 					window.location.pathname === "/index.html" ||
 					window.location.pathname.endsWith("/");
 
 				if (isHomePage) {
-					// Use view switching for single-page navigation
 					window.dispatchEvent(
 						new CustomEvent("view-change", { detail: target })
 					);
 				} else {
-					// Navigate to home page with hash for other pages
 					window.location.href = target === "home" ? "/" : `/#${target}`;
 				}
-			}
+			});
 		});
-	});
+
+		const expandButton = document.querySelector<HTMLButtonElement>(
+			"[data-expand-message]"
+		);
+		if (expandButton && expandButton.dataset.initialized !== "true") {
+			expandButton.dataset.initialized = "true";
+			expandButton.addEventListener("click", () => {
+				const textarea = document.querySelector<HTMLTextAreaElement>(
+					"[data-expandable-message]"
+				);
+				const label = expandButton.querySelector<HTMLElement>(
+					"[data-expand-label]"
+				);
+				const expandIcon =
+					expandButton.querySelector<SVGElement>("[data-expand-icon]");
+				const collapseIcon = expandButton.querySelector<SVGElement>(
+					"[data-collapse-icon]"
+				);
+				if (!textarea || !label) return;
+
+				const expanded = expandButton.getAttribute("aria-expanded") === "true";
+				expandButton.setAttribute("aria-expanded", String(!expanded));
+				textarea.classList.toggle("is-expanded", !expanded);
+				label.textContent = expanded
+					? "Expand writing space"
+					: "Collapse writing space";
+				expandIcon?.toggleAttribute("hidden", !expanded);
+				collapseIcon?.toggleAttribute("hidden", expanded);
+				if (!expanded) textarea.focus();
+			});
+		}
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initFooter, { once: true });
+	} else {
+		initFooter();
+	}
+	document.addEventListener("astro:page-load", initFooter);
 </script>
+
+<style>
+	.site-footer {
+		position: relative;
+		z-index: 50;
+		padding: clamp(3rem, 7vw, 6rem) 1rem 2.5rem;
+		border-top: 1px solid #1e293b;
+		background: #0f172a;
+		color: white;
+	}
+
+	.site-footer-inner {
+		width: min(100%, 85rem);
+		margin: 0 auto;
+	}
+
+	.footer-contact {
+		display: grid;
+		grid-template-columns: minmax(0, 0.9fr) minmax(22rem, 1.1fr);
+		gap: clamp(2rem, 6vw, 6rem);
+		align-items: start;
+		padding-bottom: clamp(3.5rem, 7vw, 6rem);
+	}
+
+	.footer-eyebrow {
+		margin: 0 0 0.8rem;
+		color: #93c5fd;
+		font:
+			750 0.72rem/1.2 Inter,
+			system-ui,
+			sans-serif;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.footer-contact-copy h2 {
+		max-width: 10ch;
+		margin: 0;
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: clamp(2.8rem, 6vw, 5.6rem);
+		font-weight: 500;
+		line-height: 0.95;
+		letter-spacing: -0.055em;
+	}
+
+	.footer-contact-copy > p:not(.footer-eyebrow) {
+		max-width: 37ch;
+		margin: 1.25rem 0 0;
+		color: #cbd5e1;
+		font:
+			0.95rem/1.65 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.footer-contact-options {
+		margin-top: 2rem;
+		padding: clamp(1.25rem, 3vw, 2rem);
+		border: 1px solid rgba(255, 255, 255, 0.13);
+		border-radius: 1.35rem;
+		background: rgba(255, 255, 255, 0.045);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	}
+
+	.footer-email-row {
+		display: flex;
+		gap: 0.55rem;
+	}
+
+	.footer-email-copy,
+	.footer-mail-button,
+	.footer-contact-links :is(a, button, span) {
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		background: rgba(255, 255, 255, 0.055);
+		color: white;
+		font-family: Inter, system-ui, sans-serif;
+		text-decoration: none;
+		transition:
+			background 150ms ease,
+			border-color 150ms ease;
+	}
+
+	.footer-email-copy {
+		display: flex;
+		min-width: 0;
+		min-height: 3.5rem;
+		flex: 1;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 0 1rem;
+		border-radius: 0.85rem;
+		cursor: pointer;
+		font-size: clamp(0.8rem, 2vw, 0.96rem);
+		text-align: left;
+	}
+
+	.footer-email-copy > span:first-child {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.footer-email-icon,
+	.footer-mail-button {
+		display: inline-flex;
+		flex: none;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.footer-mail-button {
+		width: 3.5rem;
+		border-radius: 0.85rem;
+	}
+
+	.footer-email-copy:hover,
+	.footer-mail-button:hover,
+	.footer-contact-links :is(a, button):hover {
+		border-color: rgba(147, 197, 253, 0.62);
+		background: rgba(147, 197, 253, 0.12);
+	}
+
+	.footer-copy-status {
+		min-height: 1.25rem;
+		margin: 0.5rem 0 1rem;
+		color: #94a3b8;
+		font:
+			0.7rem/1.4 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.footer-contact-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.55rem;
+	}
+
+	.footer-contact-links :is(a, button, span) {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		padding: 0.62rem 0.78rem;
+		border-radius: 999px;
+		font-size: 0.76rem;
+	}
+
+	.footer-form-panel {
+		padding: clamp(1.4rem, 3.4vw, 2.35rem);
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		border-radius: 1.4rem;
+		background: #fbf7ef;
+		box-shadow: 0 24px 70px rgba(2, 8, 23, 0.22);
+		color: #10233e;
+	}
+
+	.footer-form-kicker {
+		margin: 0 0 0.55rem;
+		color: #315b89;
+		font:
+			750 0.7rem/1.2 Inter,
+			system-ui,
+			sans-serif;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.footer-form-panel h3 {
+		margin: 0;
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: clamp(1.9rem, 3vw, 2.65rem);
+		font-weight: 500;
+		letter-spacing: -0.04em;
+	}
+
+	.footer-form {
+		display: grid;
+		gap: 1rem;
+		margin-top: 1.45rem;
+	}
+
+	.footer-form-field {
+		display: grid;
+		gap: 0.42rem;
+	}
+
+	.footer-form-field label {
+		font:
+			700 0.78rem/1.2 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.footer-message-label-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.footer-expand-button {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.2rem;
+		border: 0;
+		background: none;
+		color: #315b89;
+		cursor: pointer;
+		font:
+			700 0.7rem/1.2 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.footer-expand-button:hover {
+		color: #10233e;
+	}
+
+	.footer-form-field input,
+	.footer-form-field textarea {
+		width: 100%;
+		border: 1px solid #cbd5e1;
+		border-radius: 0.75rem;
+		background: rgba(255, 255, 255, 0.84);
+		color: #10233e;
+		font:
+			0.92rem/1.45 Inter,
+			system-ui,
+			sans-serif;
+		outline: none;
+		transition:
+			min-height 180ms ease,
+			border-color 150ms ease,
+			box-shadow 150ms ease,
+			background 150ms ease;
+	}
+
+	.footer-form-field input {
+		height: 2.85rem;
+		padding: 0 0.85rem;
+	}
+
+	.footer-form-field textarea {
+		min-height: 7rem;
+		padding: 0.75rem 0.85rem;
+		resize: vertical;
+	}
+
+	.footer-form-field textarea.is-expanded {
+		min-height: 15rem;
+	}
+
+	.footer-form-field input::placeholder,
+	.footer-form-field textarea::placeholder {
+		color: #64748b;
+	}
+
+	.footer-form-field input:focus,
+	.footer-form-field textarea:focus {
+		border-color: #315b89;
+		background: white;
+		box-shadow: 0 0 0 3px rgba(49, 91, 137, 0.16);
+	}
+
+	.footer-form-field input:user-invalid,
+	.footer-form-field textarea:user-invalid {
+		border-color: #b42318;
+	}
+
+	.footer-form-honeypot {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	.footer-form-submit {
+		display: inline-flex;
+		min-height: 2.9rem;
+		align-items: center;
+		justify-content: center;
+		gap: 0.55rem;
+		padding: 0.75rem 1rem;
+		border: 1px solid #10233e;
+		border-radius: 999px;
+		background: #10233e;
+		color: white;
+		cursor: pointer;
+		font:
+			750 0.86rem/1 Inter,
+			system-ui,
+			sans-serif;
+		transition:
+			background 150ms ease,
+			transform 150ms ease,
+			opacity 150ms ease;
+	}
+
+	.footer-form-submit:hover:not(:disabled) {
+		background: #1d3b61;
+		transform: translateY(-1px);
+	}
+
+	.footer-form-submit:disabled {
+		cursor: not-allowed;
+		opacity: 0.56;
+	}
+
+	.footer-form-privacy,
+	.footer-form-status {
+		margin: 0;
+		color: #64748b;
+		font:
+			0.72rem/1.45 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.footer-form-status {
+		min-height: 1.45em;
+		color: #315b89;
+		font-weight: 650;
+	}
+
+	.footer-bottom {
+		display: grid;
+		grid-template-columns: minmax(0, 1.6fr) minmax(9rem, 0.7fr) minmax(
+				9rem,
+				0.7fr
+			);
+		gap: 3rem;
+		padding-top: 2.5rem;
+		border-top: 1px solid #1e293b;
+	}
+
+	.footer-brand {
+		max-width: 24rem;
+	}
+
+	.footer-brand-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.65rem;
+		color: white;
+		font:
+			750 1.05rem/1 Inter,
+			system-ui,
+			sans-serif;
+		text-decoration: none;
+	}
+
+	.footer-mark {
+		display: inline-flex;
+		width: 2rem;
+		height: 2rem;
+		align-items: center;
+		justify-content: center;
+		border-radius: 0.55rem;
+		background: #2563eb;
+		font-size: 0.74rem;
+		font-weight: 900;
+		letter-spacing: -0.04em;
+	}
+
+	.footer-brand p {
+		margin: 0.9rem 0 0;
+		color: #94a3b8;
+		font:
+			0.82rem/1.65 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.footer-column > p {
+		margin: 0 0 0.8rem;
+		font:
+			700 0.82rem/1 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.footer-column ul {
+		display: grid;
+		gap: 0.58rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.footer-column :is(a, button),
+	.footer-copyright {
+		padding: 0;
+		border: 0;
+		background: none;
+		color: #94a3b8;
+		cursor: pointer;
+		font:
+			0.8rem/1.35 Inter,
+			system-ui,
+			sans-serif;
+		text-decoration: none;
+		transition: color 150ms ease;
+	}
+
+	.footer-column :is(a, button):hover {
+		color: #93c5fd;
+	}
+
+	.footer-copyright {
+		cursor: default;
+		color: #64748b;
+	}
+
+	.site-footer :is(a, button, input, textarea):focus-visible {
+		outline: 3px solid #60a5fa;
+		outline-offset: 3px;
+	}
+
+	@media (max-width: 760px) {
+		.footer-contact,
+		.footer-bottom {
+			grid-template-columns: 1fr;
+		}
+
+		.footer-contact {
+			gap: 2.5rem;
+		}
+
+		.footer-contact-copy h2 {
+			font-size: clamp(3rem, 15vw, 4.4rem);
+		}
+
+		.footer-bottom {
+			grid-template-columns: 1.3fr 0.7fr;
+			gap: 2.5rem 1.5rem;
+		}
+
+		.footer-brand {
+			grid-column: 1 / -1;
+		}
+	}
+
+	@media (max-width: 420px) {
+		.footer-email-copy {
+			padding-inline: 0.8rem;
+			font-size: 0.76rem;
+		}
+
+		.footer-contact-links {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+		}
+
+		.footer-contact-links :is(a, button, span) {
+			justify-content: center;
+		}
+
+		.footer-contact-links :is(a, button, span):last-child {
+			grid-column: 1 / -1;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.footer-email-copy,
+		.footer-mail-button,
+		.footer-contact-links :is(a, button, span),
+		.footer-expand-button,
+		.footer-form-field :is(input, textarea),
+		.footer-form-submit,
+		.footer-column :is(a, button) {
+			transition: none;
+		}
+	}
+</style>

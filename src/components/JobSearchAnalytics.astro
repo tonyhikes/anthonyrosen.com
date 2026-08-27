@@ -22,6 +22,7 @@
 
 	function getLinkLocation(link: HTMLAnchorElement) {
 		if (link.closest("[data-many-hats-hero]")) return "hero";
+		if (link.closest("#contact-dialog")) return "contact_dialog";
 		if (link.closest("#resume-view")) return "resume";
 		if (link.closest("#portfolio-view")) return "portfolio";
 		if (link.closest("footer")) return "footer";
@@ -68,12 +69,36 @@
 				return;
 			}
 
+			if (link.matches("[data-resume-download]")) {
+				sendJobSearchEvent("resume_download", {
+					file_format: href.toLowerCase().endsWith(".pdf") ? "pdf" : "file",
+					link_location: "contact_dialog",
+				});
+				return;
+			}
+
 			if (link.dataset.target === "portfolio" || href === "#portfolio") {
 				sendJobSearchEvent("portfolio_open", {
 					link_location: linkLocation,
 					link_text: linkText,
 				});
 			}
+		});
+
+		window.addEventListener("contact-email-copied", (event) => {
+			const detail = (event as CustomEvent<{ link_location?: string }>).detail;
+			sendJobSearchEvent("contact_copy", {
+				contact_method: "email",
+				link_location: detail?.link_location || "page",
+			});
+		});
+
+		window.addEventListener("contact-form-sent", (event) => {
+			const detail = (event as CustomEvent<{ link_location?: string }>).detail;
+			sendJobSearchEvent("contact_form_submit", {
+				contact_method: "form",
+				link_location: detail?.link_location || "page",
+			});
 		});
 	}
 

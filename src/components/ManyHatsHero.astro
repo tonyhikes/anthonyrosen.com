@@ -22,9 +22,13 @@ import { ArrowDown, Hand } from "lucide-react";
 			</p>
 
 			<div class="many-hats-hero-action-row">
-				<a class="many-hats-hero-primary" href="mailto:anthonyrosen@gmail.com">
+				<button
+					type="button"
+					class="many-hats-hero-primary"
+					data-contact-dialog-open
+				>
 					Let’s talk
-				</a>
+				</button>
 				<a class="many-hats-hero-overview" href="#work-overview">
 					<span>Work overview</span>
 					<ArrowDown size={18} strokeWidth={1.8} aria-hidden="true" />
@@ -193,6 +197,7 @@ import { ArrowDown, Hand } from "lucide-react";
 		font-size: 0.9rem;
 		font-weight: 750;
 		text-decoration: none;
+		cursor: pointer;
 		transition:
 			transform 160ms ease,
 			box-shadow 160ms ease;
