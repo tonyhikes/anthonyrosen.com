@@ -81,18 +81,18 @@
 				return;
 			}
 
-			if (link.closest("#download-menu")) {
+			if (
+				link.closest("#download-menu") ||
+				link.matches("[data-resume-download]")
+			) {
+				const fileFormat = href.toLowerCase().match(/\.(pdf|docx)(?:[?#]|$)/)?.[1];
+				// Placeholder links are not downloads and should not inflate reporting.
+				if (!fileFormat) return;
 				sendJobSearchEvent("resume_download", {
-					file_format: linkText.toLowerCase().includes("pdf") ? "pdf" : "docx",
-					link_location: "resume",
-				});
-				return;
-			}
-
-			if (link.matches("[data-resume-download]")) {
-				sendJobSearchEvent("resume_download", {
-					file_format: href.toLowerCase().endsWith(".pdf") ? "pdf" : "file",
-					link_location: "contact_dialog",
+					file_format: fileFormat,
+					link_location: link.closest("#download-menu")
+						? "resume"
+						: "contact_dialog",
 				});
 				return;
 			}

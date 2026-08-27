@@ -21,8 +21,9 @@ Checked in the `anthonyrosen.com` GA4 property on August 27, 2026:
 - The stream URL is `https://www.anthonyrosen.com` and its measurement ID matches the website: `G-7LRLJTJG4L`.
 - GA4 has recently received its standard events, including `page_view`, `first_visit`, `session_start`, `scroll`, and `user_engagement`.
 - The new job-search events have not appeared in the GA4 Recent Events list yet. They need one consented live test after this update is deployed.
-- GA4’s browser-history pageview option is currently on. Because this site sends its own descriptive virtual pageviews, that option should be turned off to prevent possible duplicate navigation counts.
-- No custom dimensions are registered yet. Add event-scoped dimensions for `link_location`, `contact_method`, and `file_format` so those useful details can be used in GA4 reports.
+- GA4’s browser-history pageview option is off. Normal page loads still count, while the site sends its own descriptive virtual pageviews for Home, Resume, Portfolio, Style Guide, and Colophon.
+- Event-scoped custom dimensions are registered for `link_location`, `contact_method`, and `file_format` so those details can be used in reports.
+- The Internal Traffic filter is active. Tests from Anthony’s internal network are intentionally excluded from Realtime and processed reports.
 - The currently marked key events are generic lead/purchase placeholders with no stream data. The job-search key events listed below should replace the useful part of that setup once GA4 has received them.
 
 ## Events sent by the site
@@ -36,7 +37,7 @@ Checked in the `anthonyrosen.com` GA4 property on August 27, 2026:
 | `contact_copy` | A visitor copied the email address or phone number. | `contact_method: email` or `phone`, `link_location` |
 | `contact_click` | A visitor pressed the mail icon or phone icon, opening their email or call app. | `contact_method: email` or `phone`, `link_location` |
 | `linkedin_click` | A visitor opened Anthony’s LinkedIn profile. | `link_location`, `link_text` |
-| `resume_download` | A visitor downloaded the PDF or DOCX résumé from the Resume view. | `file_format`, `link_location: resume` |
+| `resume_download` | A visitor followed a real PDF or DOCX résumé file link. Placeholder links are ignored. | `file_format`, `link_location` |
 | `portfolio_open` | A visitor opened the Portfolio view. | `link_location`, `link_text` |
 
 `link_location` separates actions taken in the `hero`, `contact_dialog`, `footer`, `navigation`, `resume`, `portfolio`, or general `page` area.
@@ -47,7 +48,7 @@ In **Google Analytics → Admin → Events**, mark these as key events:
 
 1. `contact_form_submit` — strongest signal that someone reached out.
 2. `schedule_click` — strong scheduling intent, but not proof that a meeting was booked.
-3. `resume_download` — useful job-search intent.
+3. `resume_download` — useful job-search intent after real résumé files are connected.
 
 Keep `contact_dialog_open`, `contact_copy`, `contact_click`, `linkedin_click`, and `portfolio_open` as supporting events. They are valuable for understanding the path to a contact, but treating every small interaction as a conversion makes the report noisy.
 
@@ -56,11 +57,11 @@ Keep `contact_dialog_open`, `contact_copy`, `contact_click`, `linkedin_click`, a
 1. Open the live site in a private window so the visit is easy to recognize.
 2. Accept analytics cookies.
 3. In GA4, open **Reports → Realtime**.
-4. On the site, perform one action at a time: open the contact popup, select the Schedule tab, copy the email, copy the phone number, or open the Resume view and download a file.
+4. On the site, perform one action at a time: open the contact popup, select the Schedule tab, copy the email, copy the phone number, or open the Resume and Portfolio views.
 5. Allow up to a minute for Realtime to show the event. Normal Events reports can take much longer to populate.
 6. Open an event in Realtime and confirm its details include the expected `link_location` and, where applicable, `contact_method`.
 
-Do not submit a fake contact form merely to test reporting; it sends a real email. The form event is intentionally recorded only after the message service confirms success.
+Do not submit a fake contact form merely to test reporting; it sends a real email. The form event is intentionally recorded only after the message service confirms success. The current résumé menu contains placeholder links, so it does not send `resume_download` until real files are connected.
 
 ## Consent behavior
 
@@ -84,15 +85,18 @@ Do not submit a fake contact form merely to test reporting; it sends a real emai
 - [x] GA4 measurement ID is present.
 - [x] GA4’s automatic initial pageview is disabled in the website code.
 - [x] Virtual pageviews are sent for the site’s view-switching navigation.
-- [x] Popup, footer, scheduler, form, email, phone, LinkedIn, résumé, and portfolio paths have event coverage.
+- [x] Popup, footer, scheduler, form, email, phone, LinkedIn, résumé-view, and portfolio paths have event coverage.
 - [x] A form event fires only after a successful response from the contact endpoint.
 - [x] Analytics activity is blocked before consent.
 - [x] The GA4 stream URL and measurement ID match the live site.
 - [x] GA4 reports that the stream is receiving traffic.
-- [ ] Turn off enhanced measurement for page changes based on browser history events.
-- [ ] Register `link_location`, `contact_method`, and `file_format` as event-scoped custom dimensions.
-- [ ] Confirm the events appear in the live GA4 Realtime report after the updated code is deployed.
-- [ ] Mark the recommended job-search events as key events after GA4 receives them.
+- [x] Enhanced measurement for page changes based on browser history events is off.
+- [x] `link_location`, `contact_method`, and `file_format` are registered as event-scoped custom dimensions.
+- [x] A consented test generated popup, copy, scheduler, portfolio, and virtual-pageview events with the Google tag loaded and no browser errors.
+- [x] GA4’s active Internal Traffic filter correctly excluded the internal test visit from Realtime.
+- [ ] Confirm the custom events with the next consented non-internal visit.
+- [ ] Mark `contact_form_submit` and `schedule_click` as key events after GA4 receives them.
+- [ ] Connect real PDF/DOCX résumé files before enabling `resume_download` as a key event.
 
 ## Maintenance note
 
