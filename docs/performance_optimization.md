@@ -1,5 +1,7 @@
 # Performance Optimization Documentation
 
+> Historical record. This document describes the former Three.js hero, which was removed on 2026-08-27. See `archive/slam-hero-rollback.md` for the recovery path. Do not use the file list below as current architecture guidance.
+
 ## Results Achieved
 
 - **Desktop PageSpeed**: 100 ✅

@@ -4,16 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Tony Rosen's portfolio website - a single-page application built with Astro, featuring a 3D Three.js hero background, smooth scrolling with Lenis, and comprehensive analytics integration.
+Tony Rosen's portfolio website - a single-page application built with Astro, featuring a simple editorial hero, smooth scrolling with Lenis, and comprehensive analytics integration.
 
 **Tech Stack:**
+
 - **Framework:** Astro 5 with React integration
 - **Styling:** Tailwind CSS 4 (with Preline UI plugin)
-- **3D Graphics:** Three.js (runs in Web Worker via OffscreenCanvas)
-- **Animations:** Anime.js + custom CSS animations
+- **Animations:** Lightweight CSS and browser-native animations
 - **Smooth Scroll:** Lenis
 - **Analytics:** PostHog, Google Analytics 4, LinkedIn Insight Tag, RB2B
-- **Performance:** Partytown (for offloading analytics to Web Workers)
+- **Performance:** Deferred analytics and interaction-first loading
 
 ## Commands
 
@@ -40,38 +40,24 @@ npm run astro -- --help  # Get help with Astro CLI
 
 This is a **single-page application** with client-side view switching (not Astro's built-in routing). All content lives on one page (`/`) and switches views via hash URLs:
 
-- `/` or `/#home` - Home view (Hero + SlamSection + ImpactCharts + Experience)
+- `/` or `/#home` - Home view (ManyHatsHero + ImpactCharts + Experience)
 - `/#resume` - Resume view
 - `/#portfolio` - Portfolio view
 - `/#styleguide` - Style guide view
 - `/#colophon` - Colophon view
 
 **How it works:**
+
 1. Navbar dispatches `view-change` custom events
 2. `index.astro` listens for these events and shows/hides view containers
 3. Each view change triggers analytics pageviews (GA4 + PostHog)
 4. Hash changes update browser history without page reload
 
-### 3D Background System
+### Home Experience
 
-**Two rendering paths** (based on browser support):
-
-1. **Web Worker Path** (Modern browsers with OffscreenCanvas):
-   - `ThreeScene.astro` transfers canvas control to `three-worker.ts`
-   - Three.js runs entirely in a Web Worker (non-blocking)
-   - Main thread sends mouse position updates to worker
-   - Worker handles all rendering, model loading, and animation
-
-2. **Fallback Path** (Older browsers):
-   - `ThreeSceneFallback.ts` runs Three.js on main thread
-   - Same visual result, but less performant
-
-**3D Asset:** `/public/cotton_ball-v1.glb` (loaded via GLTFLoader with Draco compression)
-
-**Visibility states:**
-- Shows on home view only
-- Hides during "slam" interactions
-- Starts idle after 5 seconds without user interaction (for Lighthouse)
+- `ManyHatsHero.astro` is the simple full-viewport introduction.
+- The experimental `ManyHats.astro` section is preserved in the repository but is not currently mounted on the homepage.
+- The former slam hero and Three.js background were removed. The rollback path is documented in `docs/archive/slam-hero-rollback.md`.
 
 ### Performance Optimizations
 
@@ -87,40 +73,27 @@ The site is optimized for fast loading and excellent Core Web Vitals scores:
    - Lenis smooth scrolling initialization deferred until after page load
    - Reduces Total Blocking Time (TBT) from 4,100ms to ~60ms on mobile
 
-3. **Resource Hints:**
-   - `preconnect` for critical origins (fonts, CDN)
-   - `dns-prefetch` for analytics domains loaded later
-   - `modulepreload` for Anime.js
-
-4. **Lenis Smooth Scrolling:**
+3. **Lenis Smooth Scrolling:**
    - Deferred initialization using `requestIdleCallback`
    - Auto-pauses after 5 seconds of inactivity (helps Lighthouse)
    - Stops when tab is hidden
    - Restarts on any user interaction
 
-5. **Font Loading:**
-   - Google Fonts (Inter) load with `display=swap` to prevent FOIT
-   - Font stylesheet loads async via media attribute trick
+4. **Font Loading:**
+   - Inter is self-hosted and uses non-blocking font-display behavior.
 
-6. **Cache Headers:**
+5. **Cache Headers:**
    - Static assets cached for 1 year with `immutable` flag (via `public/_headers`)
    - HTML pages revalidate on each request
    - Configured for Netlify/Vercel deployment
 
-### Custom Animations
+### Hero Motion
 
-Defined in `src/styles/global.css`:
-
-- **`slam`** - Scale-up entrance animation (0.6s, used in SlamSection)
-- **`shake`** - Shake animation (0.5s, multi-directional)
-- **`pulse-slow`** - Slow pulse (3s infinite, used in Hero scroll indicator)
-
-Custom utility class:
-- `.slam-text` - Text shadow effect for slam interactions
+The simple hero uses a restrained CSS hand wave and a subtle scroll-based background-color transition. It respects `prefers-reduced-motion`.
 
 ### Analytics Integration
 
-**Four tracking services** (all via Partytown):
+**Four tracking services** (loaded only after analytics consent):
 
 1. **Google Analytics 4** (`G-7LRLJTJG4L`)
 2. **PostHog** (configured in `PostHog.astro`)
@@ -128,6 +101,8 @@ Custom utility class:
 4. **RB2B** (B2B visitor identification, `RB2B.astro`)
 
 **Virtual pageviews:** Each view switch tracks as a pageview with custom path/title.
+
+**Job-search events:** `contact_click`, `resume_download`, `linkedin_click`, and `portfolio_open` are sent to GA4 and PostHog by `JobSearchAnalytics.astro`.
 
 ### Dark Mode
 
@@ -148,10 +123,8 @@ Custom utility class:
 ```
 src/
 ├── components/
-│   ├── Hero.astro              # Sticky hero section with scroll indicator
-│   ├── ThreeScene.astro        # 3D canvas (Web Worker path)
-│   ├── ThreeSceneFallback.ts   # 3D fallback (main thread)
-│   ├── SlamSection.astro       # Interactive "slam" animation section
+│   ├── ManyHatsHero.astro      # Simple editorial homepage hero
+│   ├── ManyHats.astro          # Preserved experiment; not currently mounted
 │   ├── ImpactCharts.astro      # Data visualization component
 │   ├── Experience.astro        # Work experience timeline
 │   ├── Resume.astro            # Resume view
@@ -164,6 +137,7 @@ src/
 │   ├── PostHog.astro           # PostHog analytics init
 │   ├── LinkedInTag.astro       # LinkedIn Insight Tag
 │   ├── RB2B.astro              # RB2B tracking script
+│   ├── JobSearchAnalytics.astro # GA4/PostHog job-search events
 │   └── SEO.astro               # Meta tags component
 ├── layouts/
 │   └── Layout.astro            # Main layout (includes Lenis, theme, analytics)
@@ -171,13 +145,11 @@ src/
 │   ├── index.astro             # Main SPA page (all views)
 │   └── privacy.astro           # Privacy policy page
 ├── styles/
-│   └── global.css              # Custom animations, Lenis styles, utilities
-├── workers/
-│   └── three-worker.ts         # Three.js Web Worker for 3D rendering
+│   └── global.css              # Shared styles and Lenis styles
 └── global.d.ts                 # TypeScript global declarations
 
 public/
-├── cotton_ball-v1.glb          # 3D model asset
+├── many-hats/                  # Optimized imagery for the work overview
 └── favicon-{dark,light}.png    # Theme-aware favicons
 ```
 
@@ -195,19 +167,7 @@ Components like `ImpactCharts.astro` defensively handle potentially undefined da
 
 ### Scroll Interactions
 
-The Hero section fades out as user scrolls (opacity calculated from scroll position). This is coordinated with:
-- Lenis smooth scrolling
-- `sticky-hero` positioning (fixed → absolute when scrolled past)
-- Content layer with `margin-top: 100vh` to reveal fixed hero
-
-### Slam Interactions
-
-The "slam" effect is a coordinated animation across multiple components:
-1. User triggers slam (button click in SlamSection)
-2. Custom `slam` event dispatched
-3. Hero content hides
-4. ThreeScene hides
-5. After animation completes, `reset-hero` event shows them again
+The hero transitions gently from warm cream to pale blue as the visitor scrolls. Keep its reduced-motion behavior intact when changing the section.
 
 ## ESLint Configuration
 

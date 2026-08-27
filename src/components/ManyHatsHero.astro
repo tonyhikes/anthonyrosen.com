@@ -1,0 +1,282 @@
+---
+import { ArrowDown, Hand } from "lucide-react";
+---
+
+<section
+	class="many-hats-hero"
+	aria-labelledby="many-hats-hero-heading"
+	data-many-hats-hero
+>
+	<div class="many-hats-hero-inner">
+		<div class="many-hats-hero-copy">
+			<h1 id="many-hats-hero-heading">
+				<span class="many-hats-hero-greeting">
+					<Hand size={54} strokeWidth={1.45} aria-hidden="true" />
+					Hi.
+				</span>
+				I’m Anthony.
+			</h1>
+			<p>
+				I turn complex ideas into clear, useful work—and help teams bring it to
+				life.
+			</p>
+
+			<div class="many-hats-hero-action-row">
+				<button
+					type="button"
+					class="many-hats-hero-primary"
+					data-contact-dialog-open
+				>
+					Let’s talk
+				</button>
+				<a class="many-hats-hero-overview" href="#work-overview">
+					<span>Work overview</span>
+					<ArrowDown size={18} strokeWidth={1.8} aria-hidden="true" />
+				</a>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	function initManyHatsHero() {
+		const hero = document.querySelector<HTMLElement>("[data-many-hats-hero]");
+		if (!hero || hero.dataset.initialized === "true") return;
+		hero.dataset.initialized = "true";
+
+		const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+		let scrollFrame = 0;
+
+		function updateHeroColor() {
+			scrollFrame = 0;
+			if (reduceMotion.matches) {
+				hero.style.removeProperty("background-color");
+				return;
+			}
+
+			const progress = Math.min(
+				1,
+				Math.max(0, window.scrollY / Math.max(1, hero.offsetHeight * 0.78))
+			);
+			const start = [251, 247, 239];
+			const end = [238, 244, 251];
+			const color = start.map((channel, index) =>
+				Math.round(channel + (end[index] - channel) * progress)
+			);
+			hero.style.backgroundColor = `rgb(${color.join(", ")})`;
+		}
+
+		function requestColorUpdate() {
+			if (scrollFrame) return;
+			scrollFrame = requestAnimationFrame(updateHeroColor);
+		}
+
+		reduceMotion.addEventListener("change", requestColorUpdate);
+		window.addEventListener("scroll", requestColorUpdate, { passive: true });
+		window.addEventListener("resize", requestColorUpdate, { passive: true });
+		updateHeroColor();
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initManyHatsHero, {
+			once: true,
+		});
+	} else {
+		initManyHatsHero();
+	}
+	document.addEventListener("astro:page-load", initManyHatsHero);
+</script>
+
+<style>
+	.many-hats-hero {
+		position: relative;
+		display: flex;
+		min-height: 100svh;
+		align-items: center;
+		padding: clamp(6.5rem, 10vw, 8rem) 0 clamp(3rem, 6vw, 5rem);
+		overflow: hidden;
+		background: #fbf7ef;
+		color: #10233e;
+	}
+
+	.many-hats-hero-inner {
+		width: min(100%, 85rem);
+		margin: 0 auto;
+		padding-inline: 1rem;
+	}
+
+	.many-hats-hero-copy {
+		max-width: 780px;
+	}
+
+	.many-hats-hero h1 {
+		display: flex;
+		flex-wrap: nowrap;
+		align-items: center;
+		gap: 0 0.22em;
+		margin: 0;
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: clamp(1rem, 7.25vw, 5.25rem);
+		font-weight: 500;
+		line-height: 0.98;
+		letter-spacing: -0.055em;
+		white-space: nowrap;
+	}
+
+	.many-hats-hero-greeting {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.12em;
+	}
+
+	.many-hats-hero-greeting :global(svg) {
+		width: 0.78em;
+		height: 0.78em;
+		flex: none;
+		transform-box: fill-box;
+		transform-origin: 30% 88%;
+		transform: rotate(-5deg);
+		animation: many-hats-hand-wave 10s ease-in-out 420ms infinite both;
+	}
+
+	@keyframes many-hats-hand-wave {
+		0%,
+		13.6%,
+		100% {
+			transform: rotate(-5deg) translateY(0);
+		}
+
+		1.6%,
+		4.8%,
+		8% {
+			transform: rotate(11deg) translateY(-0.018em);
+		}
+
+		3.2%,
+		6.4%,
+		9.6% {
+			transform: rotate(-10deg) translateY(0);
+		}
+
+		11.4% {
+			transform: rotate(3deg) translateY(-0.008em);
+		}
+	}
+
+	.many-hats-hero-copy > p {
+		max-width: 25ch;
+		margin: clamp(1.35rem, 2.5vw, 2rem) 0 0;
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: clamp(1.65rem, 2.8vw, 2.6rem);
+		font-weight: 400;
+		line-height: 1.12;
+		letter-spacing: -0.035em;
+		text-wrap: pretty;
+	}
+
+	.many-hats-hero-action-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1.4rem;
+		margin-top: clamp(1.8rem, 3.2vw, 2.5rem);
+	}
+
+	.many-hats-hero-primary {
+		display: inline-flex;
+		min-height: 3.25rem;
+		align-items: center;
+		justify-content: center;
+		padding: 0.85rem 1.35rem;
+		border: 1px solid #10233e;
+		border-radius: 999px;
+		background: #10233e;
+		box-shadow: 0 12px 26px rgba(16, 35, 62, 0.14);
+		color: white;
+		font-family: "Inter", system-ui, sans-serif;
+		font-size: 0.9rem;
+		font-weight: 750;
+		text-decoration: none;
+		cursor: pointer;
+		transition:
+			transform 160ms ease,
+			box-shadow 160ms ease;
+	}
+
+	.many-hats-hero-primary:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 16px 32px rgba(16, 35, 62, 0.2);
+	}
+
+	.many-hats-hero-overview {
+		display: inline-flex;
+		width: fit-content;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.7rem 0;
+		color: #10233e;
+		font-family: "Inter", system-ui, sans-serif;
+		font-size: 0.76rem;
+		font-weight: 750;
+		letter-spacing: 0.11em;
+		text-decoration: none;
+		text-transform: uppercase;
+		transition: color 160ms ease;
+	}
+
+	.many-hats-hero-overview:hover {
+		color: #315b89;
+	}
+
+	.many-hats-hero-primary:focus-visible,
+	.many-hats-hero-overview:focus-visible {
+		outline: 3px solid #93c5fd;
+		outline-offset: 4px;
+	}
+
+	@media (max-width: 700px) {
+		.many-hats-hero {
+			min-height: 100svh;
+			padding: 6rem 0 3rem;
+		}
+
+		.many-hats-hero-copy > p {
+			max-width: 20ch;
+			font-size: clamp(1.55rem, 7vw, 2rem);
+		}
+
+		.many-hats-hero-action-row {
+			gap: 0.75rem;
+			margin-top: 1.75rem;
+		}
+
+		.many-hats-hero-overview {
+			gap: 0.4rem;
+			font-size: 0.68rem;
+			letter-spacing: 0.06em;
+		}
+	}
+
+	@media (min-width: 640px) {
+		.many-hats-hero-inner {
+			padding-inline: 1.5rem;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.many-hats-hero-inner {
+			padding-inline: 2rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.many-hats-hero-greeting :global(svg) {
+			animation: none;
+		}
+
+		.many-hats-hero-primary,
+		.many-hats-hero-overview {
+			transition: none;
+		}
+	}
+</style>

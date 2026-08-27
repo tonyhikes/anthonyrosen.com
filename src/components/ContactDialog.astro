@@ -1,0 +1,821 @@
+---
+import {
+	Check,
+	Copy,
+	FileText,
+	Linkedin,
+	Mail,
+	Phone,
+	Send,
+	X,
+} from "lucide-react";
+
+const email = "anthonyrosen@gmail.com";
+const phoneDisplay = "612-281-2280";
+const phoneHref = "+16122812280";
+const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT ?? "";
+---
+
+<dialog
+	id="contact-dialog"
+	class="contact-dialog"
+	aria-labelledby="contact-dialog-title"
+	aria-describedby="contact-dialog-description"
+>
+	<div class="contact-dialog-shell">
+		<button
+			type="button"
+			class="contact-dialog-close"
+			aria-label="Close contact dialog"
+			data-contact-dialog-close
+			autofocus
+		>
+			<X size={20} strokeWidth={1.8} aria-hidden="true" />
+		</button>
+
+		<section class="contact-dialog-details">
+			<p class="contact-dialog-eyebrow">Let’s make something useful</p>
+			<h2 id="contact-dialog-title">Ready to get to work?</h2>
+			<p id="contact-dialog-description" class="contact-dialog-intro">
+				Choose the way that works for you. A short note is plenty—I’ll take it
+				from there.
+			</p>
+
+			<div class="contact-dialog-direct">
+				<div class="contact-dialog-email-wrap" data-copy-email-group>
+					<button
+						type="button"
+						class="contact-dialog-email"
+						data-copy-email={email}
+						data-copy-location="contact_dialog"
+						aria-describedby="contact-copy-status"
+					>
+						<span>{email}</span>
+						<span class="contact-dialog-icon" aria-hidden="true">
+							<Copy size={18} strokeWidth={1.8} data-copy-icon />
+							<Check size={18} strokeWidth={2} data-check-icon hidden />
+						</span>
+						<span class="sr-only">Copy email address</span>
+					</button>
+					<a
+						class="contact-dialog-mail"
+						href={`mailto:${email}`}
+						aria-label={`Open a new email to ${email}`}
+					>
+						<Mail size={19} strokeWidth={1.8} aria-hidden="true" />
+					</a>
+				</div>
+				<p
+					id="contact-copy-status"
+					class="contact-dialog-status"
+					data-copy-status
+					aria-live="polite"
+				>
+					Click the address to copy it. The envelope opens your email app.
+				</p>
+
+				<a class="contact-dialog-row" href={`tel:${phoneHref}`}>
+					<Phone size={18} strokeWidth={1.8} aria-hidden="true" />
+					<span>{phoneDisplay}</span>
+				</a>
+
+				<div
+					class="contact-dialog-links"
+					aria-label="Social profile and resume"
+				>
+					<a
+						class="contact-dialog-link"
+						href="https://linkedin.com/in/anthonyrosen"
+						target="_blank"
+						rel="noreferrer"
+					>
+						<Linkedin size={17} strokeWidth={1.8} aria-hidden="true" />
+						LinkedIn
+					</a>
+					<button type="button" class="contact-dialog-link" data-contact-resume>
+						<FileText size={17} strokeWidth={1.8} aria-hidden="true" />
+						View résumé
+					</button>
+				</div>
+			</div>
+		</section>
+
+		<section
+			class="contact-dialog-form-panel"
+			aria-labelledby="contact-form-title"
+		>
+			<div class="contact-dialog-form-heading">
+				<p class="contact-dialog-form-kicker">Prefer a form?</p>
+				<h3 id="contact-form-title">Send a quick note</h3>
+			</div>
+
+			<form
+				id="contact-form"
+				class="contact-form"
+				action={formspreeEndpoint || undefined}
+				method="POST"
+				data-contact-form
+				data-form-location="contact_dialog"
+				data-endpoint={formspreeEndpoint}
+			>
+				<div class="contact-form-field">
+					<label for="contact-name">Name</label>
+					<input
+						id="contact-name"
+						name="name"
+						type="text"
+						autocomplete="name"
+						maxlength="80"
+						required
+						placeholder="Your name"
+					/>
+				</div>
+
+				<div class="contact-form-field">
+					<label for="contact-email">Email</label>
+					<input
+						id="contact-email"
+						name="email"
+						type="email"
+						autocomplete="email"
+						inputmode="email"
+						maxlength="120"
+						required
+						placeholder="you@example.com"
+					/>
+				</div>
+
+				<div class="contact-form-field">
+					<label for="contact-message">What can I help with?</label>
+					<textarea
+						id="contact-message"
+						name="message"
+						rows="5"
+						minlength="10"
+						maxlength="2000"
+						required
+						placeholder="A little context, a link, or simply what you’re hoping to do."
+					></textarea>
+				</div>
+
+				<div class="contact-form-honeypot" aria-hidden="true">
+					<label for="contact-company-website">Leave this field blank</label>
+					<input
+						id="contact-company-website"
+						name="_gotcha"
+						type="text"
+						tabindex="-1"
+						autocomplete="off"
+					/>
+				</div>
+
+				<button
+					type="submit"
+					class="contact-form-submit"
+					disabled={!formspreeEndpoint}
+				>
+					<Send size={17} strokeWidth={1.8} aria-hidden="true" />
+					<span data-submit-label>
+						{formspreeEndpoint ? "Send message" : "Form setup pending"}
+					</span>
+				</button>
+				<p class="contact-form-privacy">
+					{
+						formspreeEndpoint
+							? "I’ll only use these details to reply."
+							: "The form is ready; it needs a Formspree endpoint before launch."
+					}
+				</p>
+				<p class="contact-form-status" data-form-status aria-live="polite"></p>
+			</form>
+		</section>
+	</div>
+</dialog>
+
+<script>
+	function initContactDialog() {
+		const dialog = document.querySelector<HTMLDialogElement>("#contact-dialog");
+		if (!dialog || dialog.dataset.initialized === "true") return;
+		dialog.dataset.initialized = "true";
+
+		let lastTrigger: HTMLElement | null = null;
+		let closeTimer = 0;
+
+		function openDialog(trigger: HTMLElement) {
+			lastTrigger = trigger;
+			if (!dialog.open) dialog.showModal();
+		}
+
+		function finishClose() {
+			window.clearTimeout(closeTimer);
+			dialog.classList.remove("is-closing");
+			if (dialog.open) dialog.close();
+			lastTrigger?.focus();
+		}
+
+		function closeDialog() {
+			if (!dialog.open || dialog.classList.contains("is-closing")) return;
+			if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+				finishClose();
+				return;
+			}
+			dialog.classList.add("is-closing");
+			closeTimer = window.setTimeout(finishClose, 180);
+		}
+
+		document.addEventListener("click", (event) => {
+			const target = event.target;
+			if (!(target instanceof Element)) return;
+
+			const opener = target.closest<HTMLElement>("[data-contact-dialog-open]");
+			if (opener) {
+				event.preventDefault();
+				openDialog(opener);
+				return;
+			}
+
+			if (target.closest("[data-contact-dialog-close]")) {
+				closeDialog();
+				return;
+			}
+
+			if (target.closest("[data-contact-resume]")) {
+				closeDialog();
+				window.setTimeout(() => {
+					window.dispatchEvent(
+						new CustomEvent("view-change", { detail: "resume" })
+					);
+				}, 190);
+			}
+		});
+
+		dialog.addEventListener("cancel", (event) => {
+			event.preventDefault();
+			closeDialog();
+		});
+
+		dialog.addEventListener("click", (event) => {
+			if (event.target !== dialog) return;
+			const rect = dialog.getBoundingClientRect();
+			const inside =
+				event.clientX >= rect.left &&
+				event.clientX <= rect.right &&
+				event.clientY >= rect.top &&
+				event.clientY <= rect.bottom;
+			if (!inside) closeDialog();
+		});
+
+		const copyButtons =
+			document.querySelectorAll<HTMLButtonElement>("[data-copy-email]");
+		copyButtons.forEach((copyButton) => {
+			if (copyButton.dataset.copyInitialized === "true") return;
+			copyButton.dataset.copyInitialized = "true";
+			let copyResetTimer = 0;
+
+			copyButton.addEventListener("click", async () => {
+				const address = copyButton.dataset.copyEmail;
+				const group = copyButton.closest<HTMLElement>(
+					"[data-copy-email-group]"
+				);
+				const copyStatus =
+					group?.querySelector<HTMLElement>("[data-copy-status]");
+				const copyIcon =
+					copyButton.querySelector<SVGElement>("[data-copy-icon]");
+				const checkIcon =
+					copyButton.querySelector<SVGElement>("[data-check-icon]");
+				if (!address) return;
+
+				try {
+					await navigator.clipboard.writeText(address);
+					if (copyStatus) {
+						copyStatus.textContent = "Email copied to your clipboard.";
+					}
+					copyIcon?.setAttribute("hidden", "");
+					checkIcon?.removeAttribute("hidden");
+					window.dispatchEvent(
+						new CustomEvent("contact-email-copied", {
+							detail: {
+								link_location: copyButton.dataset.copyLocation || "page",
+							},
+						})
+					);
+
+					window.clearTimeout(copyResetTimer);
+					copyResetTimer = window.setTimeout(() => {
+						if (copyStatus) {
+							copyStatus.textContent =
+								"Click the address to copy it. The envelope opens your email app.";
+						}
+						checkIcon?.setAttribute("hidden", "");
+						copyIcon?.removeAttribute("hidden");
+					}, 2600);
+				} catch {
+					if (copyStatus) {
+						copyStatus.textContent =
+							"Copy didn’t work. You can select the address instead.";
+					}
+				}
+			});
+		});
+
+		const contactForms = document.querySelectorAll<HTMLFormElement>(
+			"[data-contact-form]"
+		);
+		contactForms.forEach((form) => {
+			if (form.dataset.formInitialized === "true") return;
+			form.dataset.formInitialized = "true";
+
+			form.addEventListener("submit", async (event) => {
+				event.preventDefault();
+				const endpoint = form.dataset.endpoint;
+				const formStatus =
+					form.querySelector<HTMLElement>("[data-form-status]");
+				const submitButton = form.querySelector<HTMLButtonElement>(
+					"button[type='submit']"
+				);
+				const submitLabel = form.querySelector<HTMLElement>(
+					"[data-submit-label]"
+				);
+				if (!endpoint || !submitButton || !submitLabel) return;
+				if (!form.reportValidity()) return;
+
+				submitButton.disabled = true;
+				submitLabel.textContent = "Sending…";
+				if (formStatus) formStatus.textContent = "Sending your message.";
+
+				try {
+					const response = await fetch(endpoint, {
+						method: "POST",
+						body: new FormData(form),
+						headers: { Accept: "application/json" },
+					});
+
+					if (!response.ok) throw new Error("Form submission failed");
+
+					form.reset();
+					submitLabel.textContent = "Message sent";
+					if (formStatus) {
+						formStatus.textContent =
+							"Thanks—your message is on its way to Anthony.";
+					}
+					window.dispatchEvent(
+						new CustomEvent("contact-form-sent", {
+							detail: {
+								link_location: form.dataset.formLocation || "page",
+							},
+						})
+					);
+				} catch {
+					submitButton.disabled = false;
+					submitLabel.textContent = "Try again";
+					if (formStatus) {
+						formStatus.textContent =
+							"That didn’t send. Please try again, or use the email option.";
+					}
+				}
+			});
+		});
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initContactDialog, {
+			once: true,
+		});
+	} else {
+		initContactDialog();
+	}
+	document.addEventListener("astro:page-load", initContactDialog);
+</script>
+
+<style>
+	.contact-dialog {
+		width: min(calc(100% - 2rem), 58rem);
+		max-width: none;
+		max-height: min(90dvh, 48rem);
+		padding: 0;
+		border: 1px solid rgba(16, 35, 62, 0.12);
+		border-radius: 1.5rem;
+		background: #fbf7ef;
+		box-shadow: 0 32px 90px rgba(2, 10, 23, 0.3);
+		color: #10233e;
+		overflow: auto;
+		opacity: 0;
+		transform: translateY(10px) scale(0.985);
+		transition:
+			opacity 180ms ease,
+			transform 180ms ease,
+			display 180ms allow-discrete,
+			overlay 180ms allow-discrete;
+	}
+
+	.contact-dialog[open] {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+
+	.contact-dialog.is-closing {
+		opacity: 0;
+		transform: translateY(8px) scale(0.99);
+	}
+
+	@starting-style {
+		.contact-dialog[open] {
+			opacity: 0;
+			transform: translateY(10px) scale(0.985);
+		}
+	}
+
+	.contact-dialog::backdrop {
+		background: rgba(8, 20, 38, 0);
+		backdrop-filter: blur(0);
+		transition:
+			background 180ms ease,
+			backdrop-filter 180ms ease,
+			display 180ms allow-discrete,
+			overlay 180ms allow-discrete;
+	}
+
+	.contact-dialog[open]::backdrop {
+		background: rgba(8, 20, 38, 0.58);
+		backdrop-filter: blur(5px);
+	}
+
+	.contact-dialog.is-closing::backdrop {
+		background: rgba(8, 20, 38, 0);
+		backdrop-filter: blur(0);
+	}
+
+	@starting-style {
+		.contact-dialog[open]::backdrop {
+			background: rgba(8, 20, 38, 0);
+			backdrop-filter: blur(0);
+		}
+	}
+
+	.contact-dialog-shell {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+		min-height: 36rem;
+	}
+
+	.contact-dialog-close {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		z-index: 2;
+		display: inline-flex;
+		width: 2.5rem;
+		height: 2.5rem;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid rgba(16, 35, 62, 0.13);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.78);
+		color: #10233e;
+		cursor: pointer;
+		transition:
+			background 150ms ease,
+			transform 150ms ease;
+	}
+
+	.contact-dialog-close:hover {
+		background: white;
+		transform: rotate(4deg);
+	}
+
+	.contact-dialog-details,
+	.contact-dialog-form-panel {
+		padding: clamp(2rem, 4.4vw, 3.5rem);
+	}
+
+	.contact-dialog-details {
+		display: flex;
+		flex-direction: column;
+		background: #10233e;
+		color: white;
+	}
+
+	.contact-dialog-eyebrow,
+	.contact-dialog-form-kicker {
+		margin: 0 0 0.75rem;
+		font-family: Inter, system-ui, sans-serif;
+		font-size: 0.72rem;
+		font-weight: 750;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.contact-dialog-eyebrow {
+		color: #93c5fd;
+	}
+
+	.contact-dialog-details h2 {
+		max-width: 8ch;
+		margin: 0;
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: clamp(2.35rem, 4.8vw, 3.8rem);
+		font-weight: 500;
+		line-height: 0.98;
+		letter-spacing: -0.05em;
+	}
+
+	.contact-dialog-intro {
+		max-width: 34ch;
+		margin: 1.25rem 0 0;
+		color: #cbd5e1;
+		font-family: Inter, system-ui, sans-serif;
+		font-size: 0.95rem;
+		line-height: 1.65;
+	}
+
+	.contact-dialog-direct {
+		margin-top: auto;
+		padding-top: 2rem;
+	}
+
+	.contact-dialog-email-wrap {
+		display: flex;
+		align-items: stretch;
+		gap: 0.45rem;
+	}
+
+	.contact-dialog-email,
+	.contact-dialog-mail,
+	.contact-dialog-row,
+	.contact-dialog-link {
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		background: rgba(255, 255, 255, 0.06);
+		color: white;
+		font-family: Inter, system-ui, sans-serif;
+		text-decoration: none;
+		transition:
+			background 150ms ease,
+			border-color 150ms ease,
+			transform 150ms ease;
+	}
+
+	.contact-dialog-email {
+		display: flex;
+		min-width: 0;
+		flex: 1;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 0.78rem 0.9rem;
+		border-radius: 0.8rem;
+		cursor: pointer;
+		font-size: 0.86rem;
+		text-align: left;
+	}
+
+	.contact-dialog-email > span:first-child {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.contact-dialog-icon,
+	.contact-dialog-mail {
+		display: inline-flex;
+		flex: none;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.contact-dialog-mail {
+		width: 2.9rem;
+		border-radius: 0.8rem;
+	}
+
+	.contact-dialog-email:hover,
+	.contact-dialog-mail:hover,
+	.contact-dialog-row:hover,
+	.contact-dialog-link:hover {
+		border-color: rgba(147, 197, 253, 0.62);
+		background: rgba(147, 197, 253, 0.12);
+	}
+
+	.contact-dialog-status {
+		min-height: 2.4em;
+		margin: 0.45rem 0 1rem;
+		color: #94a3b8;
+		font-family: Inter, system-ui, sans-serif;
+		font-size: 0.69rem;
+		line-height: 1.35;
+	}
+
+	.contact-dialog-row {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		width: fit-content;
+		padding: 0.65rem 0.8rem;
+		border-radius: 0.75rem;
+		font-size: 0.82rem;
+	}
+
+	.contact-dialog-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-top: 0.7rem;
+	}
+
+	.contact-dialog-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		padding: 0.55rem 0.7rem;
+		border-radius: 999px;
+		font-size: 0.74rem;
+		cursor: pointer;
+	}
+
+	.contact-dialog-form-panel {
+		background: #fbf7ef;
+	}
+
+	.contact-dialog-form-kicker {
+		color: #315b89;
+	}
+
+	.contact-dialog-form-heading h3 {
+		margin: 0;
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: clamp(1.8rem, 3vw, 2.45rem);
+		font-weight: 500;
+		letter-spacing: -0.035em;
+	}
+
+	.contact-form {
+		display: grid;
+		gap: 1rem;
+		margin-top: 1.5rem;
+	}
+
+	.contact-form-field {
+		display: grid;
+		gap: 0.42rem;
+	}
+
+	.contact-form-field label {
+		font-family: Inter, system-ui, sans-serif;
+		font-size: 0.78rem;
+		font-weight: 700;
+	}
+
+	.contact-form-field input,
+	.contact-form-field textarea {
+		width: 100%;
+		border: 1px solid #cbd5e1;
+		border-radius: 0.75rem;
+		background: rgba(255, 255, 255, 0.82);
+		color: #10233e;
+		font:
+			0.92rem/1.45 Inter,
+			system-ui,
+			sans-serif;
+		outline: none;
+		transition:
+			border-color 150ms ease,
+			box-shadow 150ms ease,
+			background 150ms ease;
+	}
+
+	.contact-form-field input {
+		height: 2.85rem;
+		padding: 0 0.85rem;
+	}
+
+	.contact-form-field textarea {
+		min-height: 7rem;
+		padding: 0.75rem 0.85rem;
+		resize: vertical;
+	}
+
+	.contact-form-field input::placeholder,
+	.contact-form-field textarea::placeholder {
+		color: #64748b;
+	}
+
+	.contact-form-field input:focus,
+	.contact-form-field textarea:focus {
+		border-color: #315b89;
+		background: white;
+		box-shadow: 0 0 0 3px rgba(49, 91, 137, 0.16);
+	}
+
+	.contact-form-field input:user-invalid,
+	.contact-form-field textarea:user-invalid {
+		border-color: #b42318;
+	}
+
+	.contact-form-honeypot {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	.contact-form-submit {
+		display: inline-flex;
+		min-height: 2.9rem;
+		align-items: center;
+		justify-content: center;
+		gap: 0.55rem;
+		padding: 0.75rem 1rem;
+		border: 1px solid #10233e;
+		border-radius: 999px;
+		background: #10233e;
+		color: white;
+		cursor: pointer;
+		font-family: Inter, system-ui, sans-serif;
+		font-size: 0.86rem;
+		font-weight: 750;
+		transition:
+			background 150ms ease,
+			transform 150ms ease,
+			opacity 150ms ease;
+	}
+
+	.contact-form-submit:hover:not(:disabled) {
+		background: #1d3b61;
+		transform: translateY(-1px);
+	}
+
+	.contact-form-submit:disabled {
+		cursor: not-allowed;
+		opacity: 0.56;
+	}
+
+	.contact-form-privacy,
+	.contact-form-status {
+		margin: 0;
+		color: #64748b;
+		font-family: Inter, system-ui, sans-serif;
+		font-size: 0.72rem;
+		line-height: 1.45;
+	}
+
+	.contact-form-status {
+		min-height: 1.45em;
+		color: #315b89;
+		font-weight: 650;
+	}
+
+	.contact-dialog :is(button, a, input, textarea):focus-visible {
+		outline: 3px solid #60a5fa;
+		outline-offset: 3px;
+	}
+
+	@media (max-width: 720px) {
+		.contact-dialog {
+			width: calc(100% - 1rem);
+			max-height: calc(100dvh - 1rem);
+			margin: auto 0.5rem 0.5rem;
+			border-radius: 1.35rem;
+		}
+
+		.contact-dialog-shell {
+			display: block;
+		}
+
+		.contact-dialog-details,
+		.contact-dialog-form-panel {
+			padding: 2rem 1.25rem;
+		}
+
+		.contact-dialog-details {
+			min-height: 25rem;
+			padding-top: 3.25rem;
+		}
+
+		.contact-dialog-details h2 {
+			max-width: 10ch;
+			font-size: clamp(2.45rem, 12vw, 3.25rem);
+		}
+
+		.contact-dialog-close {
+			position: fixed;
+			top: max(1rem, env(safe-area-inset-top));
+			right: 1rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.contact-dialog,
+		.contact-dialog::backdrop,
+		.contact-dialog-close,
+		.contact-dialog-email,
+		.contact-dialog-mail,
+		.contact-dialog-row,
+		.contact-dialog-link,
+		.contact-form-submit {
+			transition: none;
+		}
+	}
+</style>

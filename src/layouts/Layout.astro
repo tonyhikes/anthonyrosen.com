@@ -7,6 +7,8 @@ import PostHog from "../components/PostHog.astro";
 import SEO from "../components/SEO.astro";
 import LinkedInTag from "../components/LinkedInTag.astro";
 import RB2B from "../components/RB2B.astro";
+import JobSearchAnalytics from "../components/JobSearchAnalytics.astro";
+import ContactDialog from "../components/ContactDialog.astro";
 
 interface Props {
 	title: string;
@@ -39,20 +41,14 @@ const { title } = Astro.props;
 		/>
 		<meta name="generator" content={Astro.generator} />
 
-		<!-- Preconnect to critical third-party origins -->
-		<link rel="preconnect" href="https://cdn.jsdelivr.net" />
-
 		<!-- DNS prefetch for analytics (loaded later via requestIdleCallback) -->
 		<link rel="dns-prefetch" href="https://us.i.posthog.com" />
 		<link rel="dns-prefetch" href="https://us-assets.i.posthog.com" />
 		<link rel="dns-prefetch" href="https://www.googletagmanager.com" />
 		<link rel="dns-prefetch" href="https://snap.licdn.com" />
-		<link rel="dns-prefetch" href="https://b2bjsstore.s3.us-west-2.amazonaws.com" />
-
-		<!-- Preload critical JavaScript modules -->
 		<link
-			rel="modulepreload"
-			href="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"
+			rel="dns-prefetch"
+			href="https://b2bjsstore.s3.us-west-2.amazonaws.com"
 		/>
 
 		<!-- Inline critical CSS for initial render to improve FCP -->
@@ -94,17 +90,6 @@ const { title } = Astro.props;
 					display: block;
 				}
 			}
-			/* Lenis critical styles - inlined to prevent FOUC */
-			html.lenis,
-			html.lenis body {
-				height: auto;
-			}
-			.lenis.lenis-smooth {
-				scroll-behavior: auto !important;
-			}
-			.lenis.lenis-stopped {
-				overflow: hidden;
-			}
 			html[data-initial-view="resume"] #home-view,
 			html[data-initial-view="portfolio"] #home-view,
 			html[data-initial-view="styleguide"] #home-view,
@@ -133,7 +118,11 @@ const { title } = Astro.props;
 		</script>
 		<script is:inline>
 			const initialHashView = window.location.hash.replace("#", "");
-			if (["resume", "portfolio", "styleguide", "colophon"].includes(initialHashView)) {
+			if (
+				["resume", "portfolio", "styleguide", "colophon"].includes(
+					initialHashView
+				)
+			) {
 				document.documentElement.dataset.initialView = initialHashView;
 			}
 		</script>
@@ -189,16 +178,17 @@ const { title } = Astro.props;
 		<!-- Google tag (gtag.js) - Deferred for performance -->
 		<script is:inline>
 			const CONSENT_KEY = "cookie-consent";
+			const GA_ANALYTICS_READY_EVENT = "anthony-analytics-ready";
 			let gaScheduled = false;
 			let gaWaitingForReady = false;
 
 			// Defer Google Analytics to improve initial page load
 			window.dataLayer = window.dataLayer || [];
 			function gtag() {
-				dataLayer.push(arguments);
+				window.dataLayer.push(arguments);
 			}
 			gtag("js", new Date());
-			gtag("config", "G-7LRLJTJG4L");
+			gtag("config", "G-7LRLJTJG4L", { send_page_view: false });
 
 			// Load GA script after page is interactive
 			function loadGA() {
@@ -233,7 +223,7 @@ const { title } = Astro.props;
 				gaWaitingForReady = true;
 
 				window.addEventListener(
-					ANALYTICS_READY_EVENT,
+					GA_ANALYTICS_READY_EVENT,
 					() => {
 						gaWaitingForReady = false;
 						scheduleGA();
@@ -257,6 +247,7 @@ const { title } = Astro.props;
 		<PostHog />
 		<LinkedInTag />
 		<RB2B />
+		<JobSearchAnalytics />
 	</head>
 	<body
 		class="bg-slate-900 text-gray-900 transition-colors duration-300 selection:bg-blue-500 selection:text-white dark:text-white"
@@ -264,96 +255,7 @@ const { title } = Astro.props;
 		<Navbar />
 		<slot />
 		<Footer />
+		<ContactDialog />
 		<CookieBanner />
-		<script>
-			// Defer Lenis initialization AGGRESSIVELY to keep completely off critical path
-			// Increased timeouts for better Lighthouse scores while maintaining UX
-			function initLenis() {
-				import("lenis").then(({ default: Lenis }) => {
-					const lenis = new Lenis();
-
-					// Expose lenis globally for other components to use
-					window.lenis = lenis;
-
-					let lenisRafId: number | null = null;
-					let hasUserInteracted = false;
-
-					function raf(time: number) {
-						lenis.raf(time);
-						lenisRafId = requestAnimationFrame(raf);
-					}
-
-					function startLenisLoop() {
-						if (lenisRafId === null) {
-							lenisRafId = requestAnimationFrame(raf);
-						}
-					}
-
-					function stopLenisLoop() {
-						if (lenisRafId !== null) {
-							cancelAnimationFrame(lenisRafId);
-							lenisRafId = null;
-						}
-					}
-
-					// Track user interaction
-					["scroll", "click", "keydown", "touchstart", "mousemove"].forEach(
-						(eventType) => {
-							document.addEventListener(
-								eventType,
-								() => {
-									hasUserInteracted = true;
-									// Restart Lenis if it was stopped by idle timeout
-									startLenisLoop();
-								},
-								{ passive: true, once: eventType === "scroll" }
-							);
-						}
-					);
-
-					// Start on load
-					startLenisLoop();
-
-					// IDLE TIMEOUT: Stop Lenis after 5 seconds if no user interaction
-					// This helps Lighthouse complete its analysis
-					const IDLE_TIMEOUT = 5000;
-					setTimeout(() => {
-						if (!hasUserInteracted) {
-							stopLenisLoop();
-						}
-					}, IDLE_TIMEOUT);
-
-					// Pause Lenis when tab is hidden to save CPU
-					document.addEventListener("visibilitychange", () => {
-						if (document.hidden) {
-							stopLenisLoop();
-						} else if (hasUserInteracted) {
-							startLenisLoop();
-						}
-					});
-				});
-			}
-
-			// CRITICAL PATH OPTIMIZATION: Delay Lenis initialization significantly
-			// Increased from 3s to 5s timeout to ensure Lighthouse analysis completes first
-			// This removes Lenis from the critical rendering path entirely
-			if (document.readyState === "complete") {
-				// Page already loaded
-				if ("requestIdleCallback" in window) {
-					requestIdleCallback(initLenis, { timeout: 5000 });
-				} else {
-					setTimeout(initLenis, 2000);
-				}
-			} else {
-				// Wait for load event
-				window.addEventListener("load", () => {
-					if ("requestIdleCallback" in window) {
-						requestIdleCallback(initLenis, { timeout: 5000 });
-					} else {
-						setTimeout(initLenis, 2000);
-					}
-				});
-			}
-		</script>
 	</body>
 </html>
