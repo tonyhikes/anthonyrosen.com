@@ -1,5 +1,7 @@
 # Technical Audit & Framework Recommendation
 
+> Historical audit. References to the former Three.js hero describe the site before the 2026-08-27 simple-hero replacement. See `archive/slam-hero-rollback.md` for the recovery path.
+
 **Verdict: STAY WITH ASTRO.**
 
 You are already using one of the best modern frameworks for a portfolio that needs to scale into a marketing site or lightweight e-commerce store. Astro is specifically designed to be "content-first" which results in faster performance than heavy Single Page Application (SPA) frameworks like Next.js or generic React setups.
@@ -18,7 +20,7 @@ You are already using one of the best modern frameworks for a portfolio that nee
 
 ## 2. Why Astro is better than the alternatives for YOU
 
-- **vs Next.js**: Next.js is complex and heavy. It sends a lot of JavaScript to the user. Astro sends **zero** JavaScript by default, unless you specifically ask for it (like your 3D scene). This makes your site faster and cheaper to host.
+- **vs Next.js**: Next.js is complex and heavy. It sends a lot of JavaScript to the user. Astro sends **zero** JavaScript by default unless a component needs it. This makes your site faster and cheaper to host.
 - **vs WordPress/Wix**: You have full control here. No plugins slowing you down, no monthly fees for basic features.
 - **vs Plain HTML/CSS**: Astro gives you "Components" (like your Navbar and Footer) so you don't repeat code, but builds to plain HTML. Best of both worlds.
 
@@ -47,7 +49,7 @@ To take your project from "Beginner" to "Pro" without changing frameworks, here 
 ## 4. Specific Answers to your questions
 
 > _Performance issues and testing in different browsers_
-> **Astro handles 90% of this** by outputting standard HTML/CSS. If it works in Chrome, it usually works everywhere. For the 3D stuff (`ThreeScene.astro`), that is where you need to check specifically on mobile (which you are already doing).
+> **Astro handles 90% of this** by outputting standard HTML/CSS. Responsive and reduced-motion checks still matter on the interactive “Many Hats” section.
 
 > _Responsiveness_
 > **Tailwind CSS** (which you are using) is the industry standard solution for this. You are already set up correctly.

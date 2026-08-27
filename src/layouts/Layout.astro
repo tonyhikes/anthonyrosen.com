@@ -7,6 +7,7 @@ import PostHog from "../components/PostHog.astro";
 import SEO from "../components/SEO.astro";
 import LinkedInTag from "../components/LinkedInTag.astro";
 import RB2B from "../components/RB2B.astro";
+import JobSearchAnalytics from "../components/JobSearchAnalytics.astro";
 
 interface Props {
 	title: string;
@@ -39,20 +40,14 @@ const { title } = Astro.props;
 		/>
 		<meta name="generator" content={Astro.generator} />
 
-		<!-- Preconnect to critical third-party origins -->
-		<link rel="preconnect" href="https://cdn.jsdelivr.net" />
-
 		<!-- DNS prefetch for analytics (loaded later via requestIdleCallback) -->
 		<link rel="dns-prefetch" href="https://us.i.posthog.com" />
 		<link rel="dns-prefetch" href="https://us-assets.i.posthog.com" />
 		<link rel="dns-prefetch" href="https://www.googletagmanager.com" />
 		<link rel="dns-prefetch" href="https://snap.licdn.com" />
-		<link rel="dns-prefetch" href="https://b2bjsstore.s3.us-west-2.amazonaws.com" />
-
-		<!-- Preload critical JavaScript modules -->
 		<link
-			rel="modulepreload"
-			href="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"
+			rel="dns-prefetch"
+			href="https://b2bjsstore.s3.us-west-2.amazonaws.com"
 		/>
 
 		<!-- Inline critical CSS for initial render to improve FCP -->
@@ -124,7 +119,11 @@ const { title } = Astro.props;
 		</script>
 		<script is:inline>
 			const initialHashView = window.location.hash.replace("#", "");
-			if (["resume", "portfolio", "styleguide", "colophon"].includes(initialHashView)) {
+			if (
+				["resume", "portfolio", "styleguide", "colophon"].includes(
+					initialHashView
+				)
+			) {
 				document.documentElement.dataset.initialView = initialHashView;
 			}
 		</script>
@@ -180,16 +179,17 @@ const { title } = Astro.props;
 		<!-- Google tag (gtag.js) - Deferred for performance -->
 		<script is:inline>
 			const CONSENT_KEY = "cookie-consent";
+			const GA_ANALYTICS_READY_EVENT = "anthony-analytics-ready";
 			let gaScheduled = false;
 			let gaWaitingForReady = false;
 
 			// Defer Google Analytics to improve initial page load
 			window.dataLayer = window.dataLayer || [];
 			function gtag() {
-				dataLayer.push(arguments);
+				window.dataLayer.push(arguments);
 			}
 			gtag("js", new Date());
-			gtag("config", "G-7LRLJTJG4L");
+			gtag("config", "G-7LRLJTJG4L", { send_page_view: false });
 
 			// Load GA script after page is interactive
 			function loadGA() {
@@ -224,7 +224,7 @@ const { title } = Astro.props;
 				gaWaitingForReady = true;
 
 				window.addEventListener(
-					ANALYTICS_READY_EVENT,
+					GA_ANALYTICS_READY_EVENT,
 					() => {
 						gaWaitingForReady = false;
 						scheduleGA();
@@ -248,6 +248,7 @@ const { title } = Astro.props;
 		<PostHog />
 		<LinkedInTag />
 		<RB2B />
+		<JobSearchAnalytics />
 	</head>
 	<body
 		class="bg-slate-900 text-gray-900 transition-colors duration-300 selection:bg-blue-500 selection:text-white dark:text-white"

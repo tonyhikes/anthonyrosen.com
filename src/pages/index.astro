@@ -1,8 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Hero from "../components/Hero.astro";
-import ThreeScene from "../components/ThreeScene.astro";
-import SlamSection from "../components/SlamSection.astro";
+import ManyHatsHero from "../components/ManyHatsHero.astro";
 import Experience from "../components/Experience.astro";
 import ImpactCharts from "../components/ImpactCharts.astro";
 import Resume from "../components/Resume.astro";
@@ -12,13 +10,9 @@ import Colophon from "../components/Colophon.astro";
 ---
 
 <Layout title="Tony Rosen | Marketing & Creative Project Manager">
-	<ThreeScene />
 	<div id="home-view" class="block">
-		<Hero />
-		<main
-			class="content-layer relative z-10 bg-white shadow-2xl dark:bg-slate-900"
-		>
-			<SlamSection />
+		<main class="content-layer relative z-30 bg-white dark:bg-slate-900">
+			<ManyHatsHero />
 			<ImpactCharts />
 			<Experience />
 		</main>
@@ -29,14 +23,6 @@ import Colophon from "../components/Colophon.astro";
 	<StyleGuide />
 	<Colophon />
 </Layout>
-
-<style>
-	.content-layer {
-		position: relative;
-		z-index: 10;
-		margin-top: 100vh; /* Push content down to reveal fixed hero */
-	}
-</style>
 
 <script>
 	// View Switching Logic
@@ -54,15 +40,15 @@ import Colophon from "../components/Colophon.astro";
 
 		const meta = viewMeta[viewId] || { title: viewId, path: `/${viewId}` };
 
-		// Send to Google Analytics (gtag.js)
+		// Send one explicit virtual pageview to Google Analytics (gtag.js).
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		if (typeof window !== "undefined" && (window as any).gtag) {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			(window as any).gtag("config", "G-7LRLJTJG4L", {
+			(window as any).gtag("event", "page_view", {
 				page_path: meta.path,
 				page_title: `${meta.title} | Tony Rosen`,
+				page_location: `${window.location.origin}${meta.path}`,
 			});
-			console.log(`📊 GA: Tracked pageview for ${meta.path}`);
 		}
 
 		// Send to PostHog
@@ -74,7 +60,6 @@ import Colophon from "../components/Colophon.astro";
 				$pathname: meta.path,
 				title: `${meta.title} | Tony Rosen`,
 			});
-			console.log(`📊 PostHog: Tracked pageview for ${meta.path}`);
 		}
 	}
 
@@ -151,12 +136,7 @@ import Colophon from "../components/Colophon.astro";
 		}
 	}
 
-	const mainViews = new Set([
-		"resume",
-		"portfolio",
-		"styleguide",
-		"colophon",
-	]);
+	const mainViews = new Set(["resume", "portfolio", "styleguide", "colophon"]);
 	const portfolioSectionShortLinks = new Set([
 		"publishing",
 		"marketing",

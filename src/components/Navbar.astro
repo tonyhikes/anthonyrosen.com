@@ -10,17 +10,15 @@
 			<!-- Logo / Icon -->
 			<a
 				href="#home"
-				class="group nav-link flex flex-shrink-0 cursor-pointer items-center gap-2"
+				class="group nav-link flex flex-shrink-0 cursor-pointer items-center"
 				data-target="home"
+				aria-label="Anthony Rosen — home"
 			>
 				<div
 					class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 font-black tracking-tighter text-white transition-transform group-hover:rotate-3"
 				>
-					TR
+					AR
 				</div>
-				<span class="text-lg font-bold text-slate-800 dark:text-white"
-					>Tony Rosen</span
-				>
 			</a>
 
 			<!-- Desktop Links -->
@@ -254,9 +252,10 @@
 			const target = (e.currentTarget as HTMLElement).dataset.target;
 			if (target) {
 				// Check if we're on the home page (/ or /index.html)
-				const isHomePage = window.location.pathname === "/" ||
-				                   window.location.pathname === "/index.html" ||
-				                   window.location.pathname.endsWith("/");
+				const isHomePage =
+					window.location.pathname === "/" ||
+					window.location.pathname === "/index.html" ||
+					window.location.pathname.endsWith("/");
 
 				if (isHomePage) {
 					// Use view switching for single-page navigation

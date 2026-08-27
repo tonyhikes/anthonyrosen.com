@@ -1,0 +1,87 @@
+<!-- Job-search-focused GA4 and PostHog events. -->
+<script>
+	type AnalyticsParameters = Record<string, string | number | boolean>;
+
+	function sendJobSearchEvent(
+		eventName: string,
+		parameters: AnalyticsParameters
+	) {
+		// gtag is defined early and queues events until Google Analytics loads.
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		if (typeof (window as any).gtag === "function") {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			(window as any).gtag("event", eventName, parameters);
+		}
+
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		if ((window as any).posthog) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			(window as any).posthog.capture(eventName, parameters);
+		}
+	}
+
+	function getLinkLocation(link: HTMLAnchorElement) {
+		if (link.closest("[data-many-hats-hero]")) return "hero";
+		if (link.closest("#resume-view")) return "resume";
+		if (link.closest("#portfolio-view")) return "portfolio";
+		if (link.closest("footer")) return "footer";
+		if (link.closest("nav")) return "navigation";
+		return "page";
+	}
+
+	function initJobSearchAnalytics() {
+		if (document.documentElement.dataset.jobSearchAnalytics === "ready") return;
+		document.documentElement.dataset.jobSearchAnalytics = "ready";
+
+		document.addEventListener("click", (event) => {
+			const target = event.target;
+			if (!(target instanceof Element)) return;
+
+			const link = target.closest<HTMLAnchorElement>("a[href]");
+			if (!link) return;
+
+			const href = link.getAttribute("href") || "";
+			const linkLocation = getLinkLocation(link);
+			const linkText = link.textContent?.trim().replace(/\s+/g, " ") || "link";
+
+			if (href.startsWith("mailto:")) {
+				sendJobSearchEvent("contact_click", {
+					contact_method: "email",
+					link_location: linkLocation,
+				});
+				return;
+			}
+
+			if (href.includes("linkedin.com")) {
+				sendJobSearchEvent("linkedin_click", {
+					link_location: linkLocation,
+					link_text: linkText,
+				});
+				return;
+			}
+
+			if (link.closest("#download-menu")) {
+				sendJobSearchEvent("resume_download", {
+					file_format: linkText.toLowerCase().includes("pdf") ? "pdf" : "docx",
+					link_location: "resume",
+				});
+				return;
+			}
+
+			if (link.dataset.target === "portfolio" || href === "#portfolio") {
+				sendJobSearchEvent("portfolio_open", {
+					link_location: linkLocation,
+					link_text: linkText,
+				});
+			}
+		});
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initJobSearchAnalytics, {
+			once: true,
+		});
+	} else {
+		initJobSearchAnalytics();
+	}
+</script>

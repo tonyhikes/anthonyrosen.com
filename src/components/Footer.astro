@@ -94,9 +94,7 @@
 						>
 					</li>
 					<li>
-						<a
-							href="/privacy"
-							class="transition-colors hover:text-blue-400"
+						<a href="/privacy" class="transition-colors hover:text-blue-400"
 							>Privacy Policy</a
 						>
 					</li>
@@ -104,18 +102,6 @@
 						<span class="text-slate-500"
 							>&copy; <span id="year"></span> Tony Rosen.</span
 						>
-					</li>
-					<li class="mt-4 text-xs text-slate-500">
-						"Cotton Ball" (<a
-							href="https://skfb.ly/oXBzx"
-							target="_blank"
-							class="hover:underline">https://skfb.ly/oXBzx</a
-						>) by amhyde is licensed under Creative Commons Attribution (<a
-							href="http://creativecommons.org/licenses/by/4.0/"
-							target="_blank"
-							class="hover:underline"
-							>http://creativecommons.org/licenses/by/4.0/</a
-						>).
 					</li>
 				</ul>
 			</div>
@@ -136,9 +122,10 @@
 			const target = (e.currentTarget as HTMLElement).dataset.target;
 			if (target) {
 				// Check if we're on the home page (/ or /index.html)
-				const isHomePage = window.location.pathname === "/" ||
-				                   window.location.pathname === "/index.html" ||
-				                   window.location.pathname.endsWith("/");
+				const isHomePage =
+					window.location.pathname === "/" ||
+					window.location.pathname === "/index.html" ||
+					window.location.pathname.endsWith("/");
 
 				if (isHomePage) {
 					// Use view switching for single-page navigation
@@ -151,28 +138,5 @@
 				}
 			}
 		});
-	});
-
-	// Track special CTA clicks
-	const contactBtn = document.querySelector('a[href^="mailto:"]');
-	contactBtn?.addEventListener("click", () => {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		if ((window as any).posthog) {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			(window as any).posthog.capture("contact_me_clicked", {
-				location: "footer",
-			});
-		}
-	});
-
-	const linkedinBtn = document.querySelector('a[href*="linkedin.com"]');
-	linkedinBtn?.addEventListener("click", () => {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		if ((window as any).posthog) {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			(window as any).posthog.capture("linkedin_profile_clicked", {
-				location: "footer",
-			});
-		}
 	});
 </script>

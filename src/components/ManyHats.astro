@@ -1,0 +1,974 @@
+---
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { manyHatsPortrait, manyHatsRoles } from "../data/many-hats";
+
+const firstRole = manyHatsRoles[0];
+const serializedRoles = JSON.stringify(manyHatsRoles).replace(/</g, "\\u003c");
+const totalRoles = String(manyHatsRoles.length).padStart(2, "0");
+const isSingleHatPrototype = manyHatsRoles.length === 1;
+const firstHeadAnchorStyle = `--hat-anchor-x: ${firstRole.headAnchor.x}; --hat-anchor-y: ${firstRole.headAnchor.y}; --hat-flight-size: ${firstRole.headAnchor.size};`;
+---
+
+<section
+	id="many-hats"
+	class="many-hats-section"
+	aria-labelledby="many-hats-heading"
+>
+	<div class="many-hats-shell">
+		<div
+			class="many-hats-card"
+			data-many-hats
+			style={`--accent: ${firstRole.accent}; --ink: ${firstRole.ink}; --wash: ${firstRole.wash};`}
+		>
+			<div class="many-hats-copy">
+				<p class="many-hats-eyebrow">Wear the right hat</p>
+				<p class="many-hats-watermark" aria-hidden="true" data-role-watermark>
+					{firstRole.label}
+				</p>
+
+				<div class="many-hats-copy-stack" aria-live="polite" aria-atomic="true">
+					<p class="many-hats-role" data-role-label>{firstRole.label}</p>
+					<h2 id="many-hats-heading" data-role-heading>{firstRole.headline}</h2>
+					<p class="many-hats-description" data-role-description>
+						{firstRole.description}
+					</p>
+					<a class="many-hats-cta" href="#portfolio" data-role-cta>
+						<span>{firstRole.cta}</span>
+						<ArrowRight aria-hidden="true" size={18} strokeWidth={1.8} />
+					</a>
+				</div>
+
+				<div class="many-hats-controls" aria-label="Choose a specialty">
+					<div class="many-hats-nav-row">
+						<button
+							type="button"
+							class="many-hats-arrow"
+							data-hat-previous
+							aria-label={isSingleHatPrototype
+								? "Replay hat animation"
+								: "Previous specialty"}
+						>
+							<ArrowLeft aria-hidden="true" size={20} strokeWidth={1.75} />
+						</button>
+
+						<p class="many-hats-count" aria-hidden="true">
+							<span data-role-count>01</span><span>/ {totalRoles}</span>
+						</p>
+
+						<button
+							type="button"
+							class="many-hats-arrow"
+							data-hat-next
+							aria-label={isSingleHatPrototype
+								? "Replay hat animation"
+								: "Next specialty"}
+						>
+							<ArrowRight aria-hidden="true" size={20} strokeWidth={1.75} />
+						</button>
+					</div>
+
+					<div class="many-hats-dots" role="group" aria-label="Specialties">
+						{
+							manyHatsRoles.map((role, index) => (
+								<button
+									type="button"
+									class="many-hats-dot"
+									data-hat-index={index}
+									aria-label={`Show ${role.label}`}
+									aria-current={index === 0 ? "true" : "false"}
+								/>
+							))
+						}
+					</div>
+				</div>
+			</div>
+
+			<div class="many-hats-portrait">
+				<div
+					class="many-hats-portrait-stage"
+					data-portrait-stage
+					style={firstHeadAnchorStyle}
+				>
+					<img
+						class="many-hats-photo"
+						data-role-portrait
+						src={manyHatsPortrait.src}
+						alt={manyHatsPortrait.alt}
+						width="1024"
+						height="1535"
+						loading="lazy"
+						decoding="async"
+						fetchpriority="low"
+						sizes="(min-width: 900px) 52vw, 100vw"
+					/>
+
+					<img
+						class="many-hats-worn-patch"
+						data-worn-patch
+						src={firstRole.wornPatchSrc}
+						alt=""
+						aria-hidden="true"
+						width="1024"
+						height="1535"
+						loading="lazy"
+						decoding="async"
+					/>
+
+					{
+						[
+							["exit", firstRole.exitHatSrc],
+							["enter", firstRole.enterHatSrc],
+							["preland", firstRole.prelandHatSrc],
+						].map(([state, src]) => (
+							<img
+								class={`many-hats-flight-hat many-hats-flight-hat-${state}`}
+								data-hat-state={state}
+								src={src}
+								alt=""
+								aria-hidden="true"
+								width="640"
+								height="640"
+								loading="lazy"
+								decoding="async"
+							/>
+						))
+					}
+				</div>
+
+				<div class="many-hats-image-caption" aria-hidden="true">
+					<span>Portrait stays locked</span>
+					<span>Hat changes independently</span>
+				</div>
+			</div>
+
+			<script
+				type="application/json"
+				data-many-hats-data
+				set:html={serializedRoles}
+			/>
+		</div>
+	</div>
+</section>
+
+<script>
+	type Role = {
+		id: string;
+		label: string;
+		headline: string;
+		description: string;
+		cta: string;
+		accent: string;
+		ink: string;
+		wash: string;
+		enterHatSrc: string;
+		prelandHatSrc: string;
+		exitHatSrc: string;
+		wornPatchSrc: string;
+		hatAlt: string;
+		headAnchor: {
+			x: string;
+			y: string;
+			size: string;
+		};
+	};
+
+	function initManyHats() {
+		const card = document.querySelector<HTMLElement>("[data-many-hats]");
+		if (!card || card.dataset.initialized === "true") return;
+		card.dataset.initialized = "true";
+
+		const dataNode = card.querySelector<HTMLScriptElement>(
+			"[data-many-hats-data]"
+		);
+		if (!dataNode?.textContent) return;
+
+		const roles = JSON.parse(dataNode.textContent) as Role[];
+		const heading = card.querySelector<HTMLElement>("[data-role-heading]");
+		const label = card.querySelector<HTMLElement>("[data-role-label]");
+		const description = card.querySelector<HTMLElement>(
+			"[data-role-description]"
+		);
+		const watermark = card.querySelector<HTMLElement>("[data-role-watermark]");
+		const count = card.querySelector<HTMLElement>("[data-role-count]");
+		const cta = card.querySelector<HTMLAnchorElement>("[data-role-cta]");
+		const ctaLabel = cta?.querySelector("span");
+		const portraitStage = card.querySelector<HTMLElement>(
+			"[data-portrait-stage]"
+		);
+		const wornPatch = card.querySelector<HTMLImageElement>("[data-worn-patch]");
+		const exitHat = card.querySelector<HTMLImageElement>(
+			'[data-hat-state="exit"]'
+		);
+		const enterHat = card.querySelector<HTMLImageElement>(
+			'[data-hat-state="enter"]'
+		);
+		const prelandHat = card.querySelector<HTMLImageElement>(
+			'[data-hat-state="preland"]'
+		);
+		const copyStack = card.querySelector<HTMLElement>(".many-hats-copy-stack");
+		const dots = Array.from(
+			card.querySelectorAll<HTMLButtonElement>("[data-hat-index]")
+		);
+		const previous = card.querySelector<HTMLButtonElement>(
+			"[data-hat-previous]"
+		);
+		const next = card.querySelector<HTMLButtonElement>("[data-hat-next]");
+		const reducedMotion = window.matchMedia(
+			"(prefers-reduced-motion: reduce)"
+		).matches;
+
+		if (
+			!heading ||
+			!label ||
+			!description ||
+			!watermark ||
+			!count ||
+			!cta ||
+			!ctaLabel ||
+			!portraitStage ||
+			!wornPatch ||
+			!exitHat ||
+			!enterHat ||
+			!prelandHat ||
+			!copyStack ||
+			!previous ||
+			!next
+		) {
+			return;
+		}
+
+		let activeIndex = 0;
+		let isAnimating = false;
+		const motionScale = new URLSearchParams(window.location.search).has(
+			"manyHatsSlow"
+		)
+			? 2
+			: 1;
+		// Hat tempo: 0.9 plays every hat phase 10% faster than its authored
+		// value. The copy panel uses textDuration and is unaffected.
+		const hatTempo = 0.9;
+		const duration = (milliseconds: number) =>
+			milliseconds * hatTempo * motionScale;
+		const textDuration = (milliseconds: number) => milliseconds * motionScale;
+		const hatImages = [wornPatch, exitHat, enterHat, prelandHat];
+
+		const waitForImage = async (image: HTMLImageElement) => {
+			if (!image.complete) {
+				await new Promise((resolve: () => void) => {
+					image.addEventListener("load", () => resolve(), { once: true });
+					image.addEventListener("error", () => resolve(), { once: true });
+				});
+			}
+			await image.decode().catch(() => undefined);
+		};
+
+		const cancelHatAnimations = () => {
+			[...hatImages, copyStack].forEach((element) => {
+				element.getAnimations().forEach((animation) => animation.cancel());
+			});
+		};
+
+		const applyRole = (role: Role, index: number) => {
+			card.style.setProperty("--accent", role.accent);
+			card.style.setProperty("--ink", role.ink);
+			card.style.setProperty("--wash", role.wash);
+			card.dataset.activeRole = role.id;
+			label.textContent = role.label;
+			heading.textContent = role.headline;
+			description.textContent = role.description;
+			watermark.textContent = role.label;
+			count.textContent = String(index + 1).padStart(2, "0");
+			ctaLabel.textContent = role.cta;
+			exitHat.src = role.exitHatSrc;
+			enterHat.src = role.enterHatSrc;
+			prelandHat.src = role.prelandHatSrc;
+			wornPatch.src = role.wornPatchSrc;
+			portraitStage.style.setProperty("--hat-anchor-x", role.headAnchor.x);
+			portraitStage.style.setProperty("--hat-anchor-y", role.headAnchor.y);
+			portraitStage.style.setProperty(
+				"--hat-flight-size",
+				role.headAnchor.size
+			);
+			dots.forEach((dot, dotIndex) => {
+				dot.setAttribute("aria-current", String(dotIndex === index));
+			});
+		};
+
+		const showRole = async (index: number, replay = false) => {
+			if (isAnimating || (!replay && index === activeIndex)) return;
+			isAnimating = true;
+			previous.disabled = true;
+			next.disabled = true;
+			dots.forEach((dot) => {
+				dot.disabled = true;
+			});
+
+			const role = roles[index];
+
+			if (reducedMotion) {
+				applyRole(role, index);
+				exitHat.style.opacity = "0";
+				enterHat.style.opacity = "0";
+				prelandHat.style.opacity = "0";
+				wornPatch.style.opacity = "1";
+			} else {
+				const settledTransform =
+					"translate(-50%, -50%) translate(0, 0) rotateZ(0deg) scale(1)";
+				// Off the head the hat is nearer the camera, so flight scales sit
+				// ABOVE the at-head registration scales (.875 exit / .995 preland).
+				const exitReadyTransform =
+					"translate(-50%, -50%) rotateZ(0deg) scale(.875)";
+				const exitLiftTransform =
+					"translate(-50%, -50%) translate(5px, -32px) rotateZ(1.5deg) scale(.92)";
+				const exitMidTransform =
+					"translate(-50%, -50%) translate(135px, -88px) rotateZ(8deg) scale(1)";
+				const exitFinalTransform =
+					"translate(-50%, -50%) translate(380px, -150px) rotateZ(16deg) scale(1.08)";
+				const entryFarTransform =
+					"translate(-50%, -50%) translate(-330px, -112px) rotateZ(-8deg) scale(1.08)";
+				// The enter->preland swap happens on the move between mid1 and
+				// mid2; both sprites tween the identical segment so the hat
+				// never stalls mid-air. midSwap sits 62.5% along mid1->mid2.
+				const entryMid1Transform =
+					"translate(-50%, -50%) translate(-96px, -44px) rotateZ(-3deg) scale(1)";
+				const entryMidSwapTransform =
+					"translate(-50%, -50%) translate(-66px, -30.25px) rotateZ(-1.75deg) scale(.9875)";
+				const entryMid2Transform =
+					"translate(-50%, -50%) translate(-48px, -22px) rotateZ(-1deg) scale(.98)";
+				const prelandContactTransform =
+					"translate(-50%, -50%) translate(-12px, -7px) rotateZ(0deg) scale(.995)";
+
+				// Stage the incoming flight artwork on the hidden sprites so it
+				// decodes during the exit instead of pausing between phases.
+				enterHat.src = role.enterHatSrc;
+				prelandHat.src = role.prelandHatSrc;
+				const incomingSpritesReady = Promise.all([
+					waitForImage(enterHat),
+					waitForImage(prelandHat),
+				]);
+
+				// Only the exit sprite is needed before motion starts.
+				await waitForImage(exitHat);
+				await Promise.all([
+					incomingSpritesReady,
+					wornPatch.animate(
+						[
+							{ opacity: 1 },
+							{ opacity: 1, offset: 0.04 },
+							{ opacity: 0, offset: 0.1 },
+							{ opacity: 0 },
+						],
+						{
+							duration: duration(520),
+							fill: "forwards",
+						}
+					).finished,
+					// Per-segment easings: the lift keeps its current absolute
+					// speed while the travel off-screen plays slower and legible.
+					exitHat.animate(
+						[
+							{ opacity: 0, transform: exitReadyTransform },
+							{
+								opacity: 1,
+								transform: exitReadyTransform,
+								offset: 0.07,
+								easing: "cubic-bezier(.5,0,.8,.5)",
+							},
+							{
+								opacity: 1,
+								transform: exitLiftTransform,
+								offset: 0.29,
+								easing: "cubic-bezier(.35,.1,.65,.6)",
+							},
+							{
+								opacity: 1,
+								transform: exitMidTransform,
+								offset: 0.6,
+								easing: "cubic-bezier(.4,.15,.75,.7)",
+							},
+							{
+								opacity: 0,
+								transform: exitFinalTransform,
+							},
+						],
+						{
+							duration: duration(520),
+							fill: "forwards",
+						}
+					).finished,
+					copyStack.animate(
+						[
+							{ opacity: 1, transform: "translateY(0)" },
+							{ opacity: 0, transform: "translateY(10px)" },
+						],
+						{ duration: textDuration(180), easing: "ease-in", fill: "forwards" }
+					).finished,
+				]);
+
+				applyRole(role, index);
+				// The patch is invisible until late in the landing — let it decode
+				// in parallel instead of pausing the flight on it.
+				const patchReady = waitForImage(wornPatch);
+				cancelHatAnimations();
+				exitHat.style.opacity = "0";
+				enterHat.style.opacity = "0";
+				prelandHat.style.opacity = "0";
+				wornPatch.style.opacity = "0";
+
+				// Handoffs are layered-opaque, never crossfaded: the incoming layer
+				// fades in on top of a still-solid layer, then the lower one cuts.
+				// The hat is never see-through mid-flight.
+				await Promise.all([
+					enterHat.animate(
+						[
+							{ opacity: 0, transform: entryFarTransform },
+							{
+								opacity: 1,
+								transform: entryFarTransform,
+								offset: 0.03,
+								easing: "cubic-bezier(.5,.05,.8,.6)",
+							},
+							{
+								opacity: 1,
+								transform: entryMid1Transform,
+								offset: 0.55,
+							},
+							{
+								opacity: 1,
+								transform: entryMid2Transform,
+								offset: 0.63,
+							},
+							{
+								opacity: 0,
+								transform: entryMid2Transform,
+								offset: 0.64,
+							},
+							{ opacity: 0, transform: entryMid2Transform },
+						],
+						{
+							duration: duration(500),
+							fill: "both",
+						}
+					).finished,
+					prelandHat.animate(
+						[
+							{ opacity: 0, transform: entryMid1Transform },
+							{
+								opacity: 0,
+								transform: entryMid1Transform,
+								offset: 0.55,
+							},
+							{
+								opacity: 1,
+								transform: entryMidSwapTransform,
+								offset: 0.6,
+							},
+							{
+								opacity: 1,
+								transform: entryMid2Transform,
+								offset: 0.63,
+								easing: "cubic-bezier(.25,.4,.45,1)",
+							},
+							{
+								opacity: 1,
+								transform: prelandContactTransform,
+								offset: 0.79,
+							},
+							{
+								opacity: 1,
+								transform: settledTransform,
+								offset: 0.83,
+							},
+							{
+								opacity: 1,
+								transform: settledTransform,
+								offset: 0.89,
+							},
+							{
+								opacity: 0,
+								transform: settledTransform,
+								offset: 0.96,
+							},
+							{ opacity: 0, transform: settledTransform },
+						],
+						{
+							duration: duration(500),
+							fill: "both",
+						}
+					).finished,
+					wornPatch.animate(
+						[
+							{ opacity: 0 },
+							{ opacity: 0, offset: 0.78 },
+							{ opacity: 1, offset: 0.86 },
+							{ opacity: 1 },
+						],
+						{
+							duration: duration(500),
+							fill: "both",
+						}
+					).finished,
+					copyStack.animate(
+						[
+							{ opacity: 0, transform: "translateY(-8px)" },
+							{ opacity: 1, transform: "translateY(0)" },
+						],
+						{ duration: textDuration(300), easing: "ease-out", fill: "both" }
+					).finished,
+					patchReady,
+				]);
+
+				cancelHatAnimations();
+				exitHat.style.opacity = "0";
+				enterHat.style.opacity = "0";
+				prelandHat.style.opacity = "0";
+				wornPatch.style.opacity = "1";
+			}
+
+			activeIndex = index;
+			isAnimating = false;
+			previous.disabled = false;
+			next.disabled = false;
+			dots.forEach((dot) => {
+				dot.disabled = false;
+			});
+		};
+
+		previous.addEventListener("click", () => {
+			const index = (activeIndex - 1 + roles.length) % roles.length;
+			void showRole(index, roles.length === 1);
+		});
+
+		next.addEventListener("click", () => {
+			const index = (activeIndex + 1) % roles.length;
+			void showRole(index, roles.length === 1);
+		});
+
+		dots.forEach((dot, index) => {
+			dot.addEventListener("click", () => {
+				void showRole(index, roles.length === 1);
+			});
+		});
+
+		card.addEventListener("keydown", (event) => {
+			if (event.key === "ArrowLeft") previous.click();
+			if (event.key === "ArrowRight") next.click();
+		});
+
+		cta.addEventListener("click", (event) => {
+			event.preventDefault();
+			window.dispatchEvent(
+				new CustomEvent("view-change", { detail: "portfolio" })
+			);
+		});
+
+		const warmImage = async (src: string) => {
+			const image = new Image();
+			image.src = src;
+			await image.decode().catch(() => undefined);
+		};
+
+		const warmHatCache = async () => {
+			await Promise.all(
+				roles.flatMap((role) =>
+					[
+						role.wornPatchSrc,
+						role.enterHatSrc,
+						role.prelandHatSrc,
+						role.exitHatSrc,
+					].map(warmImage)
+				)
+			);
+		};
+
+		if ("IntersectionObserver" in window) {
+			const observer = new IntersectionObserver(
+				(entries) => {
+					if (!entries.some((entry) => entry.isIntersecting)) return;
+					void warmHatCache();
+					observer.disconnect();
+				},
+				{ rootMargin: "600px 0px" }
+			);
+			observer.observe(card);
+		} else {
+			window.setTimeout(() => void warmHatCache(), 500);
+		}
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initManyHats, { once: true });
+	} else {
+		initManyHats();
+	}
+	document.addEventListener("astro:page-load", initManyHats);
+</script>
+
+<style>
+	.many-hats-section {
+		position: relative;
+		z-index: 10;
+		padding: clamp(4.5rem, 9vw, 8rem) clamp(1rem, 3vw, 2rem);
+		background: #f8fafc;
+		color: #10233e;
+		content-visibility: auto;
+		contain-intrinsic-size: 860px;
+	}
+
+	.many-hats-shell {
+		width: min(100%, 1280px);
+		margin: 0 auto;
+	}
+
+	.many-hats-card {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+		min-height: 680px;
+		overflow: hidden;
+		border: 1px solid color-mix(in srgb, var(--ink) 16%, white);
+		border-radius: 1.25rem;
+		background: var(--wash);
+		box-shadow: 0 30px 80px rgba(15, 35, 62, 0.12);
+		isolation: isolate;
+		transition:
+			background-color 280ms ease,
+			border-color 280ms ease;
+	}
+
+	.many-hats-copy {
+		position: relative;
+		display: flex;
+		min-width: 0;
+		flex-direction: column;
+		padding: clamp(2rem, 5vw, 4.75rem);
+		overflow: hidden;
+	}
+
+	.many-hats-eyebrow,
+	.many-hats-role {
+		position: relative;
+		z-index: 2;
+		margin: 0;
+		font-family: "Inter", system-ui, sans-serif;
+		font-size: 0.72rem;
+		font-weight: 700;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	.many-hats-role {
+		margin-bottom: 1rem;
+		letter-spacing: 0.18em;
+	}
+
+	.many-hats-watermark {
+		position: absolute;
+		top: 1.1rem;
+		left: 5rem;
+		z-index: 0;
+		margin: 0;
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: clamp(4.5rem, 9vw, 8.5rem);
+		line-height: 1;
+		letter-spacing: -0.05em;
+		color: color-mix(in srgb, var(--accent) 10%, transparent);
+		text-transform: uppercase;
+		white-space: nowrap;
+		pointer-events: none;
+		user-select: none;
+		transition: color 280ms ease;
+	}
+
+	.many-hats-copy-stack {
+		position: relative;
+		z-index: 2;
+		margin-top: auto;
+		margin-bottom: auto;
+		padding: 3rem 0 2rem;
+	}
+
+	.many-hats-copy-stack h2 {
+		max-width: 11ch;
+		margin: 0;
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: clamp(3rem, 4.2vw, 4.2rem);
+		font-weight: 500;
+		line-height: 0.98;
+		letter-spacing: -0.055em;
+		color: var(--ink);
+		text-wrap: balance;
+		transition: color 280ms ease;
+	}
+
+	.many-hats-description {
+		max-width: 33rem;
+		margin: 1.5rem 0 0;
+		font-size: clamp(1rem, 1.35vw, 1.15rem);
+		line-height: 1.65;
+		color: color-mix(in srgb, var(--ink) 72%, white);
+	}
+
+	.many-hats-cta {
+		display: inline-flex;
+		width: fit-content;
+		align-items: center;
+		gap: 0.65rem;
+		margin-top: 2rem;
+		padding: 0.88rem 1.1rem;
+		border-radius: 0.5rem;
+		background: var(--ink);
+		color: white;
+		font-size: 0.94rem;
+		font-weight: 700;
+		text-decoration: none;
+		box-shadow: 0 10px 24px color-mix(in srgb, var(--ink) 18%, transparent);
+		transition:
+			transform 160ms ease,
+			background-color 280ms ease,
+			box-shadow 160ms ease;
+	}
+
+	.many-hats-cta:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 14px 30px color-mix(in srgb, var(--ink) 24%, transparent);
+	}
+
+	.many-hats-cta:focus-visible,
+	.many-hats-arrow:focus-visible,
+	.many-hats-dot:focus-visible {
+		outline: 3px solid color-mix(in srgb, var(--accent) 52%, white);
+		outline-offset: 3px;
+	}
+
+	.many-hats-controls {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 1rem;
+	}
+
+	.many-hats-nav-row {
+		display: flex;
+		align-items: center;
+		gap: 1.35rem;
+	}
+
+	.many-hats-arrow {
+		display: inline-grid;
+		width: 3rem;
+		height: 3rem;
+		place-items: center;
+		border: 1px solid color-mix(in srgb, var(--ink) 58%, white);
+		border-radius: 999px;
+		background: transparent;
+		color: var(--ink);
+		cursor: pointer;
+		transition:
+			transform 160ms ease,
+			background-color 160ms ease,
+			color 160ms ease,
+			opacity 160ms ease;
+	}
+
+	.many-hats-arrow:hover:not(:disabled) {
+		transform: scale(1.06);
+		background: var(--ink);
+		color: white;
+	}
+
+	.many-hats-arrow:disabled {
+		cursor: wait;
+		opacity: 0.45;
+	}
+
+	.many-hats-count {
+		display: flex;
+		gap: 0.35rem;
+		margin: 0;
+		font-size: 0.95rem;
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
+		color: color-mix(in srgb, var(--ink) 48%, white);
+	}
+
+	.many-hats-count [data-role-count] {
+		color: var(--ink);
+	}
+
+	.many-hats-dots {
+		display: flex;
+		gap: 0.55rem;
+		padding-left: 4.4rem;
+	}
+
+	.many-hats-dot {
+		width: 0.55rem;
+		height: 0.55rem;
+		padding: 0;
+		border: 0;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--ink) 22%, white);
+		cursor: pointer;
+		transition:
+			transform 160ms ease,
+			background-color 220ms ease;
+	}
+
+	.many-hats-dot[aria-current="true"] {
+		transform: scale(1.18);
+		background: var(--accent);
+	}
+
+	.many-hats-portrait {
+		position: relative;
+		min-width: 0;
+		min-height: 680px;
+		overflow: hidden;
+		background: var(--wash);
+		transition: background-color 280ms ease;
+	}
+
+	.many-hats-portrait-stage {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		aspect-ratio: 1024 / 1535;
+		transform: translate3d(1%, -5%, 0) scale(1.22);
+		transform-origin: 55% 26%;
+		will-change: transform;
+	}
+
+	.many-hats-photo,
+	.many-hats-worn-patch {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: fill;
+	}
+
+	.many-hats-photo {
+		z-index: 1;
+	}
+
+	.many-hats-worn-patch {
+		z-index: 3;
+		opacity: 1;
+		will-change: opacity;
+		pointer-events: none;
+	}
+
+	.many-hats-flight-hat {
+		position: absolute;
+		top: var(--hat-anchor-y);
+		left: var(--hat-anchor-x);
+		z-index: 4;
+		width: var(--hat-flight-size);
+		height: auto;
+		aspect-ratio: 1;
+		object-fit: contain;
+		opacity: 0;
+		transform: translate(-50%, -50%);
+		transform-origin: 50% 50%;
+		will-change: transform, opacity;
+		pointer-events: none;
+	}
+
+	.many-hats-image-caption {
+		position: absolute;
+		right: 1.25rem;
+		bottom: 1.15rem;
+		left: 1.25rem;
+		z-index: 4;
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-top: 0.8rem;
+		border-top: 1px solid rgba(16, 35, 62, 0.2);
+		font-size: 0.68rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: rgba(16, 35, 62, 0.65);
+	}
+
+	@media (max-width: 899px) {
+		.many-hats-card {
+			grid-template-columns: 1fr;
+			min-height: 0;
+		}
+
+		.many-hats-copy {
+			min-height: 560px;
+			padding: 2rem clamp(1.35rem, 6vw, 3rem) 2.5rem;
+		}
+
+		.many-hats-copy-stack {
+			padding: 3.75rem 0 2.5rem;
+		}
+
+		.many-hats-copy-stack h2 {
+			font-size: clamp(3.15rem, 12vw, 5.25rem);
+		}
+
+		.many-hats-watermark {
+			left: 2rem;
+			font-size: clamp(4rem, 20vw, 7rem);
+		}
+
+		.many-hats-portrait {
+			min-height: min(720px, 108vw);
+		}
+
+		.many-hats-portrait-stage {
+			transform: translate3d(0, -5%, 0) scale(1.25);
+		}
+	}
+
+	@media (max-width: 520px) {
+		.many-hats-section {
+			padding-right: 0.75rem;
+			padding-left: 0.75rem;
+		}
+
+		.many-hats-card {
+			border-radius: 0.9rem;
+		}
+
+		.many-hats-copy {
+			min-height: 530px;
+		}
+
+		.many-hats-copy-stack h2 {
+			font-size: clamp(2.85rem, 13vw, 4rem);
+		}
+
+		.many-hats-description {
+			font-size: 1rem;
+		}
+
+		.many-hats-image-caption {
+			display: none;
+		}
+
+		.many-hats-portrait-stage {
+			transform: translate3d(0, 1%, 0) scale(1.38);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.many-hats-card *,
+		.many-hats-card *::before,
+		.many-hats-card *::after {
+			scroll-behavior: auto !important;
+			transition-duration: 0.01ms !important;
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+		}
+	}
+</style>
