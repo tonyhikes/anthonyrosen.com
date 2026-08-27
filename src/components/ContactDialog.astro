@@ -151,7 +151,13 @@ const contactEndpoint = "/api/contact";
 					data-contact-panel="schedule"
 				>
 					<div class="contact-cal-inline" data-cal-inline>
-						<p data-cal-loading>Loading available times…</p>
+						<div class="contact-cal-loading" data-cal-loading role="status">
+							<span class="sr-only">Loading available times…</span>
+							<div class="contact-cal-loading-toolbar" aria-hidden="true">
+								<span></span><strong></strong><span></span>
+							</div>
+							<div class="contact-cal-loading-grid" aria-hidden="true"></div>
+						</div>
 						<a
 							href="https://app.cal.com/anthonyrosen/15min"
 							data-cal-fallback
@@ -175,66 +181,86 @@ const contactEndpoint = "/api/contact";
 					data-endpoint={contactEndpoint}
 					hidden
 				>
-					<div class="contact-form-field">
-						<label for="contact-name">Name</label>
-						<input
-							id="contact-name"
-							name="name"
-							type="text"
-							autocomplete="name"
-							maxlength="80"
-							required
-							placeholder="Your name"
-						/>
+					<div class="contact-form-fields" data-form-content>
+						<div class="contact-form-field">
+							<label for="contact-name">Name</label>
+							<input
+								id="contact-name"
+								name="name"
+								type="text"
+								autocomplete="name"
+								maxlength="80"
+								required
+								placeholder="Your name"
+							/>
+						</div>
+
+						<div class="contact-form-field">
+							<label for="contact-email">Email</label>
+							<input
+								id="contact-email"
+								name="email"
+								type="email"
+								autocomplete="email"
+								inputmode="email"
+								maxlength="120"
+								required
+								placeholder="you@example.com"
+							/>
+						</div>
+
+						<div class="contact-form-field">
+							<label for="contact-message">What can I help with?</label>
+							<textarea
+								id="contact-message"
+								name="message"
+								rows="5"
+								minlength="10"
+								maxlength="2000"
+								required
+								placeholder="A little context, a link, or simply what you’re hoping to do."
+							></textarea>
+						</div>
+
+						<div class="contact-form-honeypot" aria-hidden="true">
+							<label for="contact-company-website">Leave this field blank</label
+							>
+							<input
+								id="contact-company-website"
+								name="_gotcha"
+								type="text"
+								tabindex="-1"
+								autocomplete="off"
+							/>
+						</div>
+
+						<button type="submit" class="contact-form-submit">
+							<Send size={17} strokeWidth={1.8} aria-hidden="true" />
+							<span data-submit-label>Send message</span>
+						</button>
+						<p class="contact-form-privacy">
+							I’ll only use these details to reply.
+						</p>
+						<p class="contact-form-status" data-form-status aria-live="polite">
+						</p>
 					</div>
 
-					<div class="contact-form-field">
-						<label for="contact-email">Email</label>
-						<input
-							id="contact-email"
-							name="email"
-							type="email"
-							autocomplete="email"
-							inputmode="email"
-							maxlength="120"
-							required
-							placeholder="you@example.com"
-						/>
+					<div
+						class="contact-form-success"
+						data-form-success
+						role="status"
+						tabindex="-1"
+						hidden
+					>
+						<span class="contact-form-success-icon" aria-hidden="true">
+							<Check size={24} strokeWidth={2.2} />
+						</span>
+						<h3>Message sent</h3>
+						<p>Thanks—your message is on its way to Anthony.</p>
+						<button type="button" data-send-another-message>
+							Send another message
+						</button>
 					</div>
-
-					<div class="contact-form-field">
-						<label for="contact-message">What can I help with?</label>
-						<textarea
-							id="contact-message"
-							name="message"
-							rows="5"
-							minlength="10"
-							maxlength="2000"
-							required
-							placeholder="A little context, a link, or simply what you’re hoping to do."
-						></textarea>
-					</div>
-
-					<div class="contact-form-honeypot" aria-hidden="true">
-						<label for="contact-company-website">Leave this field blank</label>
-						<input
-							id="contact-company-website"
-							name="_gotcha"
-							type="text"
-							tabindex="-1"
-							autocomplete="off"
-						/>
-					</div>
-
-					<button type="submit" class="contact-form-submit">
-						<Send size={17} strokeWidth={1.8} aria-hidden="true" />
-						<span data-submit-label>Send message</span>
-					</button>
-					<p class="contact-form-privacy">
-						I’ll only use these details to reply.
-					</p>
-					<p class="contact-form-status" data-form-status aria-live="polite">
-					</p>
 				</form>
 			</div>
 		</section>
@@ -322,12 +348,67 @@ const contactEndpoint = "/api/contact";
 		return calEmbedPromise;
 	}
 
+	function revealCalWhenReady(container: HTMLElement) {
+		const loading = container.querySelector<HTMLElement>("[data-cal-loading]");
+		if (!loading) return;
+
+		let revealTimer = 0;
+		const observer = new MutationObserver(connectToFrame);
+
+		function reveal() {
+			observer.disconnect();
+			window.clearTimeout(revealTimer);
+			container.classList.add("is-ready");
+			window.setTimeout(() => loading.remove(), 180);
+		}
+
+		function connectToFrame() {
+			const frame = container.querySelector<HTMLIFrameElement>("iframe");
+			if (!frame || frame.dataset.readyListener === "true") return;
+			frame.dataset.readyListener = "true";
+			frame.addEventListener("load", reveal, { once: true });
+		}
+
+		observer.observe(container, { childList: true, subtree: true });
+		connectToFrame();
+		// Never leave the loading cover stuck if the embed changes its internals.
+		revealTimer = window.setTimeout(reveal, 6000);
+	}
+
+	function warmCalEmbed() {
+		void loadCalEmbed().catch(() => undefined);
+	}
+
+	function initCalWarmup() {
+		const root = document.documentElement;
+		if (root.dataset.calWarmupInitialized === "true") return;
+		root.dataset.calWarmupInitialized = "true";
+
+		const warmOnIntent = (event: Event) => {
+			const target = event.target;
+			if (!(target instanceof Element)) return;
+			if (
+				!target.closest(
+					"[data-contact-dialog-open], a[href='#contact'], [data-contact-tabs]"
+				)
+			) {
+				return;
+			}
+			warmCalEmbed();
+		};
+
+		document.addEventListener("pointerover", warmOnIntent, { passive: true });
+		document.addEventListener("focusin", warmOnIntent);
+		document.addEventListener("touchstart", warmOnIntent, { passive: true });
+	}
+
 	async function renderCalInline(container: HTMLElement) {
 		if (container.dataset.calRendered === "true") return;
 		container.dataset.calRendered = "true";
 
 		try {
 			await loadCalEmbed();
+			revealCalWhenReady(container);
 			const Cal = installCalQueue();
 			const namespace = container.closest("footer")
 				? "footer-15min"
@@ -340,9 +421,6 @@ const contactEndpoint = "/api/contact";
 					useSlotsViewOnSmallScreen: true,
 				},
 			});
-			const loading =
-				container.querySelector<HTMLElement>("[data-cal-loading]");
-			if (loading) loading.remove();
 		} catch {
 			container.dataset.calRendered = "false";
 			const loading =
@@ -444,9 +522,20 @@ const contactEndpoint = "/api/contact";
 						activateContactTab(tabsRoot, "schedule");
 						observer.disconnect();
 					},
-					{ rootMargin: "300px" }
+					{ rootMargin: "700px 0px" }
 				);
-				observer.observe(tabsRoot);
+				const startObserving = () => observer.observe(tabsRoot);
+
+				// PageSpeed does not need the calendar. Start watching only after a
+				// person scrolls toward the footer or arrives there directly.
+				if (window.scrollY > 0 || window.location.hash === "#contact") {
+					startObserving();
+				} else {
+					window.addEventListener("scroll", startObserving, {
+						once: true,
+						passive: true,
+					});
+				}
 			}
 		});
 	}
@@ -586,6 +675,36 @@ const contactEndpoint = "/api/contact";
 		contactForms.forEach((form) => {
 			if (form.dataset.formInitialized === "true") return;
 			form.dataset.formInitialized = "true";
+			const formContent = form.querySelector<HTMLElement>(
+				"[data-form-content]"
+			);
+			const successPanel = form.querySelector<HTMLElement>(
+				"[data-form-success]"
+			);
+			const sendAnotherButton = form.querySelector<HTMLButtonElement>(
+				"[data-send-another-message]"
+			);
+
+			sendAnotherButton?.addEventListener("click", () => {
+				if (!formContent || !successPanel) return;
+				const submitButton = form.querySelector<HTMLButtonElement>(
+					"button[type='submit']"
+				);
+				const submitLabel = form.querySelector<HTMLElement>(
+					"[data-submit-label]"
+				);
+				const formStatus =
+					form.querySelector<HTMLElement>("[data-form-status]");
+
+				successPanel.hidden = true;
+				formContent.hidden = false;
+				if (submitButton) submitButton.disabled = false;
+				if (submitLabel) submitLabel.textContent = "Send message";
+				if (formStatus) formStatus.textContent = "";
+				const nameField =
+					form.querySelector<HTMLInputElement>("input[name='name']");
+				if (nameField) nameField.focus();
+			});
 
 			form.addEventListener("submit", async (event) => {
 				event.preventDefault();
@@ -616,7 +735,11 @@ const contactEndpoint = "/api/contact";
 
 					form.reset();
 					submitLabel.textContent = "Message sent";
-					if (formStatus) {
+					if (formContent && successPanel) {
+						formContent.hidden = true;
+						successPanel.hidden = false;
+						successPanel.focus();
+					} else if (formStatus) {
 						formStatus.textContent =
 							"Thanks—your message is on its way to Anthony.";
 					}
@@ -638,6 +761,7 @@ const contactEndpoint = "/api/contact";
 			});
 		});
 
+		initCalWarmup();
 		initContactTabs();
 	}
 
@@ -929,6 +1053,7 @@ const contactEndpoint = "/api/contact";
 	}
 
 	.contact-cal-inline {
+		position: relative;
 		min-height: 30rem;
 		border: 1px solid #d7dee7;
 		border-radius: 0.9rem;
@@ -936,7 +1061,6 @@ const contactEndpoint = "/api/contact";
 		overflow: hidden;
 	}
 
-	.contact-cal-inline > p,
 	.contact-cal-inline > a {
 		display: block;
 		margin: 0;
@@ -954,14 +1078,79 @@ const contactEndpoint = "/api/contact";
 		font-weight: 700;
 	}
 
+	.contact-cal-loading {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		padding: 1.35rem;
+		background: white;
+		opacity: 1;
+		pointer-events: none;
+		transition: opacity 160ms ease;
+	}
+
+	.contact-cal-inline.is-ready .contact-cal-loading {
+		opacity: 0;
+	}
+
+	.contact-cal-loading-toolbar {
+		display: grid;
+		grid-template-columns: 2.25rem 1fr 2.25rem;
+		gap: 1rem;
+		align-items: center;
+		margin-bottom: 1.4rem;
+	}
+
+	.contact-cal-loading-toolbar span,
+	.contact-cal-loading-toolbar strong,
+	.contact-cal-loading-grid {
+		background: linear-gradient(90deg, #eef2f6 25%, #f8fafc 50%, #eef2f6 75%);
+		background-size: 200% 100%;
+		animation: contact-cal-shimmer 1.25s ease-in-out infinite;
+	}
+
+	.contact-cal-loading-toolbar span {
+		height: 2.25rem;
+		border-radius: 999px;
+	}
+
+	.contact-cal-loading-toolbar strong {
+		justify-self: center;
+		width: 8rem;
+		height: 1.1rem;
+		border-radius: 999px;
+	}
+
+	.contact-cal-loading-grid {
+		height: 23rem;
+		border-radius: 0.75rem;
+		background-image:
+			linear-gradient(90deg, transparent 0 13.7%, #fff 13.7% 14.3%),
+			linear-gradient(transparent 0 16%, #fff 16% 17%),
+			linear-gradient(90deg, #eef2f6 25%, #f8fafc 50%, #eef2f6 75%);
+		background-size:
+			14.285% 100%,
+			100% 16.666%,
+			200% 100%;
+	}
+
+	@keyframes contact-cal-shimmer {
+		to {
+			background-position: -200% 0;
+		}
+	}
+
 	.contact-tabs [hidden] {
 		display: none;
 	}
 
 	.contact-form {
+		margin-top: 1rem;
+	}
+
+	.contact-form-fields {
 		display: grid;
 		gap: 1rem;
-		margin-top: 1rem;
 	}
 
 	.contact-form-field {
@@ -1077,6 +1266,69 @@ const contactEndpoint = "/api/contact";
 		font-weight: 650;
 	}
 
+	.contact-form-success {
+		display: flex;
+		min-height: 23rem;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		padding: 2rem;
+		border: 1px solid #d7dee7;
+		border-radius: 1rem;
+		background: rgba(255, 255, 255, 0.72);
+		text-align: center;
+	}
+
+	.contact-form-success-icon {
+		display: inline-flex;
+		width: 3.25rem;
+		height: 3.25rem;
+		align-items: center;
+		justify-content: center;
+		border-radius: 999px;
+		background: #dcfce7;
+		color: #166534;
+	}
+
+	.contact-form-success h3 {
+		margin: 1rem 0 0;
+		font:
+			700 1.45rem/1.2 Georgia,
+			"Times New Roman",
+			serif;
+	}
+
+	.contact-form-success p {
+		margin: 0.65rem 0 0;
+		color: #475569;
+		font:
+			0.88rem/1.55 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.contact-form-success button {
+		margin-top: 1.35rem;
+		padding: 0.72rem 1rem;
+		border: 1px solid #9fb0c3;
+		border-radius: 999px;
+		background: white;
+		color: #10233e;
+		cursor: pointer;
+		font:
+			750 0.82rem/1 Inter,
+			system-ui,
+			sans-serif;
+		transition:
+			border-color 150ms ease,
+			transform 150ms ease;
+	}
+
+	.contact-form-success button:hover {
+		border-color: #315b89;
+		transform: translateY(-1px);
+	}
+
 	.contact-dialog :is(button, a, input, textarea):focus-visible {
 		outline: 3px solid #60a5fa;
 		outline-offset: 3px;
@@ -1117,6 +1369,12 @@ const contactEndpoint = "/api/contact";
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.contact-cal-loading-toolbar span,
+		.contact-cal-loading-toolbar strong,
+		.contact-cal-loading-grid {
+			animation: none;
+		}
+
 		.contact-dialog,
 		.contact-dialog::backdrop,
 		.contact-dialog-close,

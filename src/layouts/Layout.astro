@@ -46,6 +46,8 @@ const { title } = Astro.props;
 		<link rel="dns-prefetch" href="https://us-assets.i.posthog.com" />
 		<link rel="dns-prefetch" href="https://www.googletagmanager.com" />
 		<link rel="dns-prefetch" href="https://snap.licdn.com" />
+		<!-- Warm the calendar connection without downloading the embed on page load. -->
+		<link rel="preconnect" href="https://app.cal.com" crossorigin />
 		<link
 			rel="dns-prefetch"
 			href="https://b2bjsstore.s3.us-west-2.amazonaws.com"

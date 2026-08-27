@@ -145,7 +145,13 @@ const contactEndpoint = "/api/contact";
 						data-contact-panel="schedule"
 					>
 						<div class="footer-cal-inline" data-cal-inline>
-							<p data-cal-loading>Loading available times…</p>
+							<div class="footer-cal-loading" data-cal-loading role="status">
+								<span class="sr-only">Loading available times…</span>
+								<div class="footer-cal-loading-toolbar" aria-hidden="true">
+									<span></span><strong></strong><span></span>
+								</div>
+								<div class="footer-cal-loading-grid" aria-hidden="true"></div>
+							</div>
 							<a
 								href="https://app.cal.com/anthonyrosen/15min"
 								data-cal-fallback
@@ -169,90 +175,111 @@ const contactEndpoint = "/api/contact";
 						data-endpoint={contactEndpoint}
 						hidden
 					>
-						<div class="footer-form-field">
-							<label for="footer-contact-name">Name</label>
-							<input
-								id="footer-contact-name"
-								name="name"
-								type="text"
-								autocomplete="name"
-								maxlength="80"
-								required
-								placeholder="Your name"
-							/>
-						</div>
-
-						<div class="footer-form-field">
-							<label for="footer-contact-email">Email</label>
-							<input
-								id="footer-contact-email"
-								name="email"
-								type="email"
-								autocomplete="email"
-								inputmode="email"
-								maxlength="120"
-								required
-								placeholder="you@example.com"
-							/>
-						</div>
-
-						<div class="footer-form-field">
-							<div class="footer-message-label-row">
-								<label for="footer-contact-message">Message</label>
-								<button
-									type="button"
-									class="footer-expand-button"
-									data-expand-message
-									aria-controls="footer-contact-message"
-									aria-expanded="false"
-								>
-									<Maximize2
-										size={14}
-										strokeWidth={1.9}
-										data-expand-icon
-										aria-hidden="true"
-									/>
-									<Minimize2
-										size={14}
-										strokeWidth={1.9}
-										data-collapse-icon
-										aria-hidden="true"
-										hidden
-									/>
-									<span data-expand-label>Expand writing space</span>
-								</button>
+						<div class="footer-form-fields" data-form-content>
+							<div class="footer-form-field">
+								<label for="footer-contact-name">Name</label>
+								<input
+									id="footer-contact-name"
+									name="name"
+									type="text"
+									autocomplete="name"
+									maxlength="80"
+									required
+									placeholder="Your name"
+								/>
 							</div>
-							<textarea
-								id="footer-contact-message"
-								name="message"
-								rows="5"
-								minlength="10"
-								maxlength="2000"
-								required
-								placeholder="A little context, a link, or simply what you’re hoping to do."
-								data-expandable-message></textarea>
+
+							<div class="footer-form-field">
+								<label for="footer-contact-email">Email</label>
+								<input
+									id="footer-contact-email"
+									name="email"
+									type="email"
+									autocomplete="email"
+									inputmode="email"
+									maxlength="120"
+									required
+									placeholder="you@example.com"
+								/>
+							</div>
+
+							<div class="footer-form-field">
+								<div class="footer-message-label-row">
+									<label for="footer-contact-message">Message</label>
+									<button
+										type="button"
+										class="footer-expand-button"
+										data-expand-message
+										aria-controls="footer-contact-message"
+										aria-expanded="false"
+									>
+										<Maximize2
+											size={14}
+											strokeWidth={1.9}
+											data-expand-icon
+											aria-hidden="true"
+										/>
+										<Minimize2
+											size={14}
+											strokeWidth={1.9}
+											data-collapse-icon
+											aria-hidden="true"
+											hidden
+										/>
+										<span data-expand-label>Expand writing space</span>
+									</button>
+								</div>
+								<textarea
+									id="footer-contact-message"
+									name="message"
+									rows="5"
+									minlength="10"
+									maxlength="2000"
+									required
+									placeholder="A little context, a link, or simply what you’re hoping to do."
+									data-expandable-message></textarea>
+							</div>
+
+							<div class="footer-form-honeypot" aria-hidden="true">
+								<label for="footer-company-website"
+									>Leave this field blank</label
+								>
+								<input
+									id="footer-company-website"
+									name="_gotcha"
+									type="text"
+									tabindex="-1"
+									autocomplete="off"
+								/>
+							</div>
+
+							<button type="submit" class="footer-form-submit">
+								<Send size={17} strokeWidth={1.8} aria-hidden="true" />
+								<span data-submit-label>Send message</span>
+							</button>
+							<p class="footer-form-privacy">
+								I’ll only use these details to reply.
+							</p>
+							<p class="footer-form-status" data-form-status aria-live="polite">
+							</p>
 						</div>
 
-						<div class="footer-form-honeypot" aria-hidden="true">
-							<label for="footer-company-website">Leave this field blank</label>
-							<input
-								id="footer-company-website"
-								name="_gotcha"
-								type="text"
-								tabindex="-1"
-								autocomplete="off"
-							/>
+						<div
+							class="footer-form-success"
+							data-form-success
+							role="status"
+							tabindex="-1"
+							hidden
+						>
+							<span class="footer-form-success-icon" aria-hidden="true">
+								<Check size={24} strokeWidth={2.2} />
+							</span>
+							<h3>Message sent</h3>
+							<p>Thanks—your message is on its way to Anthony.</p>
+							<button type="button" data-send-another-message>
+								Send another message
+							</button>
 						</div>
-
-						<button type="submit" class="footer-form-submit">
-							<Send size={17} strokeWidth={1.8} aria-hidden="true" />
-							<span data-submit-label>Send message</span>
-						</button>
-						<p class="footer-form-privacy">
-							I’ll only use these details to reply.
-						</p>
-						<p class="footer-form-status" data-form-status aria-live="polite">
-						</p>
 					</form>
 				</div>
 			</section>
@@ -593,6 +620,7 @@ const contactEndpoint = "/api/contact";
 	}
 
 	.footer-cal-inline {
+		position: relative;
 		min-height: 32rem;
 		border: 1px solid #d7dee7;
 		border-radius: 0.9rem;
@@ -600,7 +628,6 @@ const contactEndpoint = "/api/contact";
 		overflow: hidden;
 	}
 
-	.footer-cal-inline > p,
 	.footer-cal-inline > a {
 		display: block;
 		margin: 0;
@@ -618,14 +645,79 @@ const contactEndpoint = "/api/contact";
 		font-weight: 700;
 	}
 
+	.footer-cal-loading {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		padding: 1.35rem;
+		background: white;
+		opacity: 1;
+		pointer-events: none;
+		transition: opacity 160ms ease;
+	}
+
+	.footer-cal-inline.is-ready .footer-cal-loading {
+		opacity: 0;
+	}
+
+	.footer-cal-loading-toolbar {
+		display: grid;
+		grid-template-columns: 2.25rem 1fr 2.25rem;
+		gap: 1rem;
+		align-items: center;
+		margin-bottom: 1.4rem;
+	}
+
+	.footer-cal-loading-toolbar span,
+	.footer-cal-loading-toolbar strong,
+	.footer-cal-loading-grid {
+		background: linear-gradient(90deg, #eef2f6 25%, #f8fafc 50%, #eef2f6 75%);
+		background-size: 200% 100%;
+		animation: footer-cal-shimmer 1.25s ease-in-out infinite;
+	}
+
+	.footer-cal-loading-toolbar span {
+		height: 2.25rem;
+		border-radius: 999px;
+	}
+
+	.footer-cal-loading-toolbar strong {
+		justify-self: center;
+		width: 8rem;
+		height: 1.1rem;
+		border-radius: 999px;
+	}
+
+	.footer-cal-loading-grid {
+		height: 25rem;
+		border-radius: 0.75rem;
+		background-image:
+			linear-gradient(90deg, transparent 0 13.7%, #fff 13.7% 14.3%),
+			linear-gradient(transparent 0 16%, #fff 16% 17%),
+			linear-gradient(90deg, #eef2f6 25%, #f8fafc 50%, #eef2f6 75%);
+		background-size:
+			14.285% 100%,
+			100% 16.666%,
+			200% 100%;
+	}
+
+	@keyframes footer-cal-shimmer {
+		to {
+			background-position: -200% 0;
+		}
+	}
+
 	.footer-tabs [hidden] {
 		display: none;
 	}
 
 	.footer-form {
+		margin-top: 1rem;
+	}
+
+	.footer-form-fields {
 		display: grid;
 		gap: 1rem;
-		margin-top: 1rem;
 	}
 
 	.footer-form-field {
@@ -775,6 +867,69 @@ const contactEndpoint = "/api/contact";
 		font-weight: 650;
 	}
 
+	.footer-form-success {
+		display: flex;
+		min-height: 23rem;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		padding: 2rem;
+		border: 1px solid #d7dee7;
+		border-radius: 1rem;
+		background: rgba(255, 255, 255, 0.72);
+		text-align: center;
+	}
+
+	.footer-form-success-icon {
+		display: inline-flex;
+		width: 3.25rem;
+		height: 3.25rem;
+		align-items: center;
+		justify-content: center;
+		border-radius: 999px;
+		background: #dcfce7;
+		color: #166534;
+	}
+
+	.footer-form-success h3 {
+		margin: 1rem 0 0;
+		font:
+			700 1.45rem/1.2 Georgia,
+			"Times New Roman",
+			serif;
+	}
+
+	.footer-form-success p {
+		margin: 0.65rem 0 0;
+		color: #475569;
+		font:
+			0.88rem/1.55 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.footer-form-success button {
+		margin-top: 1.35rem;
+		padding: 0.72rem 1rem;
+		border: 1px solid #9fb0c3;
+		border-radius: 999px;
+		background: white;
+		color: #10233e;
+		cursor: pointer;
+		font:
+			750 0.82rem/1 Inter,
+			system-ui,
+			sans-serif;
+		transition:
+			border-color 150ms ease,
+			transform 150ms ease;
+	}
+
+	.footer-form-success button:hover {
+		border-color: #315b89;
+		transform: translateY(-1px);
+	}
+
 	.footer-bottom {
 		display: grid;
 		grid-template-columns: minmax(0, 1.6fr) minmax(9rem, 0.7fr) minmax(
@@ -901,6 +1056,12 @@ const contactEndpoint = "/api/contact";
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.footer-cal-loading-toolbar span,
+		.footer-cal-loading-toolbar strong,
+		.footer-cal-loading-grid {
+			animation: none;
+		}
+
 		.footer-copy-button,
 		.footer-contact-action,
 		.footer-socials a,
