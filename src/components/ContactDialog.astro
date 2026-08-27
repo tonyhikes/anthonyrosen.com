@@ -32,7 +32,7 @@ const contactEndpoint = "/api/contact";
 				from there.
 			</p>
 
-			<div class="contact-dialog-direct">
+			<div class="contact-dialog-direct" data-copy-area>
 				<div class="contact-dialog-copy-group" data-copy-group>
 					<div class="contact-dialog-copy-row">
 						<button
@@ -41,7 +41,7 @@ const contactEndpoint = "/api/contact";
 							data-copy-value={email}
 							data-copy-kind="email"
 							data-copy-location="contact_dialog"
-							aria-describedby="contact-email-copy-status"
+							aria-describedby="contact-copy-status"
 						>
 							<span>{email}</span>
 							<span class="contact-dialog-icon" aria-hidden="true">
@@ -58,15 +58,6 @@ const contactEndpoint = "/api/contact";
 							<Mail size={19} strokeWidth={1.8} aria-hidden="true" />
 						</a>
 					</div>
-					<p
-						id="contact-email-copy-status"
-						class="contact-dialog-status"
-						data-copy-status
-						data-copy-default="Click the address to copy it. The envelope opens your email app."
-						aria-live="polite"
-					>
-						Click the address to copy it. The envelope opens your email app.
-					</p>
 				</div>
 
 				<div class="contact-dialog-copy-group" data-copy-group>
@@ -77,7 +68,7 @@ const contactEndpoint = "/api/contact";
 							data-copy-value={phoneDisplay}
 							data-copy-kind="phone"
 							data-copy-location="contact_dialog"
-							aria-describedby="contact-phone-copy-status"
+							aria-describedby="contact-copy-status"
 						>
 							<span>{phoneDisplay}</span>
 							<span class="contact-dialog-icon" aria-hidden="true">
@@ -95,13 +86,14 @@ const contactEndpoint = "/api/contact";
 						</a>
 					</div>
 					<p
-						id="contact-phone-copy-status"
+						id="contact-copy-status"
 						class="contact-dialog-status"
 						data-copy-status
-						data-copy-default="Click the number to copy it. The phone icon opens your call app."
+						data-copy-default="Click the email or phone number to copy it. Use the icons to email or call."
 						aria-live="polite"
 					>
-						Click the number to copy it. The phone icon opens your call app.
+						Click the email or phone number to copy it. Use the icons to email
+						or call.
 					</p>
 				</div>
 
@@ -544,8 +536,10 @@ const contactEndpoint = "/api/contact";
 				const copyValue = copyButton.dataset.copyValue;
 				const copyKind = copyButton.dataset.copyKind || "detail";
 				const group = copyButton.closest<HTMLElement>("[data-copy-group]");
+				const copyArea = copyButton.closest<HTMLElement>("[data-copy-area]");
 				const copyStatus =
-					group?.querySelector<HTMLElement>("[data-copy-status]");
+					group?.querySelector<HTMLElement>("[data-copy-status]") ||
+					copyArea?.querySelector<HTMLElement>("[data-copy-status]");
 				const copyIcon =
 					copyButton.querySelector<SVGElement>("[data-copy-icon]");
 				const checkIcon =
@@ -657,6 +651,8 @@ const contactEndpoint = "/api/contact";
 
 <style>
 	.contact-dialog {
+		position: fixed;
+		inset: 0;
 		width: min(calc(100% - 2rem), 58rem);
 		max-width: none;
 		max-height: min(90dvh, 48rem);
@@ -667,6 +663,7 @@ const contactEndpoint = "/api/contact";
 		box-shadow: 0 32px 90px rgba(2, 10, 23, 0.3);
 		color: #10233e;
 		overflow: auto;
+		margin: auto;
 		opacity: 0;
 		transform: translateY(10px) scale(0.985);
 		transition:
@@ -798,8 +795,7 @@ const contactEndpoint = "/api/contact";
 	}
 
 	.contact-dialog-direct {
-		margin-top: auto;
-		padding-top: 2rem;
+		margin-top: 1.5rem;
 	}
 
 	.contact-dialog-copy-row {
@@ -1101,7 +1097,7 @@ const contactEndpoint = "/api/contact";
 		.contact-dialog {
 			width: calc(100% - 1rem);
 			max-height: calc(100dvh - 1rem);
-			margin: auto 0.5rem 0.5rem;
+			margin: auto;
 			border-radius: 1.35rem;
 		}
 
