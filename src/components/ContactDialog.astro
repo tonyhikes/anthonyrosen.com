@@ -1,15 +1,5 @@
 ---
-import {
-	CalendarDays,
-	Check,
-	Copy,
-	FileText,
-	Linkedin,
-	Mail,
-	Phone,
-	Send,
-	X,
-} from "lucide-react";
+import { Check, Copy, Linkedin, Mail, Phone, Send, X } from "lucide-react";
 
 const email = "anthonyrosen@gmail.com";
 const phoneDisplay = "612-281-2280";
@@ -43,71 +33,87 @@ const contactEndpoint = "/api/contact";
 			</p>
 
 			<div class="contact-dialog-direct">
-				<div class="contact-dialog-email-wrap" data-copy-email-group>
-					<button
-						type="button"
-						class="contact-dialog-email"
-						data-copy-email={email}
-						data-copy-location="contact_dialog"
-						aria-describedby="contact-copy-status"
+				<div class="contact-dialog-copy-group" data-copy-group>
+					<div class="contact-dialog-copy-row">
+						<button
+							type="button"
+							class="contact-dialog-copy"
+							data-copy-value={email}
+							data-copy-kind="email"
+							data-copy-location="contact_dialog"
+							aria-describedby="contact-email-copy-status"
+						>
+							<span>{email}</span>
+							<span class="contact-dialog-icon" aria-hidden="true">
+								<Copy size={18} strokeWidth={1.8} data-copy-icon />
+								<Check size={18} strokeWidth={2} data-check-icon hidden />
+							</span>
+							<span class="sr-only">Copy email address</span>
+						</button>
+						<a
+							class="contact-dialog-action"
+							href={`mailto:${email}`}
+							aria-label={`Open a new email to ${email}`}
+						>
+							<Mail size={19} strokeWidth={1.8} aria-hidden="true" />
+						</a>
+					</div>
+					<p
+						id="contact-email-copy-status"
+						class="contact-dialog-status"
+						data-copy-status
+						data-copy-default="Click the address to copy it. The envelope opens your email app."
+						aria-live="polite"
 					>
-						<span>{email}</span>
-						<span class="contact-dialog-icon" aria-hidden="true">
-							<Copy size={18} strokeWidth={1.8} data-copy-icon />
-							<Check size={18} strokeWidth={2} data-check-icon hidden />
-						</span>
-						<span class="sr-only">Copy email address</span>
-					</button>
-					<a
-						class="contact-dialog-mail"
-						href={`mailto:${email}`}
-						aria-label={`Open a new email to ${email}`}
-					>
-						<Mail size={19} strokeWidth={1.8} aria-hidden="true" />
-					</a>
+						Click the address to copy it. The envelope opens your email app.
+					</p>
 				</div>
-				<p
-					id="contact-copy-status"
-					class="contact-dialog-status"
-					data-copy-status
-					aria-live="polite"
-				>
-					Click the address to copy it. The envelope opens your email app.
-				</p>
 
-				<a class="contact-dialog-row" href={`tel:${phoneHref}`}>
-					<Phone size={18} strokeWidth={1.8} aria-hidden="true" />
-					<span>{phoneDisplay}</span>
-				</a>
-				<a
-					class="contact-dialog-row"
-					href="https://app.cal.com/anthonyrosen/15min"
-					data-cal-trigger
-					data-cal-link="anthonyrosen/15min"
-					data-cal-namespace="15min"
-					data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
-				>
-					<CalendarDays size={18} strokeWidth={1.8} aria-hidden="true" />
-					<span>Schedule a 15-minute call</span>
-				</a>
+				<div class="contact-dialog-copy-group" data-copy-group>
+					<div class="contact-dialog-copy-row">
+						<button
+							type="button"
+							class="contact-dialog-copy"
+							data-copy-value={phoneDisplay}
+							data-copy-kind="phone"
+							data-copy-location="contact_dialog"
+							aria-describedby="contact-phone-copy-status"
+						>
+							<span>{phoneDisplay}</span>
+							<span class="contact-dialog-icon" aria-hidden="true">
+								<Copy size={18} strokeWidth={1.8} data-copy-icon />
+								<Check size={18} strokeWidth={2} data-check-icon hidden />
+							</span>
+							<span class="sr-only">Copy phone number</span>
+						</button>
+						<a
+							class="contact-dialog-action"
+							href={`tel:${phoneHref}`}
+							aria-label={`Call ${phoneDisplay}`}
+						>
+							<Phone size={19} strokeWidth={1.8} aria-hidden="true" />
+						</a>
+					</div>
+					<p
+						id="contact-phone-copy-status"
+						class="contact-dialog-status"
+						data-copy-status
+						data-copy-default="Click the number to copy it. The phone icon opens your call app."
+						aria-live="polite"
+					>
+						Click the number to copy it. The phone icon opens your call app.
+					</p>
+				</div>
 
-				<div
-					class="contact-dialog-links"
-					aria-label="Social profile and resume"
-				>
+				<div class="contact-dialog-socials" aria-label="Social links">
 					<a
-						class="contact-dialog-link"
 						href="https://linkedin.com/in/anthonyrosen"
 						target="_blank"
 						rel="noreferrer"
+						aria-label="Anthony Rosen on LinkedIn"
 					>
-						<Linkedin size={17} strokeWidth={1.8} aria-hidden="true" />
-						LinkedIn
+						<Linkedin size={19} strokeWidth={1.8} aria-hidden="true" />
 					</a>
-					<button type="button" class="contact-dialog-link" data-contact-resume>
-						<FileText size={17} strokeWidth={1.8} aria-hidden="true" />
-						View résumé
-					</button>
 				</div>
 			</div>
 		</section>
@@ -117,79 +123,137 @@ const contactEndpoint = "/api/contact";
 			aria-labelledby="contact-form-title"
 		>
 			<div class="contact-dialog-form-heading">
-				<p class="contact-dialog-form-kicker">Prefer a form?</p>
-				<h3 id="contact-form-title">Send a quick note</h3>
+				<p class="contact-dialog-form-kicker">Choose what works for you</p>
+				<h3 id="contact-form-title">Let’s connect</h3>
 			</div>
 
-			<form
-				id="contact-form"
-				class="contact-form"
-				action={contactEndpoint}
-				method="POST"
-				data-contact-form
-				data-form-location="contact_dialog"
-				data-endpoint={contactEndpoint}
+			<div
+				class="contact-tabs"
+				data-contact-tabs
+				id="contact-dialog-connect-tabs"
 			>
-				<div class="contact-form-field">
-					<label for="contact-name">Name</label>
-					<input
-						id="contact-name"
-						name="name"
-						type="text"
-						autocomplete="name"
-						maxlength="80"
-						required
-						placeholder="Your name"
-					/>
-				</div>
-
-				<div class="contact-form-field">
-					<label for="contact-email">Email</label>
-					<input
-						id="contact-email"
-						name="email"
-						type="email"
-						autocomplete="email"
-						inputmode="email"
-						maxlength="120"
-						required
-						placeholder="you@example.com"
-					/>
-				</div>
-
-				<div class="contact-form-field">
-					<label for="contact-message">What can I help with?</label>
-					<textarea
-						id="contact-message"
-						name="message"
-						rows="5"
-						minlength="10"
-						maxlength="2000"
-						required
-						placeholder="A little context, a link, or simply what you’re hoping to do."
-					></textarea>
-				</div>
-
-				<div class="contact-form-honeypot" aria-hidden="true">
-					<label for="contact-company-website">Leave this field blank</label>
-					<input
-						id="contact-company-website"
-						name="_gotcha"
-						type="text"
+				<div
+					class="contact-tab-list"
+					role="tablist"
+					aria-label="Contact options"
+				>
+					<button
+						type="button"
+						role="tab"
+						id="contact-dialog-schedule-tab"
+						aria-controls="contact-dialog-schedule-panel"
+						aria-selected="true"
+						data-contact-tab="schedule"
+					>
+						Schedule a call
+					</button>
+					<button
+						type="button"
+						role="tab"
+						id="contact-dialog-form-tab"
+						aria-controls="contact-dialog-form-panel"
+						aria-selected="false"
 						tabindex="-1"
-						autocomplete="off"
-					/>
+						data-contact-tab="form"
+					>
+						Send a quick note
+					</button>
 				</div>
 
-				<button type="submit" class="contact-form-submit">
-					<Send size={17} strokeWidth={1.8} aria-hidden="true" />
-					<span data-submit-label>Send message</span>
-				</button>
-				<p class="contact-form-privacy">
-					I’ll only use these details to reply.
-				</p>
-				<p class="contact-form-status" data-form-status aria-live="polite"></p>
-			</form>
+				<div
+					id="contact-dialog-schedule-panel"
+					class="contact-tab-panel"
+					role="tabpanel"
+					aria-labelledby="contact-dialog-schedule-tab"
+					data-contact-panel="schedule"
+				>
+					<div class="contact-cal-inline" data-cal-inline>
+						<p data-cal-loading>Loading available times…</p>
+						<a
+							href="https://app.cal.com/anthonyrosen/15min"
+							data-cal-fallback
+							hidden
+						>
+							Open scheduling in Cal.com
+						</a>
+					</div>
+				</div>
+
+				<form
+					id="contact-form"
+					class="contact-form"
+					role="tabpanel"
+					aria-labelledby="contact-dialog-form-tab"
+					action={contactEndpoint}
+					method="POST"
+					data-contact-form
+					data-contact-panel="form"
+					data-form-location="contact_dialog"
+					data-endpoint={contactEndpoint}
+					hidden
+				>
+					<div class="contact-form-field">
+						<label for="contact-name">Name</label>
+						<input
+							id="contact-name"
+							name="name"
+							type="text"
+							autocomplete="name"
+							maxlength="80"
+							required
+							placeholder="Your name"
+						/>
+					</div>
+
+					<div class="contact-form-field">
+						<label for="contact-email">Email</label>
+						<input
+							id="contact-email"
+							name="email"
+							type="email"
+							autocomplete="email"
+							inputmode="email"
+							maxlength="120"
+							required
+							placeholder="you@example.com"
+						/>
+					</div>
+
+					<div class="contact-form-field">
+						<label for="contact-message">What can I help with?</label>
+						<textarea
+							id="contact-message"
+							name="message"
+							rows="5"
+							minlength="10"
+							maxlength="2000"
+							required
+							placeholder="A little context, a link, or simply what you’re hoping to do."
+						></textarea>
+					</div>
+
+					<div class="contact-form-honeypot" aria-hidden="true">
+						<label for="contact-company-website">Leave this field blank</label>
+						<input
+							id="contact-company-website"
+							name="_gotcha"
+							type="text"
+							tabindex="-1"
+							autocomplete="off"
+						/>
+					</div>
+
+					<button type="submit" class="contact-form-submit">
+						<Send size={17} strokeWidth={1.8} aria-hidden="true" />
+						<span data-submit-label>Send message</span>
+					</button>
+					<p class="contact-form-privacy">
+						I’ll only use these details to reply.
+					</p>
+					<p class="contact-form-status" data-form-status aria-live="polite">
+					</p>
+				</form>
+			</div>
 		</section>
 	</div>
 </dialog>
@@ -245,12 +309,17 @@ const contactEndpoint = "/api/contact";
 		calEmbedPromise = new Promise((resolve, reject) => {
 			const Cal = installCalQueue();
 			Cal.loaded = true;
-			Cal("init", "15min", { origin: "https://app.cal.com" });
+			Cal("init", "contact-dialog-15min", {
+				origin: "https://app.cal.com",
+			});
+			Cal("init", "footer-15min", { origin: "https://app.cal.com" });
 			Cal.config = Cal.config || {};
 			Cal.config.forwardQueryParams = true;
-			Cal.ns["15min"]("ui", {
-				hideEventTypeDetails: false,
-				layout: "month_view",
+			["contact-dialog-15min", "footer-15min"].forEach((namespace) => {
+				Cal.ns[namespace]("ui", {
+					hideEventTypeDetails: true,
+					layout: "month_view",
+				});
 			});
 
 			const script = document.createElement("script");
@@ -270,6 +339,135 @@ const contactEndpoint = "/api/contact";
 		return calEmbedPromise;
 	}
 
+	async function renderCalInline(container: HTMLElement) {
+		if (container.dataset.calRendered === "true") return;
+		container.dataset.calRendered = "true";
+
+		try {
+			await loadCalEmbed();
+			const Cal = installCalQueue();
+			const namespace = container.closest("footer")
+				? "footer-15min"
+				: "contact-dialog-15min";
+			Cal.ns[namespace]("inline", {
+				elementOrSelector: container,
+				calLink: "anthonyrosen/15min",
+				config: {
+					layout: "month_view",
+					useSlotsViewOnSmallScreen: true,
+				},
+			});
+			const loading =
+				container.querySelector<HTMLElement>("[data-cal-loading]");
+			if (loading) loading.remove();
+		} catch {
+			container.dataset.calRendered = "false";
+			const loading =
+				container.querySelector<HTMLElement>("[data-cal-loading]");
+			const fallback = container.querySelector<HTMLElement>(
+				"[data-cal-fallback]"
+			);
+			if (loading) loading.textContent = "The scheduler could not load here.";
+			fallback?.removeAttribute("hidden");
+		}
+	}
+
+	function activateContactTab(
+		tabsRoot: HTMLElement,
+		tabName: string,
+		options: { focus?: boolean; track?: boolean } = {}
+	) {
+		const tabs = Array.from(
+			tabsRoot.querySelectorAll<HTMLButtonElement>("[data-contact-tab]")
+		);
+		const panels = Array.from(
+			tabsRoot.querySelectorAll<HTMLElement>("[data-contact-panel]")
+		);
+
+		tabs.forEach((tab) => {
+			const selected = tab.dataset.contactTab === tabName;
+			tab.setAttribute("aria-selected", String(selected));
+			tab.tabIndex = selected ? 0 : -1;
+			if (selected && options.focus) tab.focus();
+		});
+
+		panels.forEach((panel) => {
+			panel.hidden = panel.dataset.contactPanel !== tabName;
+		});
+
+		if (tabName === "schedule") {
+			const calContainer =
+				tabsRoot.querySelector<HTMLElement>("[data-cal-inline]");
+			if (calContainer) void renderCalInline(calContainer);
+			if (options.track) {
+				window.dispatchEvent(
+					new CustomEvent("cal-scheduler-opened", {
+						detail: {
+							link_location: tabsRoot.closest("footer")
+								? "footer"
+								: "contact_dialog",
+						},
+					})
+				);
+			}
+		}
+	}
+
+	function initContactTabs() {
+		const tabGroups = document.querySelectorAll<HTMLElement>(
+			"[data-contact-tabs]"
+		);
+		tabGroups.forEach((tabsRoot) => {
+			if (tabsRoot.dataset.tabsInitialized === "true") return;
+			tabsRoot.dataset.tabsInitialized = "true";
+
+			const tabs = Array.from(
+				tabsRoot.querySelectorAll<HTMLButtonElement>("[data-contact-tab]")
+			);
+			tabs.forEach((tab, index) => {
+				tab.addEventListener("click", () => {
+					activateContactTab(tabsRoot, tab.dataset.contactTab || "schedule", {
+						track: tab.dataset.contactTab === "schedule",
+					});
+				});
+
+				tab.addEventListener("keydown", (event) => {
+					if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+						return;
+					}
+					event.preventDefault();
+					let nextIndex = index;
+					if (event.key === "ArrowLeft")
+						nextIndex = (index - 1 + tabs.length) % tabs.length;
+					if (event.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
+					if (event.key === "Home") nextIndex = 0;
+					if (event.key === "End") nextIndex = tabs.length - 1;
+					const nextTab = tabs[nextIndex];
+					activateContactTab(
+						tabsRoot,
+						nextTab.dataset.contactTab || "schedule",
+						{
+							focus: true,
+							track: nextTab.dataset.contactTab === "schedule",
+						}
+					);
+				});
+			});
+
+			if (tabsRoot.closest("footer")) {
+				const observer = new IntersectionObserver(
+					(entries) => {
+						if (!entries.some((entry) => entry.isIntersecting)) return;
+						activateContactTab(tabsRoot, "schedule");
+						observer.disconnect();
+					},
+					{ rootMargin: "300px" }
+				);
+				observer.observe(tabsRoot);
+			}
+		});
+	}
+
 	function initContactDialog() {
 		const dialog = document.querySelector<HTMLDialogElement>("#contact-dialog");
 		if (!dialog || dialog.dataset.initialized === "true") return;
@@ -281,6 +479,8 @@ const contactEndpoint = "/api/contact";
 		function openDialog(trigger: HTMLElement) {
 			lastTrigger = trigger;
 			if (!dialog.open) dialog.showModal();
+			const tabsRoot = document.getElementById("contact-dialog-connect-tabs");
+			if (tabsRoot) activateContactTab(tabsRoot, "schedule");
 		}
 
 		function finishClose() {
@@ -315,15 +515,6 @@ const contactEndpoint = "/api/contact";
 				closeDialog();
 				return;
 			}
-
-			if (target.closest("[data-contact-resume]")) {
-				closeDialog();
-				window.setTimeout(() => {
-					window.dispatchEvent(
-						new CustomEvent("view-change", { detail: "resume" })
-					);
-				}, 190);
-			}
 		});
 
 		dialog.addEventListener("cancel", (event) => {
@@ -343,34 +534,33 @@ const contactEndpoint = "/api/contact";
 		});
 
 		const copyButtons =
-			document.querySelectorAll<HTMLButtonElement>("[data-copy-email]");
+			document.querySelectorAll<HTMLButtonElement>("[data-copy-value]");
 		copyButtons.forEach((copyButton) => {
 			if (copyButton.dataset.copyInitialized === "true") return;
 			copyButton.dataset.copyInitialized = "true";
 			let copyResetTimer = 0;
 
 			copyButton.addEventListener("click", async () => {
-				const address = copyButton.dataset.copyEmail;
-				const group = copyButton.closest<HTMLElement>(
-					"[data-copy-email-group]"
-				);
+				const copyValue = copyButton.dataset.copyValue;
+				const copyKind = copyButton.dataset.copyKind || "detail";
+				const group = copyButton.closest<HTMLElement>("[data-copy-group]");
 				const copyStatus =
 					group?.querySelector<HTMLElement>("[data-copy-status]");
 				const copyIcon =
 					copyButton.querySelector<SVGElement>("[data-copy-icon]");
 				const checkIcon =
 					copyButton.querySelector<SVGElement>("[data-check-icon]");
-				if (!address) return;
+				if (!copyValue) return;
 
 				try {
-					await navigator.clipboard.writeText(address);
+					await navigator.clipboard.writeText(copyValue);
 					if (copyStatus) {
-						copyStatus.textContent = "Email copied to your clipboard.";
+						copyStatus.textContent = `${copyKind === "phone" ? "Phone number" : "Email"} copied to your clipboard.`;
 					}
 					copyIcon?.setAttribute("hidden", "");
 					checkIcon?.removeAttribute("hidden");
 					window.dispatchEvent(
-						new CustomEvent("contact-email-copied", {
+						new CustomEvent(`contact-${copyKind}-copied`, {
 							detail: {
 								link_location: copyButton.dataset.copyLocation || "page",
 							},
@@ -379,17 +569,16 @@ const contactEndpoint = "/api/contact";
 
 					window.clearTimeout(copyResetTimer);
 					copyResetTimer = window.setTimeout(() => {
-						if (copyStatus) {
+						if (copyStatus)
 							copyStatus.textContent =
-								"Click the address to copy it. The envelope opens your email app.";
-						}
+								copyStatus.dataset.copyDefault || "Click to copy.";
 						checkIcon?.setAttribute("hidden", "");
 						copyIcon?.removeAttribute("hidden");
 					}, 2600);
 				} catch {
 					if (copyStatus) {
 						copyStatus.textContent =
-							"Copy didn’t work. You can select the address instead.";
+							"Copy didn’t work. You can select the text instead.";
 					}
 				}
 			});
@@ -453,39 +642,7 @@ const contactEndpoint = "/api/contact";
 			});
 		});
 
-		const calTriggers =
-			document.querySelectorAll<HTMLAnchorElement>("[data-cal-trigger]");
-		calTriggers.forEach((trigger) => {
-			if (trigger.dataset.calInitialized === "true") return;
-			trigger.dataset.calInitialized = "true";
-
-			trigger.addEventListener("click", async (event) => {
-				event.preventDefault();
-				if (trigger.dataset.calReady === "true") return;
-				trigger.setAttribute("aria-busy", "true");
-
-				window.dispatchEvent(
-					new CustomEvent("cal-scheduler-opened", {
-						detail: {
-							link_location: trigger.closest("footer")
-								? "footer"
-								: "contact_dialog",
-						},
-					})
-				);
-
-				try {
-					await loadCalEmbed();
-					trigger.dataset.calReady = "true";
-					await new Promise((resolve) => window.setTimeout(resolve, 500));
-					trigger.click();
-				} catch {
-					window.location.href = trigger.href;
-				} finally {
-					trigger.removeAttribute("aria-busy");
-				}
-			});
-		});
+		initContactTabs();
 	}
 
 	if (document.readyState === "loading") {
@@ -645,16 +802,15 @@ const contactEndpoint = "/api/contact";
 		padding-top: 2rem;
 	}
 
-	.contact-dialog-email-wrap {
+	.contact-dialog-copy-row {
 		display: flex;
 		align-items: stretch;
 		gap: 0.45rem;
 	}
 
-	.contact-dialog-email,
-	.contact-dialog-mail,
-	.contact-dialog-row,
-	.contact-dialog-link {
+	.contact-dialog-copy,
+	.contact-dialog-action,
+	.contact-dialog-socials a {
 		border: 1px solid rgba(255, 255, 255, 0.16);
 		background: rgba(255, 255, 255, 0.06);
 		color: white;
@@ -666,7 +822,7 @@ const contactEndpoint = "/api/contact";
 			transform 150ms ease;
 	}
 
-	.contact-dialog-email {
+	.contact-dialog-copy {
 		display: flex;
 		min-width: 0;
 		flex: 1;
@@ -680,29 +836,28 @@ const contactEndpoint = "/api/contact";
 		text-align: left;
 	}
 
-	.contact-dialog-email > span:first-child {
+	.contact-dialog-copy > span:first-child {
 		min-width: 0;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
 
 	.contact-dialog-icon,
-	.contact-dialog-mail {
+	.contact-dialog-action {
 		display: inline-flex;
 		flex: none;
 		align-items: center;
 		justify-content: center;
 	}
 
-	.contact-dialog-mail {
+	.contact-dialog-action {
 		width: 2.9rem;
 		border-radius: 0.8rem;
 	}
 
-	.contact-dialog-email:hover,
-	.contact-dialog-mail:hover,
-	.contact-dialog-row:hover,
-	.contact-dialog-link:hover {
+	.contact-dialog-copy:hover,
+	.contact-dialog-action:hover,
+	.contact-dialog-socials a:hover {
 		border-color: rgba(147, 197, 253, 0.62);
 		background: rgba(147, 197, 253, 0.12);
 	}
@@ -716,31 +871,21 @@ const contactEndpoint = "/api/contact";
 		line-height: 1.35;
 	}
 
-	.contact-dialog-row {
+	.contact-dialog-socials {
 		display: flex;
-		align-items: center;
-		gap: 0.7rem;
-		width: fit-content;
-		padding: 0.65rem 0.8rem;
-		border-radius: 0.75rem;
-		font-size: 0.82rem;
-	}
-
-	.contact-dialog-links {
-		display: flex;
-		flex-wrap: wrap;
 		gap: 0.5rem;
 		margin-top: 0.7rem;
+		padding-top: 0.7rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
 	}
 
-	.contact-dialog-link {
+	.contact-dialog-socials a {
 		display: inline-flex;
+		width: 2.5rem;
+		height: 2.5rem;
 		align-items: center;
-		gap: 0.45rem;
-		padding: 0.55rem 0.7rem;
+		justify-content: center;
 		border-radius: 999px;
-		font-size: 0.74rem;
-		cursor: pointer;
 	}
 
 	.contact-dialog-form-panel {
@@ -759,10 +904,79 @@ const contactEndpoint = "/api/contact";
 		letter-spacing: -0.035em;
 	}
 
+	.contact-tabs {
+		margin-top: 1.35rem;
+	}
+
+	.contact-tab-list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.3rem;
+		padding: 0.3rem;
+		border: 1px solid #cbd5e1;
+		border-radius: 0.9rem;
+		background: rgba(255, 255, 255, 0.62);
+	}
+
+	.contact-tab-list button {
+		min-height: 2.65rem;
+		padding: 0.55rem 0.7rem;
+		border: 0;
+		border-radius: 0.65rem;
+		background: transparent;
+		color: #475569;
+		cursor: pointer;
+		font:
+			750 0.76rem/1.2 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.contact-tab-list button[aria-selected="true"] {
+		background: #10233e;
+		box-shadow: 0 4px 14px rgba(16, 35, 62, 0.18);
+		color: white;
+	}
+
+	.contact-tab-panel,
+	.contact-form {
+		margin-top: 1rem;
+	}
+
+	.contact-cal-inline {
+		min-height: 30rem;
+		border: 1px solid #d7dee7;
+		border-radius: 0.9rem;
+		background: white;
+		overflow: hidden;
+	}
+
+	.contact-cal-inline > p,
+	.contact-cal-inline > a {
+		display: block;
+		margin: 0;
+		padding: 1.25rem;
+		color: #475569;
+		font:
+			0.82rem/1.5 Inter,
+			system-ui,
+			sans-serif;
+		text-align: center;
+	}
+
+	.contact-cal-inline > a {
+		color: #1d4ed8;
+		font-weight: 700;
+	}
+
+	.contact-tabs [hidden] {
+		display: none;
+	}
+
 	.contact-form {
 		display: grid;
 		gap: 1rem;
-		margin-top: 1.5rem;
+		margin-top: 1rem;
 	}
 
 	.contact-form-field {
@@ -921,10 +1135,10 @@ const contactEndpoint = "/api/contact";
 		.contact-dialog,
 		.contact-dialog::backdrop,
 		.contact-dialog-close,
-		.contact-dialog-email,
-		.contact-dialog-mail,
-		.contact-dialog-row,
-		.contact-dialog-link,
+		.contact-dialog-copy,
+		.contact-dialog-action,
+		.contact-dialog-socials a,
+		.contact-tab-list button,
 		.contact-form-submit {
 			transition: none;
 		}

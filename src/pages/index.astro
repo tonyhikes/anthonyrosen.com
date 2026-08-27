@@ -9,7 +9,7 @@ import StyleGuide from "../components/StyleGuide.astro";
 import Colophon from "../components/Colophon.astro";
 ---
 
-<Layout title="Tony Rosen | Marketing & Creative Project Manager">
+<Layout title="Anthony Rosen | Marketing & Creative Project Manager">
 	<div id="home-view" class="block">
 		<main class="content-layer relative z-30 bg-white dark:bg-slate-900">
 			<ManyHatsHero />
@@ -46,7 +46,7 @@ import Colophon from "../components/Colophon.astro";
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			(window as any).gtag("event", "page_view", {
 				page_path: meta.path,
-				page_title: `${meta.title} | Tony Rosen`,
+				page_title: `${meta.title} | Anthony Rosen`,
 				page_location: `${window.location.origin}${meta.path}`,
 			});
 		}
@@ -58,7 +58,7 @@ import Colophon from "../components/Colophon.astro";
 			(window as any).posthog.capture("$pageview", {
 				$current_url: window.location.origin + meta.path,
 				$pathname: meta.path,
-				title: `${meta.title} | Tony Rosen`,
+				title: `${meta.title} | Anthony Rosen`,
 			});
 		}
 	}

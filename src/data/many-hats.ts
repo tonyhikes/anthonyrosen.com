@@ -21,7 +21,7 @@ export type HatRole = {
 
 export const manyHatsPortrait = {
 	src: "/many-hats/final3.webp",
-	alt: "Tony seated at a desk with a laptop and notepad",
+	alt: "Anthony seated at a desk with a laptop and notepad",
 };
 
 /**

@@ -1,9 +1,7 @@
 ---
 import {
-	CalendarDays,
 	Check,
 	Copy,
-	FileText,
 	Linkedin,
 	Mail,
 	Maximize2,
@@ -30,24 +28,25 @@ const contactEndpoint = "/api/contact";
 				</p>
 
 				<div class="footer-contact-options" aria-label="Direct contact options">
-					<div class="footer-email-group" data-copy-email-group>
-						<div class="footer-email-row">
+					<div class="footer-copy-group" data-copy-group>
+						<div class="footer-copy-row">
 							<button
 								type="button"
-								class="footer-email-copy"
-								data-copy-email={email}
+								class="footer-copy-button"
+								data-copy-value={email}
+								data-copy-kind="email"
 								data-copy-location="footer"
-								aria-describedby="footer-copy-status"
+								aria-describedby="footer-email-copy-status"
 							>
 								<span>{email}</span>
-								<span class="footer-email-icon" aria-hidden="true">
+								<span class="footer-copy-icon" aria-hidden="true">
 									<Copy size={19} strokeWidth={1.8} data-copy-icon />
 									<Check size={19} strokeWidth={2} data-check-icon hidden />
 								</span>
 								<span class="sr-only">Copy email address</span>
 							</button>
 							<a
-								class="footer-mail-button"
+								class="footer-contact-action"
 								href={`mailto:${email}`}
 								aria-label={`Open a new email to ${email}`}
 							>
@@ -55,142 +54,216 @@ const contactEndpoint = "/api/contact";
 							</a>
 						</div>
 						<p
-							id="footer-copy-status"
+							id="footer-email-copy-status"
 							class="footer-copy-status"
 							data-copy-status
+							data-copy-default="Click the address to copy it. The envelope opens your email app."
 							aria-live="polite"
 						>
 							Click the address to copy it. The envelope opens your email app.
 						</p>
 					</div>
 
-					<div class="footer-contact-links">
-						<a href={`tel:${phoneHref}`}>
-							<Phone size={18} strokeWidth={1.8} aria-hidden="true" />
-							{phoneDisplay}
-						</a>
-						<a
-							href="https://app.cal.com/anthonyrosen/15min"
-							data-cal-trigger
-							data-cal-link="anthonyrosen/15min"
-							data-cal-namespace="15min"
-							data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+					<div class="footer-copy-group" data-copy-group>
+						<div class="footer-copy-row">
+							<button
+								type="button"
+								class="footer-copy-button"
+								data-copy-value={phoneDisplay}
+								data-copy-kind="phone"
+								data-copy-location="footer"
+								aria-describedby="footer-phone-copy-status"
+							>
+								<span>{phoneDisplay}</span>
+								<span class="footer-copy-icon" aria-hidden="true">
+									<Copy size={19} strokeWidth={1.8} data-copy-icon />
+									<Check size={19} strokeWidth={2} data-check-icon hidden />
+								</span>
+								<span class="sr-only">Copy phone number</span>
+							</button>
+							<a
+								class="footer-contact-action"
+								href={`tel:${phoneHref}`}
+								aria-label={`Call ${phoneDisplay}`}
+							>
+								<Phone size={20} strokeWidth={1.8} aria-hidden="true" />
+							</a>
+						</div>
+						<p
+							id="footer-phone-copy-status"
+							class="footer-copy-status"
+							data-copy-status
+							data-copy-default="Click the number to copy it. The phone icon opens your call app."
+							aria-live="polite"
 						>
-							<CalendarDays size={18} strokeWidth={1.8} aria-hidden="true" />
-							Schedule 15 minutes
-						</a>
+							Click the number to copy it. The phone icon opens your call app.
+						</p>
+					</div>
+
+					<div class="footer-socials" aria-label="Social links">
 						<a
 							href="https://linkedin.com/in/anthonyrosen"
 							target="_blank"
 							rel="noreferrer"
+							aria-label="Anthony Rosen on LinkedIn"
 						>
-							<Linkedin size={18} strokeWidth={1.8} aria-hidden="true" />
-							LinkedIn
+							<Linkedin size={20} strokeWidth={1.8} aria-hidden="true" />
 						</a>
-						<button type="button" class="footer-link" data-target="resume">
-							<FileText size={18} strokeWidth={1.8} aria-hidden="true" />
-							View résumé
-						</button>
 					</div>
 				</div>
 			</div>
 
 			<section class="footer-form-panel" aria-labelledby="footer-form-title">
-				<p class="footer-form-kicker">Send a quick note</p>
-				<h3 id="footer-form-title">What can I help with?</h3>
+				<p class="footer-form-kicker">Choose what works for you</p>
+				<h3 id="footer-form-title">Let’s connect</h3>
 
-				<form
-					class="footer-form"
-					action={contactEndpoint}
-					method="POST"
-					data-contact-form
-					data-form-location="footer"
-					data-endpoint={contactEndpoint}
-				>
-					<div class="footer-form-field">
-						<label for="footer-contact-name">Name</label>
-						<input
-							id="footer-contact-name"
-							name="name"
-							type="text"
-							autocomplete="name"
-							maxlength="80"
-							required
-							placeholder="Your name"
-						/>
-					</div>
-
-					<div class="footer-form-field">
-						<label for="footer-contact-email">Email</label>
-						<input
-							id="footer-contact-email"
-							name="email"
-							type="email"
-							autocomplete="email"
-							inputmode="email"
-							maxlength="120"
-							required
-							placeholder="you@example.com"
-						/>
-					</div>
-
-					<div class="footer-form-field">
-						<div class="footer-message-label-row">
-							<label for="footer-contact-message">Message</label>
-							<button
-								type="button"
-								class="footer-expand-button"
-								data-expand-message
-								aria-controls="footer-contact-message"
-								aria-expanded="false"
-							>
-								<Maximize2
-									size={14}
-									strokeWidth={1.9}
-									data-expand-icon
-									aria-hidden="true"
-								/>
-								<Minimize2
-									size={14}
-									strokeWidth={1.9}
-									data-collapse-icon
-									aria-hidden="true"
-									hidden
-								/>
-								<span data-expand-label>Expand writing space</span>
-							</button>
-						</div>
-						<textarea
-							id="footer-contact-message"
-							name="message"
-							rows="5"
-							minlength="10"
-							maxlength="2000"
-							required
-							placeholder="A little context, a link, or simply what you’re hoping to do."
-							data-expandable-message></textarea>
-					</div>
-
-					<div class="footer-form-honeypot" aria-hidden="true">
-						<label for="footer-company-website">Leave this field blank</label>
-						<input
-							id="footer-company-website"
-							name="_gotcha"
-							type="text"
+				<div class="footer-tabs" data-contact-tabs id="footer-connect-tabs">
+					<div
+						class="footer-tab-list"
+						role="tablist"
+						aria-label="Contact options"
+					>
+						<button
+							type="button"
+							role="tab"
+							id="footer-schedule-tab"
+							aria-controls="footer-schedule-panel"
+							aria-selected="true"
+							data-contact-tab="schedule"
+						>
+							Schedule a call
+						</button>
+						<button
+							type="button"
+							role="tab"
+							id="footer-form-tab"
+							aria-controls="footer-quick-note-panel"
+							aria-selected="false"
 							tabindex="-1"
-							autocomplete="off"
-						/>
+							data-contact-tab="form"
+						>
+							Send a quick note
+						</button>
 					</div>
 
-					<button type="submit" class="footer-form-submit">
-						<Send size={17} strokeWidth={1.8} aria-hidden="true" />
-						<span data-submit-label>Send message</span>
-					</button>
-					<p class="footer-form-privacy">
-						I’ll only use these details to reply.
-					</p>
-					<p class="footer-form-status" data-form-status aria-live="polite"></p>
-				</form>
+					<div
+						id="footer-schedule-panel"
+						class="footer-tab-panel"
+						role="tabpanel"
+						aria-labelledby="footer-schedule-tab"
+						data-contact-panel="schedule"
+					>
+						<div class="footer-cal-inline" data-cal-inline>
+							<p data-cal-loading>Loading available times…</p>
+							<a
+								href="https://app.cal.com/anthonyrosen/15min"
+								data-cal-fallback
+								hidden
+							>
+								Open scheduling in Cal.com
+							</a>
+						</div>
+					</div>
+
+					<form
+						id="footer-quick-note-panel"
+						class="footer-form"
+						role="tabpanel"
+						aria-labelledby="footer-form-tab"
+						action={contactEndpoint}
+						method="POST"
+						data-contact-form
+						data-contact-panel="form"
+						data-form-location="footer"
+						data-endpoint={contactEndpoint}
+						hidden
+					>
+						<div class="footer-form-field">
+							<label for="footer-contact-name">Name</label>
+							<input
+								id="footer-contact-name"
+								name="name"
+								type="text"
+								autocomplete="name"
+								maxlength="80"
+								required
+								placeholder="Your name"
+							/>
+						</div>
+
+						<div class="footer-form-field">
+							<label for="footer-contact-email">Email</label>
+							<input
+								id="footer-contact-email"
+								name="email"
+								type="email"
+								autocomplete="email"
+								inputmode="email"
+								maxlength="120"
+								required
+								placeholder="you@example.com"
+							/>
+						</div>
+
+						<div class="footer-form-field">
+							<div class="footer-message-label-row">
+								<label for="footer-contact-message">Message</label>
+								<button
+									type="button"
+									class="footer-expand-button"
+									data-expand-message
+									aria-controls="footer-contact-message"
+									aria-expanded="false"
+								>
+									<Maximize2
+										size={14}
+										strokeWidth={1.9}
+										data-expand-icon
+										aria-hidden="true"
+									/>
+									<Minimize2
+										size={14}
+										strokeWidth={1.9}
+										data-collapse-icon
+										aria-hidden="true"
+										hidden
+									/>
+									<span data-expand-label>Expand writing space</span>
+								</button>
+							</div>
+							<textarea
+								id="footer-contact-message"
+								name="message"
+								rows="5"
+								minlength="10"
+								maxlength="2000"
+								required
+								placeholder="A little context, a link, or simply what you’re hoping to do."
+								data-expandable-message></textarea>
+						</div>
+
+						<div class="footer-form-honeypot" aria-hidden="true">
+							<label for="footer-company-website">Leave this field blank</label>
+							<input
+								id="footer-company-website"
+								name="_gotcha"
+								type="text"
+								tabindex="-1"
+								autocomplete="off"
+							/>
+						</div>
+
+						<button type="submit" class="footer-form-submit">
+							<Send size={17} strokeWidth={1.8} aria-hidden="true" />
+							<span data-submit-label>Send message</span>
+						</button>
+						<p class="footer-form-privacy">
+							I’ll only use these details to reply.
+						</p>
+						<p class="footer-form-status" data-form-status aria-live="polite">
+						</p>
+					</form>
+				</div>
 			</section>
 		</section>
 
@@ -379,14 +452,14 @@ const contactEndpoint = "/api/contact";
 		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 	}
 
-	.footer-email-row {
+	.footer-copy-row {
 		display: flex;
 		gap: 0.55rem;
 	}
 
-	.footer-email-copy,
-	.footer-mail-button,
-	.footer-contact-links :is(a, button, span) {
+	.footer-copy-button,
+	.footer-contact-action,
+	.footer-socials a {
 		border: 1px solid rgba(255, 255, 255, 0.16);
 		background: rgba(255, 255, 255, 0.055);
 		color: white;
@@ -397,7 +470,7 @@ const contactEndpoint = "/api/contact";
 			border-color 150ms ease;
 	}
 
-	.footer-email-copy {
+	.footer-copy-button {
 		display: flex;
 		min-width: 0;
 		min-height: 3.5rem;
@@ -412,28 +485,28 @@ const contactEndpoint = "/api/contact";
 		text-align: left;
 	}
 
-	.footer-email-copy > span:first-child {
+	.footer-copy-button > span:first-child {
 		min-width: 0;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
 
-	.footer-email-icon,
-	.footer-mail-button {
+	.footer-copy-icon,
+	.footer-contact-action {
 		display: inline-flex;
 		flex: none;
 		align-items: center;
 		justify-content: center;
 	}
 
-	.footer-mail-button {
+	.footer-contact-action {
 		width: 3.5rem;
 		border-radius: 0.85rem;
 	}
 
-	.footer-email-copy:hover,
-	.footer-mail-button:hover,
-	.footer-contact-links :is(a, button):hover {
+	.footer-copy-button:hover,
+	.footer-contact-action:hover,
+	.footer-socials a:hover {
 		border-color: rgba(147, 197, 253, 0.62);
 		background: rgba(147, 197, 253, 0.12);
 	}
@@ -448,19 +521,21 @@ const contactEndpoint = "/api/contact";
 			sans-serif;
 	}
 
-	.footer-contact-links {
+	.footer-socials {
 		display: flex;
-		flex-wrap: wrap;
 		gap: 0.55rem;
+		margin-top: 0.85rem;
+		padding-top: 0.85rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
 	}
 
-	.footer-contact-links :is(a, button, span) {
+	.footer-socials a {
 		display: inline-flex;
+		width: 2.75rem;
+		height: 2.75rem;
 		align-items: center;
-		gap: 0.45rem;
-		padding: 0.62rem 0.78rem;
+		justify-content: center;
 		border-radius: 999px;
-		font-size: 0.76rem;
 	}
 
 	.footer-form-panel {
@@ -491,10 +566,79 @@ const contactEndpoint = "/api/contact";
 		letter-spacing: -0.04em;
 	}
 
+	.footer-tabs {
+		margin-top: 1.35rem;
+	}
+
+	.footer-tab-list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.3rem;
+		padding: 0.3rem;
+		border: 1px solid #cbd5e1;
+		border-radius: 0.9rem;
+		background: rgba(255, 255, 255, 0.68);
+	}
+
+	.footer-tab-list button {
+		min-height: 2.65rem;
+		padding: 0.55rem 0.7rem;
+		border: 0;
+		border-radius: 0.65rem;
+		background: transparent;
+		color: #475569;
+		cursor: pointer;
+		font:
+			750 0.76rem/1.2 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.footer-tab-list button[aria-selected="true"] {
+		background: #10233e;
+		box-shadow: 0 4px 14px rgba(16, 35, 62, 0.18);
+		color: white;
+	}
+
+	.footer-tab-panel,
+	.footer-form {
+		margin-top: 1rem;
+	}
+
+	.footer-cal-inline {
+		min-height: 32rem;
+		border: 1px solid #d7dee7;
+		border-radius: 0.9rem;
+		background: white;
+		overflow: hidden;
+	}
+
+	.footer-cal-inline > p,
+	.footer-cal-inline > a {
+		display: block;
+		margin: 0;
+		padding: 1.25rem;
+		color: #475569;
+		font:
+			0.82rem/1.5 Inter,
+			system-ui,
+			sans-serif;
+		text-align: center;
+	}
+
+	.footer-cal-inline > a {
+		color: #1d4ed8;
+		font-weight: 700;
+	}
+
+	.footer-tabs [hidden] {
+		display: none;
+	}
+
 	.footer-form {
 		display: grid;
 		gap: 1rem;
-		margin-top: 1.45rem;
+		margin-top: 1rem;
 	}
 
 	.footer-form-field {
@@ -763,29 +907,17 @@ const contactEndpoint = "/api/contact";
 	}
 
 	@media (max-width: 420px) {
-		.footer-email-copy {
+		.footer-copy-button {
 			padding-inline: 0.8rem;
 			font-size: 0.76rem;
-		}
-
-		.footer-contact-links {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-		}
-
-		.footer-contact-links :is(a, button, span) {
-			justify-content: center;
-		}
-
-		.footer-contact-links :is(a, button, span):last-child {
-			grid-column: 1 / -1;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.footer-email-copy,
-		.footer-mail-button,
-		.footer-contact-links :is(a, button, span),
+		.footer-copy-button,
+		.footer-contact-action,
+		.footer-socials a,
+		.footer-tab-list button,
 		.footer-expand-button,
 		.footer-form-field :is(input, textarea),
 		.footer-form-submit,

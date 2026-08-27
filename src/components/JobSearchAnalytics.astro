@@ -53,6 +53,14 @@
 				return;
 			}
 
+			if (href.startsWith("tel:")) {
+				sendJobSearchEvent("contact_click", {
+					contact_method: "phone",
+					link_location: linkLocation,
+				});
+				return;
+			}
+
 			if (href.includes("linkedin.com")) {
 				sendJobSearchEvent("linkedin_click", {
 					link_location: linkLocation,
@@ -89,6 +97,14 @@
 			const detail = (event as CustomEvent<{ link_location?: string }>).detail;
 			sendJobSearchEvent("contact_copy", {
 				contact_method: "email",
+				link_location: detail?.link_location || "page",
+			});
+		});
+
+		window.addEventListener("contact-phone-copied", (event) => {
+			const detail = (event as CustomEvent<{ link_location?: string }>).detail;
+			sendJobSearchEvent("contact_copy", {
+				contact_method: "phone",
 				link_location: detail?.link_location || "page",
 			});
 		});
