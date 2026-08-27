@@ -1,5 +1,6 @@
 ---
 import {
+	CalendarDays,
 	Check,
 	Copy,
 	FileText,
@@ -13,7 +14,7 @@ import {
 const email = "anthonyrosen@gmail.com";
 const phoneDisplay = "612-281-2280";
 const phoneHref = "+16122812280";
-const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT ?? "";
+const contactEndpoint = "/api/contact";
 ---
 
 <dialog
@@ -78,6 +79,17 @@ const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT ?? "";
 					<Phone size={18} strokeWidth={1.8} aria-hidden="true" />
 					<span>{phoneDisplay}</span>
 				</a>
+				<a
+					class="contact-dialog-row"
+					href="https://app.cal.com/anthonyrosen/15min"
+					data-cal-trigger
+					data-cal-link="anthonyrosen/15min"
+					data-cal-namespace="15min"
+					data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+				>
+					<CalendarDays size={18} strokeWidth={1.8} aria-hidden="true" />
+					<span>Schedule a 15-minute call</span>
+				</a>
 
 				<div
 					class="contact-dialog-links"
@@ -112,11 +124,11 @@ const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT ?? "";
 			<form
 				id="contact-form"
 				class="contact-form"
-				action={formspreeEndpoint || undefined}
+				action={contactEndpoint}
 				method="POST"
 				data-contact-form
 				data-form-location="contact_dialog"
-				data-endpoint={formspreeEndpoint}
+				data-endpoint={contactEndpoint}
 			>
 				<div class="contact-form-field">
 					<label for="contact-name">Name</label>
@@ -169,22 +181,12 @@ const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT ?? "";
 					/>
 				</div>
 
-				<button
-					type="submit"
-					class="contact-form-submit"
-					disabled={!formspreeEndpoint}
-				>
+				<button type="submit" class="contact-form-submit">
 					<Send size={17} strokeWidth={1.8} aria-hidden="true" />
-					<span data-submit-label>
-						{formspreeEndpoint ? "Send message" : "Form setup pending"}
-					</span>
+					<span data-submit-label>Send message</span>
 				</button>
 				<p class="contact-form-privacy">
-					{
-						formspreeEndpoint
-							? "I’ll only use these details to reply."
-							: "The form is ready; it needs a Formspree endpoint before launch."
-					}
+					I’ll only use these details to reply.
 				</p>
 				<p class="contact-form-status" data-form-status aria-live="polite"></p>
 			</form>
@@ -193,6 +195,81 @@ const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT ?? "";
 </dialog>
 
 <script>
+	type CalCall = unknown[];
+	type CalApi = ((...args: CalCall) => CalApi | void) & { q: CalCall[] };
+	type CalGlobal = CalApi & {
+		loaded?: boolean;
+		ns: Record<string, CalApi>;
+		config?: { forwardQueryParams?: boolean };
+	};
+	type CalWindow = Window & { Cal?: CalGlobal };
+
+	let calEmbedPromise: Promise<void> | null = null;
+
+	function installCalQueue() {
+		const calWindow = window as CalWindow;
+		if (calWindow.Cal) return calWindow.Cal;
+
+		const enqueue = (api: CalApi, args: CalCall) => api.q.push(args);
+		const cal = ((...args: CalCall) => {
+			const activeCal = calWindow.Cal;
+			if (!activeCal) return;
+
+			if (args[0] === "init") {
+				const namespace = args[1];
+				const api = ((...namespaceArgs: CalCall) => {
+					enqueue(api, namespaceArgs);
+				}) as CalApi;
+				api.q = [];
+
+				if (typeof namespace === "string") {
+					activeCal.ns[namespace] = activeCal.ns[namespace] || api;
+					enqueue(activeCal.ns[namespace], args);
+					enqueue(activeCal, ["initNamespace", namespace]);
+					return activeCal.ns[namespace];
+				}
+			}
+
+			enqueue(activeCal, args);
+		}) as CalGlobal;
+
+		cal.q = [];
+		cal.ns = {};
+		calWindow.Cal = cal;
+		return cal;
+	}
+
+	function loadCalEmbed() {
+		if (calEmbedPromise) return calEmbedPromise;
+
+		calEmbedPromise = new Promise((resolve, reject) => {
+			const Cal = installCalQueue();
+			Cal.loaded = true;
+			Cal("init", "15min", { origin: "https://app.cal.com" });
+			Cal.config = Cal.config || {};
+			Cal.config.forwardQueryParams = true;
+			Cal.ns["15min"]("ui", {
+				hideEventTypeDetails: false,
+				layout: "month_view",
+			});
+
+			const script = document.createElement("script");
+			script.src = "https://app.cal.com/embed/embed.js";
+			script.async = true;
+			script.addEventListener("load", () => resolve(), { once: true });
+			script.addEventListener(
+				"error",
+				() => reject(new Error("Cal.com failed to load")),
+				{
+					once: true,
+				}
+			);
+			document.head.appendChild(script);
+		});
+
+		return calEmbedPromise;
+	}
+
 	function initContactDialog() {
 		const dialog = document.querySelector<HTMLDialogElement>("#contact-dialog");
 		if (!dialog || dialog.dataset.initialized === "true") return;
@@ -372,6 +449,40 @@ const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT ?? "";
 						formStatus.textContent =
 							"That didn’t send. Please try again, or use the email option.";
 					}
+				}
+			});
+		});
+
+		const calTriggers =
+			document.querySelectorAll<HTMLAnchorElement>("[data-cal-trigger]");
+		calTriggers.forEach((trigger) => {
+			if (trigger.dataset.calInitialized === "true") return;
+			trigger.dataset.calInitialized = "true";
+
+			trigger.addEventListener("click", async (event) => {
+				event.preventDefault();
+				if (trigger.dataset.calReady === "true") return;
+				trigger.setAttribute("aria-busy", "true");
+
+				window.dispatchEvent(
+					new CustomEvent("cal-scheduler-opened", {
+						detail: {
+							link_location: trigger.closest("footer")
+								? "footer"
+								: "contact_dialog",
+						},
+					})
+				);
+
+				try {
+					await loadCalEmbed();
+					trigger.dataset.calReady = "true";
+					await new Promise((resolve) => window.setTimeout(resolve, 500));
+					trigger.click();
+				} catch {
+					window.location.href = trigger.href;
+				} finally {
+					trigger.removeAttribute("aria-busy");
 				}
 			});
 		});

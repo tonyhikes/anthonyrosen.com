@@ -1,5 +1,6 @@
 ---
 import {
+	CalendarDays,
 	Check,
 	Copy,
 	FileText,
@@ -14,7 +15,7 @@ import {
 const email = "anthonyrosen@gmail.com";
 const phoneDisplay = "612-281-2280";
 const phoneHref = "+16122812280";
-const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT ?? "";
+const contactEndpoint = "/api/contact";
 ---
 
 <footer id="contact" class="site-footer">
@@ -69,6 +70,16 @@ const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT ?? "";
 							{phoneDisplay}
 						</a>
 						<a
+							href="https://app.cal.com/anthonyrosen/15min"
+							data-cal-trigger
+							data-cal-link="anthonyrosen/15min"
+							data-cal-namespace="15min"
+							data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+						>
+							<CalendarDays size={18} strokeWidth={1.8} aria-hidden="true" />
+							Schedule 15 minutes
+						</a>
+						<a
 							href="https://linkedin.com/in/anthonyrosen"
 							target="_blank"
 							rel="noreferrer"
@@ -90,11 +101,11 @@ const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT ?? "";
 
 				<form
 					class="footer-form"
-					action={formspreeEndpoint || undefined}
+					action={contactEndpoint}
 					method="POST"
 					data-contact-form
 					data-form-location="footer"
-					data-endpoint={formspreeEndpoint}
+					data-endpoint={contactEndpoint}
 				>
 					<div class="footer-form-field">
 						<label for="footer-contact-name">Name</label>
@@ -171,22 +182,12 @@ const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT ?? "";
 						/>
 					</div>
 
-					<button
-						type="submit"
-						class="footer-form-submit"
-						disabled={!formspreeEndpoint}
-					>
+					<button type="submit" class="footer-form-submit">
 						<Send size={17} strokeWidth={1.8} aria-hidden="true" />
-						<span data-submit-label>
-							{formspreeEndpoint ? "Send message" : "Form setup pending"}
-						</span>
+						<span data-submit-label>Send message</span>
 					</button>
 					<p class="footer-form-privacy">
-						{
-							formspreeEndpoint
-								? "I’ll only use these details to reply."
-								: "The form is ready; it needs a Formspree endpoint before launch."
-						}
+						I’ll only use these details to reply.
 					</p>
 					<p class="footer-form-status" data-form-status aria-live="polite"></p>
 				</form>
