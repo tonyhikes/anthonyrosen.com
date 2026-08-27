@@ -78,12 +78,21 @@ const { title } = Astro.props;
 			* {
 				box-sizing: border-box;
 			}
-			/* Keep Tailwind visibility classes working before the main stylesheet loads */
-			.hidden {
-				display: none;
-			}
-			.block {
-				display: block;
+			/* Keep Tailwind visibility classes working before the main stylesheet
+			   loads. These live in a cascade layer on purpose: unlayered rules
+			   outrank every layered one regardless of specificity or order, and
+			   Tailwind ships its utilities in @layer utilities. Unlayered, the
+			   .hidden below would beat `sm:block`, `lg:flex` and every other
+			   responsive display variant site-wide. Because this layer is
+			   declared before Tailwind's, its rules lose to them once the main
+			   stylesheet arrives, while still applying before it does. */
+			@layer critical-fallback {
+				.hidden {
+					display: none;
+				}
+				.block {
+					display: block;
+				}
 			}
 			/* Lenis critical styles - inlined to prevent FOUC */
 			html.lenis,

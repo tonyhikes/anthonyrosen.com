@@ -23,7 +23,7 @@ const CHART_FRAME = "relative h-20 w-full pt-2 sm:h-16";
 // Six evenly spaced columns: centers sit at (i + 0.5) / 6 of the plot area.
 const COLUMN_CENTERS = [8.333, 25, 41.667, 58.333, 75, 91.667];
 
-const AreaChart = ({ color = "text-blue-600" }) => {
+const AreaChart = ({ color = "text-blue-600 dark:text-blue-400" }) => {
 	const gradientId = useId();
 
 	return (
@@ -70,7 +70,7 @@ const AreaChart = ({ color = "text-blue-600" }) => {
 	);
 };
 
-const BarChart = ({ color = "bg-blue-600" }) => (
+const BarChart = ({ color = "bg-blue-600 dark:bg-blue-400" }) => (
 	<div className={`${CHART_FRAME} flex items-end gap-1.5 px-2`}>
 		{[48, 84, 60, 100, 72, 100].map((height, i) => (
 			<div key={i} className="flex h-full flex-1 items-end">
@@ -83,7 +83,10 @@ const BarChart = ({ color = "bg-blue-600" }) => (
 	</div>
 );
 
-const LineChart = ({ color = "text-blue-600", inverse = false }) => (
+const LineChart = ({
+	color = "text-blue-600 dark:text-blue-400",
+	inverse = false,
+}) => (
 	<div className={CHART_FRAME}>
 		<svg
 			viewBox="0 0 100 40"
@@ -126,7 +129,7 @@ const MixedChart = () => {
 				{bars.map((h, i) => (
 					<div key={i} className="flex h-full flex-1 items-end">
 						<div
-							className="mx-auto w-full max-w-[10px] rounded-t-sm bg-slate-200"
+							className="mx-auto w-full max-w-[10px] rounded-t-sm bg-slate-200 dark:bg-slate-600"
 							style={{ height: `${h}%` }}
 						/>
 					</div>
@@ -137,7 +140,7 @@ const MixedChart = () => {
 				<div className="relative h-full w-full">
 					<svg
 						viewBox="0 0 100 40"
-						className="h-full w-full"
+						className="h-full w-full text-blue-600 dark:text-blue-400"
 						preserveAspectRatio="none"
 						aria-hidden="true"
 						focusable="false"
@@ -145,7 +148,7 @@ const MixedChart = () => {
 						<path
 							d={linePath}
 							fill="none"
-							stroke="#2563eb" // Blue-600
+							stroke="currentColor"
 							strokeWidth="2"
 							strokeLinecap="round"
 							strokeLinejoin="round"
@@ -155,7 +158,7 @@ const MixedChart = () => {
 					{points.map((p, i) => (
 						<span
 							key={i}
-							className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white bg-blue-600"
+							className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white bg-blue-600 dark:border-slate-800 dark:bg-blue-400"
 							style={{ left: `${p.x}%`, top: `${(p.y / 40) * 100}%` }}
 						/>
 					))}
@@ -165,7 +168,10 @@ const MixedChart = () => {
 	);
 };
 
-const RadialChart = ({ percentage, color = "text-blue-600" }) => (
+const RadialChart = ({
+	percentage,
+	color = "text-blue-600 dark:text-blue-400",
+}) => (
 	<div className="relative flex h-16 w-16 shrink-0 items-center justify-center">
 		<svg
 			className="h-full w-full -rotate-90 transform"
@@ -174,7 +180,7 @@ const RadialChart = ({ percentage, color = "text-blue-600" }) => (
 			focusable="false"
 		>
 			<path
-				className="text-slate-100"
+				className="text-slate-100 dark:text-slate-600"
 				d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
 				fill="none"
 				stroke="currentColor"
@@ -204,7 +210,7 @@ const MetricCard = ({
 	icon: Icon,
 	accentColor,
 }) => (
-	<div className="group flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-blue-200 hover:shadow-lg sm:p-6">
+	<div className="group flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-blue-200 hover:shadow-lg sm:p-6 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-500">
 		<div className="mb-4 flex items-start justify-between gap-3">
 			<div className={`shrink-0 rounded-lg p-2 ${accentColor}`}>
 				<Icon size={20} className="text-white" strokeWidth={2.5} />
@@ -213,8 +219,8 @@ const MetricCard = ({
 				<div
 					className={`flex items-center rounded-full px-2 py-1 text-xs font-medium ${
 						trend === "up"
-							? "bg-slate-100 text-slate-700"
-							: "bg-slate-100 text-slate-700"
+							? "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200"
+							: "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200"
 					}`}
 				>
 					{trend === "up" ? (
@@ -228,18 +234,18 @@ const MetricCard = ({
 		</div>
 
 		<div className="mb-6">
-			<h3 className="text-3xl font-bold tracking-tight text-slate-900">
+			<h3 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
 				{value}
 			</h3>
-			<p className="mt-1 text-sm font-medium tracking-wide text-slate-500 uppercase">
+			<p className="mt-1 text-sm font-medium tracking-wide text-slate-500 uppercase dark:text-slate-300">
 				{title}
 			</p>
-			<p className="mt-2 text-sm leading-relaxed text-slate-400 sm:line-clamp-2">
+			<p className="mt-2 text-sm leading-relaxed text-slate-400 sm:line-clamp-2 dark:text-slate-400">
 				{subtext}
 			</p>
 		</div>
 
-		<div className="mt-auto border-t border-slate-50 pt-4">
+		<div className="mt-auto border-t border-slate-50 pt-4 dark:border-slate-700">
 			{ChartComponent}
 		</div>
 	</div>
@@ -281,7 +287,7 @@ const ImpactMetrics = () => {
 				trendLabel: "3 New Regions",
 				icon: TrendingUp,
 				accentColor: "bg-blue-600",
-				ChartComponent: <AreaChart color="text-blue-600" />,
+				ChartComponent: <AreaChart />,
 			},
 			{
 				title: "B2B Lead Gen",
@@ -292,7 +298,7 @@ const ImpactMetrics = () => {
 				trendLabel: "Strong Pipeline",
 				icon: Activity,
 				accentColor: "bg-blue-600",
-				ChartComponent: <BarChart color="bg-blue-600" />,
+				ChartComponent: <BarChart />,
 			},
 		],
 		ops: [
@@ -305,7 +311,7 @@ const ImpactMetrics = () => {
 				trendLabel: "5 Days → 2 Days",
 				icon: Zap,
 				accentColor: "bg-blue-600",
-				ChartComponent: <LineChart color="text-blue-600" inverse={true} />,
+				ChartComponent: <LineChart inverse={true} />,
 			},
 			{
 				title: "CSAT Score",
@@ -331,7 +337,7 @@ const ImpactMetrics = () => {
 				trendLabel: "Annual",
 				icon: Layers,
 				accentColor: "bg-blue-600",
-				ChartComponent: <BarChart color="bg-blue-600" />,
+				ChartComponent: <BarChart />,
 			},
 		],
 		scale: [
@@ -344,7 +350,7 @@ const ImpactMetrics = () => {
 				trendLabel: "Consistent",
 				icon: Users,
 				accentColor: "bg-blue-600",
-				ChartComponent: <AreaChart color="text-blue-600" />,
+				ChartComponent: <AreaChart />,
 			},
 			{
 				title: "Global Reach",
@@ -355,7 +361,7 @@ const ImpactMetrics = () => {
 				trendLabel: "Global",
 				icon: Globe,
 				accentColor: "bg-blue-600",
-				ChartComponent: <BarChart color="bg-blue-600" />,
+				ChartComponent: <BarChart />,
 			},
 			{
 				title: "Launch Success",
@@ -368,7 +374,7 @@ const ImpactMetrics = () => {
 				accentColor: "bg-blue-600",
 				ChartComponent: (
 					<div className="flex h-20 items-center justify-center sm:h-16">
-						<RadialChart percentage={100} color="text-blue-600" />
+						<RadialChart percentage={100} />
 					</div>
 				),
 			},
