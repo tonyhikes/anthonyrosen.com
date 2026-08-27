@@ -462,6 +462,17 @@ const contactEndpoint = "/api/contact";
 		function openDialog(trigger: HTMLElement) {
 			lastTrigger = trigger;
 			if (!dialog.open) dialog.showModal();
+			window.dispatchEvent(
+				new CustomEvent("contact-dialog-opened", {
+					detail: {
+						link_location: trigger.closest("[data-many-hats-hero]")
+							? "hero"
+							: trigger.closest("nav")
+								? "navigation"
+								: "page",
+					},
+				})
+			);
 			const tabsRoot = document.getElementById("contact-dialog-connect-tabs");
 			if (tabsRoot) activateContactTab(tabsRoot, "schedule");
 		}

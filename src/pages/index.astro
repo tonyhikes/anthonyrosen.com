@@ -26,9 +26,20 @@ import Colophon from "../components/Colophon.astro";
 
 <script>
 	// View Switching Logic
+	const ANALYTICS_CONSENT_KEY = "cookie-consent";
+
+	function hasAnalyticsConsent() {
+		try {
+			return localStorage.getItem(ANALYTICS_CONSENT_KEY) === "accepted";
+		} catch {
+			return false;
+		}
+	}
 
 	// Track virtual pageviews in Google Analytics
 	function trackPageView(viewId: string) {
+		if (!hasAnalyticsConsent()) return;
+
 		// Map view IDs to readable page titles and paths
 		const viewMeta: Record<string, { title: string; path: string }> = {
 			home: { title: "Home", path: "/" },
@@ -172,6 +183,14 @@ import Colophon from "../components/Colophon.astro";
 		// Open the shared URL on first load, then keep Back/Forward in sync.
 		navigateFromLocation();
 		window.addEventListener("popstate", navigateFromLocation);
+
+		// If consent is granted during this visit, record the view the visitor is
+		// currently seeing. Earlier activity remains discarded.
+		window.addEventListener("cookie-consent-updated", (event) => {
+			if ((event as CustomEvent<string>).detail === "accepted") {
+				trackPageView(getViewFromLocation());
+			}
+		});
 	}
 
 	// Initialize when DOM is ready

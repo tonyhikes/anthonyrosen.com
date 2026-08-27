@@ -1,11 +1,23 @@
 <!-- Job-search-focused GA4 and PostHog events. -->
 <script>
 	type AnalyticsParameters = Record<string, string | number | boolean>;
+	const ANALYTICS_CONSENT_KEY = "cookie-consent";
+
+	function hasAnalyticsConsent() {
+		try {
+			return localStorage.getItem(ANALYTICS_CONSENT_KEY) === "accepted";
+		} catch {
+			return false;
+		}
+	}
 
 	function sendJobSearchEvent(
 		eventName: string,
 		parameters: AnalyticsParameters
 	) {
+		// Do not queue interaction history before the visitor accepts analytics.
+		if (!hasAnalyticsConsent()) return;
+
 		// gtag is defined early and queues events until Google Analytics loads.
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		if (typeof (window as any).gtag === "function") {
@@ -113,6 +125,13 @@
 			const detail = (event as CustomEvent<{ link_location?: string }>).detail;
 			sendJobSearchEvent("contact_form_submit", {
 				contact_method: "form",
+				link_location: detail?.link_location || "page",
+			});
+		});
+
+		window.addEventListener("contact-dialog-opened", (event) => {
+			const detail = (event as CustomEvent<{ link_location?: string }>).detail;
+			sendJobSearchEvent("contact_dialog_open", {
 				link_location: detail?.link_location || "page",
 			});
 		});

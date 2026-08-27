@@ -1,56 +1,99 @@
-# Analytics Setup Guide
+# Google Analytics and Job-Search Events
 
-This document outlines the analytics stack implemented on `anthonyrosen.com` to track user behavior, pageviews, and B2B visitor identity.
+Last verified: August 27, 2026
 
-## 🛠 Analytics Stack
+This is the plain-English record of what `anthonyrosen.com` measures, where the events come from, and how to check them in Google Analytics 4 (GA4).
 
-### 1. PostHog (Primary User Intelligence)
+## Current setup
 
-PostHog is used for detailed behavioral analytics, session recordings, and custom event tracking.
+- **Google Analytics property:** `G-7LRLJTJG4L`
+- **Primary purpose:** understand which portfolio content people view and which actions suggest job or project interest.
+- **Consent:** Google Analytics, PostHog, LinkedIn Insight Tag, and RB2B load only after a visitor accepts analytics cookies.
+- **Performance:** the analytics scripts wait until the page is idle or the visitor interacts, so they stay out of the initial page load.
+- **Single-page navigation:** Home, Resume, Portfolio, Style Guide, and Colophon send their own virtual pageviews even though the browser does not do a full page reload.
+- **Shared event names:** the job-search events below are sent to both GA4 and PostHog after consent.
 
-- **Pageviews**: Tracked as virtual pageviews in the SPA-like navigation.
-- **Session Recordings**: Enabled to watch user interactions (masked for privacy).
-- **Heatmaps**: Available via the PostHog toolbar.
-- **Custom Events**:
-  - `contact_me_clicked`: Clicks on the email link in the footer.
-  - `linkedin_profile_clicked`: Clicks on the LinkedIn footer link.
-  - `resume_downloaded`: Tracks PDF/DOCX downloads.
+## Live GA4 account check
 
-### 2. Google Analytics 4 (GA4)
+Checked in the `anthonyrosen.com` GA4 property on August 27, 2026:
 
-Used for high-level traffic source analysis and basic pageview tracking.
+- The **Anthony Rosen CV** web stream is active and receiving traffic.
+- The stream URL is `https://www.anthonyrosen.com` and its measurement ID matches the website: `G-7LRLJTJG4L`.
+- GA4 has recently received its standard events, including `page_view`, `first_visit`, `session_start`, `scroll`, and `user_engagement`.
+- The new job-search events have not appeared in the GA4 Recent Events list yet. They need one consented live test after this update is deployed.
+- GA4’s browser-history pageview option is currently on. Because this site sends its own descriptive virtual pageviews, that option should be turned off to prevent possible duplicate navigation counts.
+- No custom dimensions are registered yet. Add event-scoped dimensions for `link_location`, `contact_method`, and `file_format` so those useful details can be used in GA4 reports.
+- The currently marked key events are generic lead/purchase placeholders with no stream data. The job-search key events listed below should replace the useful part of that setup once GA4 has received them.
 
-- Integrated via **Partytown** to ensure zero impact on page load speed.
+## Events sent by the site
 
-### 3. B2B Identification
+| Event | What it means | Useful details included |
+| --- | --- | --- |
+| `page_view` | A visitor opened Home, Resume, Portfolio, Style Guide, or Colophon. | `page_path`, `page_title`, `page_location` |
+| `contact_dialog_open` | A visitor opened the “Let’s talk” popup. | `link_location` such as `hero` |
+| `schedule_click` | A visitor intentionally selected the Schedule a Call tab. The scheduler appearing by default is not counted as a click. | `contact_method: calendar`, `link_location`, `event_duration_minutes: 15` |
+| `contact_form_submit` | The contact form reported a successful send. Failed or incomplete submissions are not counted. | `contact_method: form`, `link_location` |
+| `contact_copy` | A visitor copied the email address or phone number. | `contact_method: email` or `phone`, `link_location` |
+| `contact_click` | A visitor pressed the mail icon or phone icon, opening their email or call app. | `contact_method: email` or `phone`, `link_location` |
+| `linkedin_click` | A visitor opened Anthony’s LinkedIn profile. | `link_location`, `link_text` |
+| `resume_download` | A visitor downloaded the PDF or DOCX résumé from the Resume view. | `file_format`, `link_location: resume` |
+| `portfolio_open` | A visitor opened the Portfolio view. | `link_location`, `link_text` |
 
-- **LinkedIn Insight Tag**: Captures professional demographics (Company, Job Title) of visitors.
-- **RB2B**: Identifies specific LinkedIn profiles of visitors (primarily US-based).
+`link_location` separates actions taken in the `hero`, `contact_dialog`, `footer`, `navigation`, `resume`, `portfolio`, or general `page` area.
 
-## 🚀 How to Maintenance
+## Recommended GA4 key events
 
-### Changing Tracking IDs
+In **Google Analytics → Admin → Events**, mark these as key events:
 
-If you need to change your tracking IDs, edit the following files:
+1. `contact_form_submit` — strongest signal that someone reached out.
+2. `schedule_click` — strong scheduling intent, but not proof that a meeting was booked.
+3. `resume_download` — useful job-search intent.
 
-- **GA4 ID**: `src/layouts/Layout.astro` (Search for `G-7LRLJTJG4L`)
-- **PostHog ID**: `src/components/PostHog.astro`
-- **LinkedIn Partner ID**: `src/components/LinkedInTag.astro`
-- **RB2B Script ID**: `src/components/RB2B.astro`
+Keep `contact_dialog_open`, `contact_copy`, `contact_click`, `linkedin_click`, and `portfolio_open` as supporting events. They are valuable for understanding the path to a contact, but treating every small interaction as a conversion makes the report noisy.
 
-### 💡 How to get your LinkedIn Partner ID
+## How to verify the events
 
-Since you are using a personal account, you'll need to access LinkedIn's **Campaign Manager** (it's free to create an account for this purpose):
+1. Open the live site in a private window so the visit is easy to recognize.
+2. Accept analytics cookies.
+3. In GA4, open **Reports → Realtime**.
+4. On the site, perform one action at a time: open the contact popup, select the Schedule tab, copy the email, copy the phone number, or open the Resume view and download a file.
+5. Allow up to a minute for Realtime to show the event. Normal Events reports can take much longer to populate.
+6. Open an event in Realtime and confirm its details include the expected `link_location` and, where applicable, `contact_method`.
 
-1.  **Open Campaign Manager**: Go to [LinkedIn Campaign Manager](https://www.linkedin.com/campaignmanager/accounts).
-2.  **Create an Ad Account**: If you don't have one, follow the prompts to create a basic account. You don't need to run any ads to use the Insight Tag.
-3.  **Navigate to Insight Tag**: In the top menu, go to **Analyze** > **Insight Tag**.
-4.  **Create Tag**: Click **Create Insight Tag** (if not already created).
-5.  **Get the ID**:
-    - Click **I will use a tag manager**.
-    - You will see your **Partner ID**. It is a 7-digit number (e.g., `1234567`).
-6.  **Update your code**: Copy that ID and paste it into `src/components/LinkedInTag.astro` where it says `REPLACE_WITH_YOUR_ID`.
+Do not submit a fake contact form merely to test reporting; it sends a real email. The form event is intentionally recorded only after the message service confirms success.
 
-### Performance
+## Consent behavior
 
-All tracking scripts (GA4, PostHog, LinkedIn, RB2B) are loaded via **Partytown** or deferred methods to maintain a 100/100 PageSpeed score.
+- Before acceptance, pageviews and contact interactions are discarded rather than saved for later.
+- After acceptance, the current page is recorded once and future eligible actions are tracked.
+- If a visitor declines, the analytics services do not load.
+
+## Files that control the setup
+
+- GA4 initialization and consent: `src/layouts/Layout.astro`
+- Virtual pageviews: `src/pages/index.astro`
+- Job-search events: `src/components/JobSearchAnalytics.astro`
+- Popup/footer copy, form, and scheduler triggers: `src/components/ContactDialog.astro`
+- Cookie choice: `src/components/CookieBanner.astro`
+- PostHog: `src/components/PostHog.astro`
+- LinkedIn Insight Tag: `src/components/LinkedInTag.astro`
+- RB2B: `src/components/RB2B.astro`
+
+## Verification checklist
+
+- [x] GA4 measurement ID is present.
+- [x] GA4’s automatic initial pageview is disabled in the website code.
+- [x] Virtual pageviews are sent for the site’s view-switching navigation.
+- [x] Popup, footer, scheduler, form, email, phone, LinkedIn, résumé, and portfolio paths have event coverage.
+- [x] A form event fires only after a successful response from the contact endpoint.
+- [x] Analytics activity is blocked before consent.
+- [x] The GA4 stream URL and measurement ID match the live site.
+- [x] GA4 reports that the stream is receiving traffic.
+- [ ] Turn off enhanced measurement for page changes based on browser history events.
+- [ ] Register `link_location`, `contact_method`, and `file_format` as event-scoped custom dimensions.
+- [ ] Confirm the events appear in the live GA4 Realtime report after the updated code is deployed.
+- [ ] Mark the recommended job-search events as key events after GA4 receives them.
+
+## Maintenance note
+
+If the GA4 property changes, update `G-7LRLJTJG4L` in `src/layouts/Layout.astro`. Event names should remain stable so reports continue to compare cleanly over time.
