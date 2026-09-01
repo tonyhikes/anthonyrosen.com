@@ -277,7 +277,16 @@ const contactEndpoint = "/api/contact";
 	};
 	type CalWindow = Window & { Cal?: CalGlobal };
 
+	const CAL_LINK = "anthonyrosen/15min";
+	const CAL_ORIGIN = "https://app.cal.com";
+	const CAL_NAMESPACES = ["contact-dialog-15min", "footer-15min"];
+	// The scheduler sits inside a white card in both the dialog and the footer.
+	// Without an explicit theme Cal.com follows the OS color scheme rather than
+	// the site's class-based theme, so it sometimes rendered dark on a light card.
+	const CAL_THEME = "light";
+
 	let calEmbedPromise: Promise<void> | null = null;
+	let calAssetsPreloaded = false;
 
 	function installCalQueue() {
 		const calWindow = window as CalWindow;
@@ -318,21 +327,21 @@ const contactEndpoint = "/api/contact";
 		calEmbedPromise = new Promise((resolve, reject) => {
 			const Cal = installCalQueue();
 			Cal.loaded = true;
-			Cal("init", "contact-dialog-15min", {
-				origin: "https://app.cal.com",
+			CAL_NAMESPACES.forEach((namespace) => {
+				Cal("init", namespace, { origin: CAL_ORIGIN });
 			});
-			Cal("init", "footer-15min", { origin: "https://app.cal.com" });
 			Cal.config = Cal.config || {};
 			Cal.config.forwardQueryParams = true;
-			["contact-dialog-15min", "footer-15min"].forEach((namespace) => {
+			CAL_NAMESPACES.forEach((namespace) => {
 				Cal.ns[namespace]("ui", {
+					theme: CAL_THEME,
 					hideEventTypeDetails: true,
 					layout: "month_view",
 				});
 			});
 
 			const script = document.createElement("script");
-			script.src = "https://app.cal.com/embed/embed.js";
+			script.src = `${CAL_ORIGIN}/embed/embed.js`;
 			script.async = true;
 			script.addEventListener("load", () => resolve(), { once: true });
 			script.addEventListener(
@@ -348,35 +357,60 @@ const contactEndpoint = "/api/contact";
 		return calEmbedPromise;
 	}
 
-	function revealCalWhenReady(container: HTMLElement) {
+	// Cal.com's preload instruction opens the booking page in a hidden iframe so
+	// its scripts, styles and fonts land in the browser cache before the real
+	// scheduler is mounted. Only worth doing while no scheduler exists yet.
+	function preloadCalAssets() {
+		if (calAssetsPreloaded) return;
+		if (document.querySelector("[data-cal-inline][data-cal-rendered='true']")) {
+			return;
+		}
+		calAssetsPreloaded = true;
+		const Cal = installCalQueue();
+		Cal.ns[CAL_NAMESPACES[0]]("preload", { calLink: CAL_LINK });
+	}
+
+	function showCalFallback(container: HTMLElement) {
+		const loading = container.querySelector<HTMLElement>("[data-cal-loading]");
+		const fallback = container.querySelector<HTMLElement>(
+			"[data-cal-fallback]"
+		);
+		if (loading) loading.remove();
+		container.classList.add("is-ready");
+		if (fallback) fallback.removeAttribute("hidden");
+	}
+
+	function revealCalWhenReady(container: HTMLElement, namespace: string) {
 		const loading = container.querySelector<HTMLElement>("[data-cal-loading]");
 		if (!loading) return;
 
+		const Cal = installCalQueue();
 		let revealTimer = 0;
-		const observer = new MutationObserver(connectToFrame);
 
 		function reveal() {
-			observer.disconnect();
 			window.clearTimeout(revealTimer);
 			container.classList.add("is-ready");
 			window.setTimeout(() => loading.remove(), 180);
 		}
 
-		function connectToFrame() {
-			const frame = container.querySelector<HTMLIFrameElement>("iframe");
-			if (!frame || frame.dataset.readyListener === "true") return;
-			frame.dataset.readyListener = "true";
-			frame.addEventListener("load", reveal, { once: true });
-		}
-
-		observer.observe(container, { childList: true, subtree: true });
-		connectToFrame();
+		// linkReady fires once the booking page has actually rendered its slots,
+		// which is well after the iframe's own load event. Waiting for it keeps
+		// the skeleton up instead of flashing an empty white frame.
+		Cal.ns[namespace]("on", { action: "linkReady", callback: reveal });
+		Cal.ns[namespace]("on", {
+			action: "linkFailed",
+			callback: () => {
+				window.clearTimeout(revealTimer);
+				showCalFallback(container);
+			},
+		});
 		// Never leave the loading cover stuck if the embed changes its internals.
-		revealTimer = window.setTimeout(reveal, 6000);
+		revealTimer = window.setTimeout(reveal, 8000);
 	}
 
 	function warmCalEmbed() {
 		void loadCalEmbed().catch(() => undefined);
+		preloadCalAssets();
 	}
 
 	function initCalWarmup() {
@@ -405,31 +439,26 @@ const contactEndpoint = "/api/contact";
 	async function renderCalInline(container: HTMLElement) {
 		if (container.dataset.calRendered === "true") return;
 		container.dataset.calRendered = "true";
+		const namespace = container.closest("footer")
+			? "footer-15min"
+			: "contact-dialog-15min";
 
 		try {
 			await loadCalEmbed();
-			revealCalWhenReady(container);
+			revealCalWhenReady(container, namespace);
 			const Cal = installCalQueue();
-			const namespace = container.closest("footer")
-				? "footer-15min"
-				: "contact-dialog-15min";
 			Cal.ns[namespace]("inline", {
 				elementOrSelector: container,
-				calLink: "anthonyrosen/15min",
+				calLink: CAL_LINK,
 				config: {
+					theme: CAL_THEME,
 					layout: "month_view",
 					useSlotsViewOnSmallScreen: true,
 				},
 			});
 		} catch {
 			container.dataset.calRendered = "false";
-			const loading =
-				container.querySelector<HTMLElement>("[data-cal-loading]");
-			const fallback = container.querySelector<HTMLElement>(
-				"[data-cal-fallback]"
-			);
-			if (loading) loading.textContent = "The scheduler could not load here.";
-			fallback?.removeAttribute("hidden");
+			showCalFallback(container);
 		}
 	}
 
@@ -516,15 +545,29 @@ const contactEndpoint = "/api/contact";
 			});
 
 			if (tabsRoot.closest("footer")) {
-				const observer = new IntersectionObserver(
+				// Two stages: warm the embed script and booking-page assets while
+				// the footer is still well below the viewport, then mount the real
+				// scheduler once it is close enough to be seen soon.
+				const warmObserver = new IntersectionObserver(
+					(entries) => {
+						if (!entries.some((entry) => entry.isIntersecting)) return;
+						warmCalEmbed();
+						warmObserver.disconnect();
+					},
+					{ rootMargin: "1800px 0px" }
+				);
+				const renderObserver = new IntersectionObserver(
 					(entries) => {
 						if (!entries.some((entry) => entry.isIntersecting)) return;
 						activateContactTab(tabsRoot, "schedule");
-						observer.disconnect();
+						renderObserver.disconnect();
 					},
 					{ rootMargin: "700px 0px" }
 				);
-				const startObserving = () => observer.observe(tabsRoot);
+				const startObserving = () => {
+					warmObserver.observe(tabsRoot);
+					renderObserver.observe(tabsRoot);
+				};
 
 				// PageSpeed does not need the calendar. Start watching only after a
 				// person scrolls toward the footer or arrives there directly.
@@ -1058,6 +1101,8 @@ const contactEndpoint = "/api/contact";
 		border: 1px solid #d7dee7;
 		border-radius: 0.9rem;
 		background: white;
+		/* Cal.com reads the container's color scheme; keep it light like the card. */
+		color-scheme: light;
 		overflow: hidden;
 	}
 
