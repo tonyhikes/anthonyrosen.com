@@ -326,9 +326,24 @@
 	const dropdownBtn = document.getElementById("download-menu-btn");
 	const dropdownMenu = document.getElementById("download-menu");
 
+	function closeMenu() {
+		dropdownMenu?.classList.add("hidden");
+		dropdownBtn?.setAttribute("aria-expanded", "false");
+	}
+
+	function toggleMenu() {
+		const isHidden = dropdownMenu?.classList.contains("hidden");
+		if (isHidden) {
+			dropdownMenu?.classList.remove("hidden");
+			dropdownBtn?.setAttribute("aria-expanded", "true");
+		} else {
+			closeMenu();
+		}
+	}
+
 	dropdownBtn?.addEventListener("click", (e) => {
 		e.stopPropagation();
-		dropdownMenu?.classList.toggle("hidden");
+		toggleMenu();
 	});
 
 	// Close dropdown when clicking outside
@@ -336,10 +351,19 @@
 		if (
 			dropdownBtn &&
 			dropdownMenu &&
+			!dropdownMenu.classList.contains("hidden") &&
 			!dropdownBtn.contains(e.target as Node) &&
 			!dropdownMenu.contains(e.target as Node)
 		) {
-			dropdownMenu.classList.add("hidden");
+			closeMenu();
+		}
+	});
+
+	// Close on Escape key
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape" && !dropdownMenu?.classList.contains("hidden")) {
+			closeMenu();
+			dropdownBtn?.focus(); // Return focus to button
 		}
 	});
 </script>
