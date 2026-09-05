@@ -105,6 +105,7 @@
 					type="button"
 					aria-label="Open menu"
 					aria-expanded="false"
+					aria-controls="mobile-menu"
 					class="rounded-md p-2 text-slate-600 hover:bg-gray-100 focus:outline-none dark:text-slate-300 dark:hover:bg-slate-800"
 				>
 					<svg
@@ -228,9 +229,20 @@
 	const btn = document.getElementById("mobile-menu-btn");
 	const menu = document.getElementById("mobile-menu");
 
+	function setMenuState(isOpen: boolean) {
+		if (isOpen) {
+			menu?.classList.remove("hidden");
+			btn?.setAttribute("aria-expanded", "true");
+		} else {
+			menu?.classList.add("hidden");
+			btn?.setAttribute("aria-expanded", "false");
+		}
+	}
+
 	btn?.addEventListener("click", (e) => {
-		e.stopPropagation(); // Prevent immediate closing if we add document click listener
-		menu?.classList.toggle("hidden");
+		e.stopPropagation();
+		const isHidden = menu?.classList.contains("hidden");
+		setMenuState(!!isHidden);
 	});
 
 	// Close mobile menu when clicking outside
@@ -241,7 +253,15 @@
 			!btn?.contains(e.target as Node) &&
 			!menu.contains(e.target as Node)
 		) {
-			menu.classList.add("hidden");
+			setMenuState(false);
+		}
+	});
+
+	// Close on Escape key
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape" && menu && !menu.classList.contains("hidden")) {
+			setMenuState(false);
+			btn?.focus(); // Return focus to button
 		}
 	});
 
@@ -271,7 +291,7 @@
 
 				// Close mobile menu
 				if (!menu?.classList.contains("hidden")) {
-					menu?.classList.add("hidden");
+					setMenuState(false);
 				}
 			}
 		});
