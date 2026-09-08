@@ -4,6 +4,13 @@ const responseHeaders = {
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const minimumFormFillTimeMs = 2_000;
+
+const knownSpamMessageFragments = [
+	"i would like more information",
+	"please contact me by email",
+	"anthony rosen",
+];
 
 function json(body: Record<string, unknown>, status = 200) {
 	return new Response(JSON.stringify(body), {
@@ -39,6 +46,41 @@ function escapeHtml(value: string) {
 	});
 }
 
+function isSameOriginRequest(request: Request, requestUrl: URL) {
+	const origin = request.headers.get("origin");
+	if (!origin) return false;
+
+	try {
+		const originUrl = new URL(origin);
+		return (
+			originUrl.protocol === requestUrl.protocol &&
+			originUrl.host === requestUrl.host
+		);
+	} catch {
+		return false;
+	}
+}
+
+function looksLikeKnownSpam(message: string) {
+	const normalizedMessage = message
+		.toLowerCase()
+		.replace(/[—–-]/g, " ")
+		.replace(/\s+/g, " ");
+
+	return knownSpamMessageFragments.every((fragment) =>
+		normalizedMessage.includes(fragment)
+	);
+}
+
+async function createIdempotencyKey(...values: string[]) {
+	const input = new TextEncoder().encode(values.join("\n"));
+	const digest = await crypto.subtle.digest("SHA-256", input);
+	const hash = Array.from(new Uint8Array(digest), (byte) =>
+		byte.toString(16).padStart(2, "0")
+	).join("");
+	return `contact/v1/${hash}`;
+}
+
 export default {
 	async fetch(request: Request) {
 		if (request.method !== "POST") {
@@ -49,8 +91,7 @@ export default {
 		}
 
 		const requestUrl = new URL(request.url);
-		const origin = request.headers.get("origin");
-		if (origin && new URL(origin).host !== requestUrl.host) {
+		if (!isSameOriginRequest(request, requestUrl)) {
 			return json({ ok: false, error: "Request origin not allowed." }, 403);
 		}
 
@@ -67,7 +108,21 @@ export default {
 		}
 
 		// Bots commonly fill fields that are intentionally hidden from people.
-		if (cleanSingleLine(formData.get("_gotcha"), 200)) {
+		if (
+			cleanSingleLine(formData.get("_gotcha"), 200) ||
+			cleanSingleLine(formData.get("company"), 200)
+		) {
+			return json({ ok: true });
+		}
+
+		const formStartedAt = Number(
+			cleanSingleLine(formData.get("form_started_at"), 30)
+		);
+		if (
+			!Number.isFinite(formStartedAt) ||
+			formStartedAt <= 0 ||
+			Date.now() - formStartedAt < minimumFormFillTimeMs
+		) {
 			return json({ ok: true });
 		}
 
@@ -80,6 +135,10 @@ export default {
 				{ ok: false, error: "Please check your name, email, and message." },
 				400
 			);
+		}
+
+		if (looksLikeKnownSpam(message)) {
+			return json({ ok: true });
 		}
 
 		const apiKey = process.env.RESEND_API_KEY?.trim();
@@ -95,13 +154,20 @@ export default {
 		const safeName = escapeHtml(name);
 		const safeEmail = escapeHtml(email);
 		const safeMessage = escapeHtml(message).replace(/\n/g, "<br />");
+		const idempotencyKey = await createIdempotencyKey(
+			name,
+			email,
+			message,
+			from,
+			to
+		);
 
 		const resendResponse = await fetch("https://api.resend.com/emails", {
 			method: "POST",
 			headers: {
 				Authorization: `Bearer ${apiKey}`,
 				"Content-Type": "application/json",
-				"Idempotency-Key": crypto.randomUUID(),
+				"Idempotency-Key": idempotencyKey,
 				"User-Agent": "anthonyrosen.com-contact-form/1.0",
 			},
 			body: JSON.stringify({

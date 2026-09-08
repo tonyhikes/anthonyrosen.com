@@ -8,6 +8,7 @@
 		"preview": "astro preview",
 		"astro": "astro",
 		"lint": "ESLINT_USE_FLAT_CONFIG=false eslint .",
+		"test:contact": "node --test api/contact.test.ts",
 		"format": "prettier --write ."
 	},
 	"dependencies": {

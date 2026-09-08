@@ -232,7 +232,14 @@ const contactEndpoint = "/api/contact";
 								tabindex="-1"
 								autocomplete="off"
 							/>
+							<input
+								name="company"
+								type="text"
+								tabindex="-1"
+								autocomplete="off"
+							/>
 						</div>
+						<input name="form_started_at" type="hidden" data-form-started-at />
 
 						<button type="submit" class="contact-form-submit">
 							<Send size={17} strokeWidth={1.8} aria-hidden="true" />
@@ -727,6 +734,13 @@ const contactEndpoint = "/api/contact";
 			const sendAnotherButton = form.querySelector<HTMLButtonElement>(
 				"[data-send-another-message]"
 			);
+			const formStartedAt = form.querySelector<HTMLInputElement>(
+				"[data-form-started-at]"
+			);
+			const resetFormStartedAt = () => {
+				if (formStartedAt) formStartedAt.value = Date.now().toString();
+			};
+			resetFormStartedAt();
 
 			sendAnotherButton?.addEventListener("click", () => {
 				if (!formContent || !successPanel) return;
@@ -744,6 +758,7 @@ const contactEndpoint = "/api/contact";
 				if (submitButton) submitButton.disabled = false;
 				if (submitLabel) submitLabel.textContent = "Send message";
 				if (formStatus) formStatus.textContent = "";
+				resetFormStartedAt();
 				const nameField =
 					form.querySelector<HTMLInputElement>("input[name='name']");
 				if (nameField) nameField.focus();
