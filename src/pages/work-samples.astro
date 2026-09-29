@@ -3,35 +3,25 @@ import Layout from "../layouts/Layout.astro";
 
 const samples = [
 	{
-		category: "Newsletter",
-		title: "Alz Amateurs newsletter",
-		platform: "Substack",
+		title: "Newsletter: Alz Amateurs",
 		href: "https://newsletter.alzamateurs.com/p/the-brains-cleanup-crew-is-becoming",
 	},
 	{
-		category: "Social",
-		title: "Social post",
-		platform: "Instagram",
-		href: "https://www.instagram.com/p/C_vNEXpzWVm/",
-	},
-	{
-		category: "Video",
-		title: "Video post",
-		platform: "Instagram Reel",
-		href: "https://www.instagram.com/reel/DFstRNmvY7p/",
-	},
-	{
-		category: "Blog",
 		title:
-			"Why your smartphone can’t replace a dedicated satellite communicator for the outdoors",
-		platform: "ACR Bivy Stick",
+			"Blog post: Why your smartphone can’t replace a dedicated satellite communicator for the outdoors",
 		href: "https://bivystick.com/why-your-smartphone-cant-replace-a-dedicated-satellite-communicator-for-the-outdoors/",
 	},
 	{
-		category: "Influencer",
+		title: "Social post",
+		href: "https://www.instagram.com/p/C_vNEXpzWVm/",
+	},
+	{
 		title: "Influencer post with @heykiera_",
-		platform: "Instagram Reel",
 		href: "https://www.instagram.com/heykiera_/reel/DAtzoQos6bq/",
+	},
+	{
+		title: "Video post",
+		href: "https://www.instagram.com/reel/DFstRNmvY7p/",
 	},
 ];
 ---
@@ -43,41 +33,26 @@ const samples = [
 	<main class="work-samples" id="main-content">
 		<div class="samples-inner">
 			<header class="samples-header">
-				<p class="samples-eyebrow">Selected work</p>
-				<h1>Work samples.</h1>
-				<p class="samples-intro">
-					A few examples across newsletters, social, video, and more.
-				</p>
+				<h1>Writing, social &amp; video samples</h1>
 			</header>
 			<ul class="samples-list" aria-label="Work samples">
 				{
-					samples.map((sample, index) => (
+					samples.map((sample) => (
 						<li class="sample-row">
-							<span class="sample-number" aria-hidden="true">
-								{String(index + 1).padStart(2, "0")}
-							</span>
-							<div class="sample-copy">
-								<p class="sample-category">
-									{sample.category} · {sample.platform}
-								</p>
+							<a
+								class="sample-link"
+								href={sample.href}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
 								<h2>{sample.title}</h2>
-								<a
-									class="sample-link"
-									href={sample.href}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									{sample.href}
-									<span class="sr-only"> (opens in a new tab)</span>
-								</a>
-							</div>
+								<span class="sample-url">{sample.href}</span>
+								<span class="sr-only"> (opens in a new tab)</span>
+							</a>
 						</li>
 					))
 				}
 			</ul>
-			<p class="samples-note">
-				Each sample opens on its original platform in a new tab.
-			</p>
 		</div>
 	</main>
 </Layout>
@@ -86,35 +61,22 @@ const samples = [
 	.work-samples {
 		background: #fff;
 		color: #0f172a;
-		padding: 8rem 1.25rem 5rem;
+		padding: 7rem 2rem 4rem;
 	}
 	.samples-inner {
 		max-width: 56rem;
-		margin: 0 auto;
+		margin: 0;
+		text-align: left;
 	}
 	.samples-header {
-		margin-bottom: 2.5rem;
-	}
-	.samples-eyebrow,
-	.sample-category {
-		color: #2563eb;
-		font-size: 0.75rem;
-		font-weight: 700;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
+		margin-bottom: 1.5rem;
 	}
 	.samples-header h1 {
-		margin: 0.75rem 0 1rem;
-		font-size: 3rem;
-		font-weight: 750;
-		letter-spacing: -0.045em;
-		line-height: 1.1;
-	}
-	.samples-intro {
-		max-width: 34rem;
-		color: #475569;
-		font-size: 1.125rem;
-		line-height: 1.7;
+		margin: 0;
+		font-size: 1.75rem;
+		font-weight: 700;
+		letter-spacing: -0.025em;
+		line-height: 1.4;
 	}
 	.samples-list {
 		list-style: none;
@@ -123,87 +85,64 @@ const samples = [
 		border-top: 1px solid #e2e8f0;
 	}
 	.sample-row {
-		display: flex;
-		align-items: flex-start;
-		gap: 1.5rem;
-		padding: 1.5rem 0;
 		border-bottom: 1px solid #e2e8f0;
 	}
-	.sample-number {
-		padding-top: 0.1rem;
-		color: #64748b;
-		font-size: 0.875rem;
+	.sample-link {
+		display: block;
+		padding: 1.25rem 0;
+		color: inherit;
+		text-decoration: none;
+		overflow-wrap: break-word;
+		word-break: break-word;
 	}
-	.sample-copy {
-		flex: 1;
-		min-width: 0;
-	}
-	.sample-copy h2 {
-		margin: 0.4rem 0;
+	.sample-link h2 {
+		margin: 0 0 0.4rem;
 		font-size: 1.125rem;
 		font-weight: 650;
 		line-height: 1.5;
-		overflow-wrap: break-word;
 	}
-	.sample-link {
+	.sample-url {
 		color: #1d4ed8;
 		font-size: 0.875rem;
 		line-height: 1.8;
 		text-decoration: underline;
 		text-underline-offset: 3px;
-		overflow-wrap: break-word;
-		word-break: break-word;
 	}
-	.sample-link:hover {
+	.sample-link:hover h2,
+	.sample-link:hover .sample-url {
 		color: #1e40af;
 	}
 	.sample-link:focus-visible {
 		outline: 3px solid #2563eb;
 		outline-offset: 4px;
 	}
-	.samples-note {
-		margin-top: 1.5rem;
-		color: #64748b;
-		font-size: 0.875rem;
-		line-height: 1.6;
-	}
 	:global(.dark) .work-samples {
 		background: #0f172a;
 		color: #f8fafc;
-	}
-	:global(.dark) .samples-intro {
-		color: #cbd5e1;
 	}
 	:global(.dark) .samples-list,
 	:global(.dark) .sample-row {
 		border-color: #334155;
 	}
-	:global(.dark) .samples-eyebrow,
-	:global(.dark) .sample-category,
-	:global(.dark) .sample-link {
+	:global(.dark) .sample-url {
 		color: #93c5fd;
 	}
-	:global(.dark) .sample-link:hover {
+	:global(.dark) .sample-link:hover h2,
+	:global(.dark) .sample-link:hover .sample-url {
 		color: #bfdbfe;
 	}
-	:global(.dark) .sample-number,
-	:global(.dark) .samples-note {
-		color: #94a3b8;
-	}
-	@media (max-width: 480px) {
+	@media (max-width: 1023px) {
 		.work-samples {
-			padding-top: 6.5rem;
-			padding-bottom: 3.5rem;
+			padding-left: 1.5rem;
+			padding-right: 1.5rem;
+		}
+	}
+	@media (max-width: 639px) {
+		.work-samples {
+			padding: 6rem 1rem 3rem;
 		}
 		.samples-header h1 {
-			font-size: 2.5rem;
-		}
-		.sample-row {
-			gap: 0.75rem;
-			padding: 1.25rem 0;
-		}
-		.sample-number {
-			display: none;
+			font-size: 1.5rem;
 		}
 	}
 </style>
