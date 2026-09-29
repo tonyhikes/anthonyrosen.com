@@ -1,0 +1,238 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const samples = [
+	{
+		category: "Newsletter",
+		title: "Alz Amateurs newsletter",
+		platform: "Substack",
+		href: "https://newsletter.alzamateurs.com/p/the-brains-cleanup-crew-is-becoming",
+	},
+	{
+		category: "Social",
+		title: "Social post",
+		platform: "Instagram",
+		href: "https://www.instagram.com/p/C_vNEXpzWVm/",
+	},
+	{
+		category: "Video",
+		title: "Video post",
+		platform: "Instagram Reel",
+		href: "https://www.instagram.com/reel/DFstRNmvY7p/",
+	},
+	{
+		category: "Blog",
+		title:
+			"Why your smartphone can’t replace a dedicated satellite communicator for the outdoors",
+		platform: "ACR Bivy Stick",
+		href: "https://bivystick.com/why-your-smartphone-cant-replace-a-dedicated-satellite-communicator-for-the-outdoors/",
+	},
+	{
+		category: "Influencer",
+		title: "Influencer post with @heykiera_",
+		platform: "Instagram Reel",
+		href: "https://www.instagram.com/heykiera_/reel/DAtzoQos6bq/",
+	},
+];
+---
+
+<Layout
+	title="Work Samples | Anthony Rosen"
+	description="A selection of Anthony Rosen’s work across newsletters, social media, video, blog posts, and influencer content."
+>
+	<main class="work-samples" id="main-content">
+		<div class="samples-inner">
+			<header class="samples-header">
+				<p class="samples-eyebrow">Selected work</p>
+				<h1>Work samples.</h1>
+				<p class="samples-intro">
+					A few examples across newsletters, social, video, and more.
+				</p>
+			</header>
+			<ul class="samples-list" aria-label="Work samples">
+				{
+					samples.map((sample, index) => (
+						<li>
+							<a
+								class="sample-link"
+								href={sample.href}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								<span class="sample-number" aria-hidden="true">
+									{String(index + 1).padStart(2, "0")}
+								</span>
+								<div class="sample-copy">
+									<p class="sample-category">{sample.category}</p>
+									<h2>{sample.title}</h2>
+									<p class="sample-platform">{sample.platform}</p>
+								</div>
+								<span class="sample-action" aria-hidden="true">
+									View <span>↗</span>
+								</span>
+								<span class="sr-only"> (opens in a new tab)</span>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+			<p class="samples-note">
+				Each sample opens on its original platform in a new tab.
+			</p>
+		</div>
+	</main>
+</Layout>
+
+<style>
+	.work-samples {
+		background: #f8fafc;
+		color: #0f172a;
+		padding: 8rem 1.25rem 5rem;
+	}
+	.samples-inner {
+		max-width: 56rem;
+		margin: 0 auto;
+	}
+	.samples-header {
+		margin-bottom: 2.5rem;
+	}
+	.samples-eyebrow,
+	.sample-category {
+		color: #2563eb;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+	.samples-header h1 {
+		margin: 0.75rem 0 1rem;
+		font-size: 3rem;
+		font-weight: 750;
+		letter-spacing: -0.045em;
+		line-height: 1.1;
+	}
+	.samples-intro {
+		max-width: 34rem;
+		color: #475569;
+		font-size: 1.125rem;
+		line-height: 1.7;
+	}
+	.samples-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.samples-list li + li {
+		margin-top: 0.75rem;
+	}
+	.sample-link {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		padding: 1.5rem;
+		border: 1px solid #e2e8f0;
+		border-radius: 0.75rem;
+		background: #fff;
+		color: inherit;
+		text-decoration: none;
+		transition:
+			border-color 0.15s,
+			background-color 0.15s;
+	}
+	.sample-link:hover {
+		border-color: #93c5fd;
+		background: #eff6ff;
+	}
+	.sample-link:focus-visible {
+		outline: 3px solid #2563eb;
+		outline-offset: 4px;
+	}
+	.sample-number {
+		align-self: flex-start;
+		padding-top: 0.1rem;
+		color: #64748b;
+		font-size: 0.875rem;
+	}
+	.sample-copy {
+		flex: 1;
+		min-width: 0;
+	}
+	.sample-copy h2 {
+		margin: 0.4rem 0;
+		font-size: 1.125rem;
+		font-weight: 650;
+		line-height: 1.5;
+		overflow-wrap: break-word;
+	}
+	.sample-platform {
+		color: #64748b;
+		font-size: 0.875rem;
+		line-height: 1.5;
+	}
+	.sample-action {
+		flex-shrink: 0;
+		color: #2563eb;
+		font-size: 0.875rem;
+		font-weight: 600;
+		white-space: nowrap;
+	}
+	.sample-action span {
+		margin-left: 0.3rem;
+		font-size: 1.125rem;
+	}
+	.samples-note {
+		margin-top: 1.5rem;
+		color: #64748b;
+		font-size: 0.875rem;
+		line-height: 1.6;
+	}
+	:global(.dark) .work-samples {
+		background: #0f172a;
+		color: #f8fafc;
+	}
+	:global(.dark) .samples-intro {
+		color: #cbd5e1;
+	}
+	:global(.dark) .sample-link {
+		background: #1e293b;
+		border-color: #334155;
+	}
+	:global(.dark) .sample-link:hover {
+		background: #172554;
+		border-color: #60a5fa;
+	}
+	:global(.dark) .samples-eyebrow,
+	:global(.dark) .sample-category,
+	:global(.dark) .sample-action {
+		color: #93c5fd;
+	}
+	:global(.dark) .sample-number,
+	:global(.dark) .sample-platform,
+	:global(.dark) .samples-note {
+		color: #94a3b8;
+	}
+	@media (max-width: 480px) {
+		.work-samples {
+			padding-top: 6.5rem;
+			padding-bottom: 3.5rem;
+		}
+		.samples-header h1 {
+			font-size: 2.5rem;
+		}
+		.sample-link {
+			gap: 0.75rem;
+			padding: 1.25rem 1rem;
+		}
+		.sample-number {
+			display: none;
+		}
+		.sample-action {
+			align-self: flex-start;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.sample-link {
+			transition: none;
+		}
+	}
+</style>

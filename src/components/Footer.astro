@@ -365,8 +365,7 @@ const contactEndpoint = "/api/contact";
 
 				const isHomePage =
 					window.location.pathname === "/" ||
-					window.location.pathname === "/index.html" ||
-					window.location.pathname.endsWith("/");
+					window.location.pathname === "/index.html";
 
 				if (isHomePage) {
 					window.dispatchEvent(

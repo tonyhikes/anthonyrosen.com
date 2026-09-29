@@ -1,5 +1,8 @@
 ---
-
+const isHomePage =
+	Astro.url.pathname === "/" || Astro.url.pathname === "/index.html";
+const viewHref = (view: string) =>
+	isHomePage ? `#${view}` : view === "home" ? "/" : `/#${view}`;
 ---
 
 <nav
@@ -9,7 +12,7 @@
 		<div class="flex h-16 items-center justify-between">
 			<!-- Logo / Icon -->
 			<a
-				href="#home"
+				href={viewHref("home")}
 				class="group nav-link flex flex-shrink-0 cursor-pointer items-center"
 				data-target="home"
 				aria-label="AR — Anthony Rosen — home"
@@ -25,14 +28,14 @@
 			<div class="navbar-desktop-links items-center gap-8">
 				<!-- Portfolio Link -->
 				<a
-					href="#portfolio"
+					href={viewHref("portfolio")}
 					class="nav-link text-sm font-medium text-slate-600 transition-colors hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400"
 					data-target="portfolio">Portfolio</a
 				>
 
 				<!-- Resume Link triggers View Change -->
 				<a
-					href="#resume"
+					href={viewHref("resume")}
 					class="nav-link text-sm font-medium text-slate-600 transition-colors hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400"
 					data-target="resume">Resume</a
 				>
@@ -130,12 +133,12 @@
 	>
 		<div class="space-y-1 px-4 pt-2 pb-4">
 			<a
-				href="#portfolio"
+				href={viewHref("portfolio")}
 				class="nav-link block rounded-md px-3 py-2 text-base font-medium text-slate-700 hover:bg-gray-50 hover:text-blue-600 dark:text-slate-200 dark:hover:bg-slate-800"
 				data-target="portfolio">Portfolio</a
 			>
 			<a
-				href="#resume"
+				href={viewHref("resume")}
 				class="nav-link block rounded-md px-3 py-2 text-base font-medium text-slate-700 hover:bg-gray-50 hover:text-blue-600 dark:text-slate-200 dark:hover:bg-slate-800"
 				data-target="resume">Resume</a
 			>
@@ -231,6 +234,10 @@
 	btn?.addEventListener("click", (e) => {
 		e.stopPropagation(); // Prevent immediate closing if we add document click listener
 		menu?.classList.toggle("hidden");
+		btn.setAttribute(
+			"aria-expanded",
+			String(!menu?.classList.contains("hidden"))
+		);
 	});
 
 	// Close mobile menu when clicking outside
@@ -242,6 +249,7 @@
 			!menu.contains(e.target as Node)
 		) {
 			menu.classList.add("hidden");
+			btn?.setAttribute("aria-expanded", "false");
 		}
 	});
 
@@ -254,8 +262,7 @@
 				// Check if we're on the home page (/ or /index.html)
 				const isHomePage =
 					window.location.pathname === "/" ||
-					window.location.pathname === "/index.html" ||
-					window.location.pathname.endsWith("/");
+					window.location.pathname === "/index.html";
 
 				if (isHomePage) {
 					// Use view switching for single-page navigation
@@ -265,13 +272,14 @@
 					);
 				} else {
 					// Navigate to home page with hash for other pages
-					// Let the default link behavior handle navigation
+					e.preventDefault();
 					window.location.href = target === "home" ? "/" : `/#${target}`;
 				}
 
 				// Close mobile menu
 				if (!menu?.classList.contains("hidden")) {
 					menu?.classList.add("hidden");
+					btn?.setAttribute("aria-expanded", "false");
 				}
 			}
 		});
