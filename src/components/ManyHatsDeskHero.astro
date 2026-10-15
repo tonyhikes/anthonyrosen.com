@@ -355,7 +355,14 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 		$<HTMLButtonElement>("[data-mhd-prev]").addEventListener("click", () => step(-1));
 		$<HTMLButtonElement>("[data-mhd-next]").addEventListener("click", () => step(1));
 
+		// Swipe the photo (touch only: phones, tablets, touch laptops). The
+		// photo's CSS lets the browser own vertical scrolling and pinch-zoom
+		// only (touch-action), so a sideways swipe reaches us instead of being
+		// cancelled as a scroll.
 		let touchStart: { x: number; y: number } | null = null;
+		figure.addEventListener("pointercancel", () => {
+			touchStart = null;
+		});
 		figure.addEventListener("pointerdown", (event) => {
 			if (event.pointerType === "touch") touchStart = { x: event.clientX, y: event.clientY };
 		});
@@ -639,6 +646,8 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 		position: relative;
 		z-index: 2; /* flying hats pass over the statement */
 		container-type: inline-size;
+		/* the page still scrolls and zooms; sideways swipes change hats */
+		touch-action: pan-y pinch-zoom;
 		--sw: min(150cqi, 100svh);
 		--top: clamp(0.5rem, 3vh, 2rem);
 		align-self: end;
