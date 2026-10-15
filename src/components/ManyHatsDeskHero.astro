@@ -1,0 +1,871 @@
+---
+/**
+ * The Many Hats hero: a statement on the left whose role word, underline
+ * and color switch with the hat (at the moment it lands; nothing in the
+ * statement animates), and Anthony at his desk on the right.
+ * A floating glass dock cycles the hats (autoplay, with the timer drawn as a
+ * ring around the active dot, which is also the pause button).
+ *
+ * The swap itself (flight, settle, brim shadow, hair) is `createHatStage`;
+ * this component adds the words, colors and controls through its hooks.
+ */
+import { ArrowDown } from "lucide-react";
+import HatStage from "./many-hats/HatStage.astro";
+import { hatRoles, serializeHatRoles } from "../data/many-hats-roles";
+
+interface Props {
+	/** the page's first section: load the portrait at high priority */
+	priority?: boolean;
+}
+
+const { priority = false } = Astro.props;
+const first = hatRoles[0];
+// keep in step with --sw below
+const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
+---
+
+{
+	/* the headline is the first thing on screen: fetch its font right away
+	   (without it the late swap shifts the layout slightly) */
+	priority && (
+		<link
+			rel="preload"
+			href="/fonts/newsreader/Newsreader-SemiBold-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
+	)
+}
+<section
+	class="mhd"
+	data-mhd
+	aria-labelledby="mhd-title"
+	style={`--ink: ${first.color.ink}; --cap: ${first.color.cap}; --paper: ${first.color.paper};`}
+>
+	<div class="mhd-inner">
+		<!-- The statement. Each block stacks invisible copies of every role
+		     beneath the live one, so it is always as tall as its longest
+		     role: nothing below it moves when the hat changes. -->
+		<!-- Headline, subhead and buttons stack at fixed gaps on desktop
+		     (the copy is written to a steady 3 + ~2 lines, so they do not
+		     jump). On phones the photo follows the subhead, so invisible
+		     copies of every role reserve the tallest block there and the
+		     photo never moves; spare room falls under the subhead. -->
+		<div class="mhd-statement">
+			<div class="mhd-slot">
+				{
+					hatRoles.map((role) => (
+						<div class="mhd-sizer" aria-hidden="true">
+							<p class="mhd-title">
+								<span class="mhd-word-wrap">{role.hero.word}</span>{" "}
+								<span class="mhd-rest">{role.hero.rest}</span>
+							</p>
+							<p class="mhd-sub">{role.hero.sub}</p>
+						</div>
+					))
+				}
+				<div class="mhd-live">
+					<h1 class="mhd-title" id="mhd-title">
+						<span class="mhd-word-wrap">
+							<span class="mhd-word" data-mhd-word>{first.hero.word}</span>
+							<span class="mhd-brush" aria-hidden="true"></span>
+						</span>{" "}
+						<span class="mhd-rest" data-mhd-rest>{first.hero.rest}</span>
+					</h1>
+					<p class="mhd-sub" data-mhd-sub>{first.hero.sub}</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="mhd-support">
+			<div class="mhd-actions">
+				<button type="button" class="mhd-cta" data-contact-dialog-open>Let’s talk</button>
+				<a class="mhd-overview" href="#work-overview">
+					<span>Work overview</span>
+					<ArrowDown size={18} strokeWidth={1.8} aria-hidden="true" />
+				</a>
+			</div>
+		</div>
+
+		<div class="mhd-figure" data-mhd-figure>
+			<HatStage class="mhd-stage" framing="desk" sizes={stageSizes} priority={priority} />
+
+			<nav class="mhd-dock" aria-label="Choose a hat">
+				<p class="mhd-dock-label" aria-hidden="true">
+					<span class="mhd-touch">Swipe hats</span><span class="mhd-pointer">Change hats</span>
+				</p>
+				<div class="mhd-dock-row">
+					<button type="button" class="mhd-arrow" data-mhd-prev aria-label="Previous hat">
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7" /></svg>
+					</button>
+					<div class="mhd-dots">
+						{
+							hatRoles.map((role, index) => (
+								<button
+									type="button"
+									class="mhd-dot"
+									data-mhd-dot={index}
+									aria-label={role.label}
+									aria-current={index === 0 ? "true" : undefined}
+								>
+									<span class="mhd-dot-core">
+										<svg class="mhd-ring" viewBox="0 0 32 32" aria-hidden="true">
+											<circle class="mhd-ring-track" cx="16" cy="16" r="14.6" />
+											<circle class="mhd-ring-fill" cx="16" cy="16" r="14.6" pathLength="1" />
+										</svg>
+										<svg class="mhd-icon mhd-icon-pause" viewBox="0 0 24 24" aria-hidden="true">
+											<path d="M9 6.5v11M15 6.5v11" />
+										</svg>
+										<svg class="mhd-icon mhd-icon-play" viewBox="0 0 24 24" aria-hidden="true">
+											<path d="M9 6.8v10.4l8.2-5.2z" />
+										</svg>
+									</span>
+								</button>
+							))
+						}
+					</div>
+					<button type="button" class="mhd-arrow" data-mhd-next aria-label="Next hat">
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+					</button>
+				</div>
+			</nav>
+		</div>
+	</div>
+
+	<p class="mhd-sr" aria-live="polite" data-mhd-status></p>
+	<script is:inline type="application/json" data-hat-roles set:html={serializeHatRoles("desk")} />
+</section>
+
+<script>
+	import { mount, readRoles, reducedMotion, type ClientHatRole } from "../scripts/many-hats/shared";
+	import { createHatStage, type FlightTiming } from "../scripts/many-hats/hat-stage";
+
+	type HeroRole = ClientHatRole & {
+		hero: { word: string; rest: string; sub: string };
+	};
+
+	/** ms each hat is worn before the next one (the ring around the dot) */
+	const DWELL = 6200;
+	/** ms for the text block to disappear when a hat is chosen */
+	const HIDE_MS = 90;
+
+	mount("[data-mhd]", (root) => {
+		const roles = readRoles(root) as HeroRole[];
+		const hat = createHatStage(root);
+		const $ = <T extends Element>(selector: string) => root.querySelector<T>(selector) as T;
+
+		const figure = $<HTMLElement>("[data-mhd-figure]");
+		const word = $<HTMLElement>("[data-mhd-word]");
+		const blocks = [$<HTMLElement>(".mhd-statement"), $<HTMLElement>(".mhd-support")];
+		const rest = $<HTMLElement>("[data-mhd-rest]");
+		const sub = $<HTMLElement>("[data-mhd-sub]");
+		const status = $<HTMLElement>("[data-mhd-status]");
+		const dots = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-mhd-dot]"));
+		const cores = dots.map((dot) => dot.querySelector<HTMLElement>(".mhd-dot-core") as HTMLElement);
+		const rings = dots.map((dot) => dot.querySelector<SVGCircleElement>(".mhd-ring-fill") as SVGCircleElement);
+
+		let active = 0;
+		let busy = false;
+		let queued: number | null = null;
+		let autoplay = !reducedMotion();
+		let paused = false;
+		let inView = false;
+		let holding = false; // keyboard focus inside the section
+		let timer: Animation | null = null;
+
+		// --- words and color ------------------------------------------------
+		const setCopy = (role: HeroRole) => {
+			// the word, line and button switch color; the paper eases (CSS)
+			root.style.setProperty("--ink", role.color.ink);
+			root.style.setProperty("--cap", role.color.cap);
+			root.style.setProperty("--paper", role.color.paper);
+			word.textContent = role.hero.word;
+			rest.textContent = role.hero.rest;
+			sub.textContent = role.hero.sub;
+		};
+
+		/** The text block (statement, subhead, buttons) disappears the moment a
+		 * hat is chosen, switches words and colors while hidden, and fades
+		 * back in at the pace of the incoming hat, arriving with it. Nothing
+		 * inside the block moves on its own. */
+		const hideBlock = (to: HeroRole) => {
+			const out = blocks.map((block) =>
+				block.animate([{ opacity: 1 }, { opacity: 0 }], {
+					duration: HIDE_MS,
+					easing: "ease-out",
+					fill: "forwards",
+				})
+			);
+			void Promise.all(out.map((animation) => animation.finished))
+				.then(() => setCopy(to))
+				.catch(() => undefined);
+		};
+
+		const showBlock = ({ entryDuration }: FlightTiming) =>
+			blocks.map((block) =>
+				block.animate([{ opacity: 0 }, { opacity: 1 }], {
+					duration: entryDuration,
+					easing: "cubic-bezier(.4,0,.6,1)",
+					fill: "both",
+				})
+			);
+
+		// --- the dock -------------------------------------------------------
+		const stopped = () => !autoplay || paused;
+
+		const setDots = (index: number) => {
+			dots.forEach((dot, i) => {
+				if (i === index) dot.setAttribute("aria-current", "true");
+				else dot.removeAttribute("aria-current");
+				dot.setAttribute(
+					"aria-label",
+					i === index
+						? `${roles[i].label}: ${stopped() ? "play" : "pause"} hat rotation`
+						: roles[i].label
+				);
+			});
+			root.classList.toggle("is-paused", stopped());
+		};
+
+		/** Only the two dots involved move: the newly active one springs up
+		 * past its size and settles, the old one tucks down. */
+		const bounceDots = (from: number, to: number) => {
+			if (reducedMotion()) return;
+			cores[to].animate(
+				[
+					{ transform: "scale(0.3)" },
+					{ transform: "scale(1.16)", offset: 0.5 },
+					{ transform: "scale(0.94)", offset: 0.78 },
+					{ transform: "scale(1)" },
+				],
+				{ duration: 620, easing: "cubic-bezier(.3,.7,.4,1)" }
+			);
+			cores[from].animate(
+				[
+					{ transform: "scale(1)" },
+					{ transform: "scale(0.16)", offset: 0.6 },
+					{ transform: "scale(0.3)" },
+				],
+				{ duration: 460, easing: "cubic-bezier(.4,0,.2,1)" }
+			);
+		};
+
+		// --- autoplay: the ring's own animation is the timer -----------------
+		const canRun = () =>
+			!stopped() && inView && !holding && document.visibilityState === "visible";
+
+		const syncTimer = () => {
+			if (!timer) return;
+			if (canRun() && !busy) timer.play();
+			else timer.pause();
+		};
+
+		const startTimer = () => {
+			timer?.cancel();
+			timer = null;
+			if (stopped()) return;
+			const run = rings[active].animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], {
+				duration: DWELL,
+				easing: "linear",
+				fill: "forwards",
+			});
+			timer = run;
+			run.finished
+				.then(() => {
+					if (timer === run && canRun()) void show((active + 1) % roles.length);
+				})
+				.catch(() => undefined);
+			syncTimer();
+		};
+
+		// --- the swap -------------------------------------------------------
+		const show = async (index: number) => {
+			if (index === active && !busy) return;
+			if (busy) {
+				queued = index;
+				return;
+			}
+			busy = true;
+			timer?.cancel();
+			timer = null;
+			const from = roles[active];
+			const to = roles[index];
+			bounceDots(active, index);
+			setDots(index);
+			if (!reducedMotion()) hideBlock(to);
+			status.textContent = `${to.hero.word} ${to.hero.rest}`;
+
+			try {
+				if (reducedMotion()) {
+					setCopy(to);
+					await hat.showInstantly(to);
+				} else {
+					await hat.toss(from, to, {
+						onLaunch: (timing) => showBlock(timing),
+					});
+				}
+			} catch {
+				// never leave the controls dead: settle on the new hat
+				setCopy(to);
+				await hat.showInstantly(to).catch(() => undefined);
+			}
+			setCopy(to);
+			blocks.forEach((block) => block.getAnimations().forEach((animation) => animation.cancel()));
+
+			active = index;
+			busy = false;
+			if (queued !== null && queued !== active) {
+				const next = queued;
+				queued = null;
+				void show(next);
+				return;
+			}
+			queued = null;
+			startTimer();
+		};
+
+		const togglePause = () => {
+			if (stopped()) {
+				autoplay = true;
+				paused = false;
+			} else {
+				paused = true;
+			}
+			setDots(active);
+			if (stopped()) {
+				timer?.pause();
+			} else if (timer) {
+				syncTimer();
+			} else {
+				startTimer();
+			}
+		};
+
+		// --- input ----------------------------------------------------------
+		// Picking a hat never stops the rotation; only the pause button does.
+		dots.forEach((dot, index) => {
+			dot.addEventListener("click", () => {
+				if (index === active && !busy) togglePause();
+				else void show(index);
+			});
+			dot.addEventListener("pointerenter", () => void hat.warmRole(roles[index]));
+		});
+		const step = (by: number) => void show((active + by + roles.length) % roles.length);
+		$<HTMLButtonElement>("[data-mhd-prev]").addEventListener("click", () => step(-1));
+		$<HTMLButtonElement>("[data-mhd-next]").addEventListener("click", () => step(1));
+
+		let touchStart: { x: number; y: number } | null = null;
+		figure.addEventListener("pointerdown", (event) => {
+			if (event.pointerType === "touch") touchStart = { x: event.clientX, y: event.clientY };
+		});
+		figure.addEventListener("pointerup", (event) => {
+			if (!touchStart) return;
+			const dx = event.clientX - touchStart.x;
+			const dy = event.clientY - touchStart.y;
+			touchStart = null;
+			if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+			step(dx < 0 ? 1 : -1);
+		});
+
+		// keyboard users get a hold while focus is inside the section
+		root.addEventListener("focusin", (event) => {
+			holding = (event.target as Element).matches(":focus-visible");
+			syncTimer();
+		});
+		root.addEventListener("focusout", (event) => {
+			if (root.contains(event.relatedTarget as Node)) return;
+			holding = false;
+			syncTimer();
+		});
+		document.addEventListener("visibilitychange", syncTimer);
+
+		// Prepare the swaps only once on screen and after the page has loaded
+		// and gone idle, so nothing competes with the portrait itself.
+		const pageSettled = new Promise<void>((resolve) => {
+			const idle = () =>
+				"requestIdleCallback" in window
+					? window.requestIdleCallback(() => resolve(), { timeout: 2000 })
+					: window.setTimeout(resolve, 300);
+			if (document.readyState === "complete") idle();
+			else window.addEventListener("load", idle, { once: true });
+		});
+		let prefetched = false;
+		const prefetch = () => {
+			if (prefetched) return;
+			prefetched = true;
+			void pageSettled.then(async () => {
+				await hat.loadBare();
+				for (let i = 1; i <= roles.length; i += 1) {
+					await hat.warmRole(roles[(active + i) % roles.length]);
+				}
+			});
+		};
+		if ("IntersectionObserver" in window) {
+			new IntersectionObserver(
+				([entry]) => {
+					inView = entry.isIntersecting;
+					if (inView) prefetch();
+					syncTimer();
+				},
+				{ threshold: 0.45 }
+			).observe(root);
+		} else {
+			inView = true;
+			prefetch();
+		}
+
+		setDots(active);
+		startTimer();
+	});
+</script>
+
+<style>
+	.mhd {
+		--text: #161a26;
+		--muted: #555a64;
+		--nav-clear: 4.0625rem;
+		--gutter: clamp(1.25rem, 5vw, 4.5rem);
+		--spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+		position: relative;
+		overflow: clip;
+		background-color: var(--paper);
+		color: var(--text);
+		font-family: "Inter", system-ui, sans-serif;
+		transition: background-color 900ms ease;
+	}
+
+	.mhd-sr {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	/* ---- layout ----------------------------------------------------------
+	   Desktop: statement and support stack on the left; the photograph
+	   fills the right column and bleeds off the right and bottom edges.
+	   Phones: statement, then the photograph (with the dock), then support. */
+	.mhd-inner {
+		display: grid;
+		grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+		grid-template-areas:
+			"statement figure"
+			"support figure"
+			". figure";
+		grid-template-rows: auto auto 1fr;
+		column-gap: clamp(1rem, 3vw, 3rem);
+		min-height: min(100svh, 60rem);
+		padding: calc(var(--nav-clear) + clamp(2rem, 6vh, 4.5rem)) 0 0 var(--gutter);
+	}
+
+	.mhd-statement {
+		grid-area: statement;
+		position: relative;
+		z-index: 1;
+		align-self: end;
+	}
+
+	.mhd-support {
+		grid-area: support;
+		position: relative;
+		z-index: 1;
+		padding-bottom: clamp(2.5rem, 8vh, 5rem);
+	}
+
+	/* stacked copies: the live text over invisible copies of every role;
+	   the live unit hugs the top, so spare room falls below the subhead */
+	.mhd-slot {
+		display: grid;
+	}
+	.mhd-slot > :global(*) {
+		grid-area: 1 / 1;
+	}
+	.mhd-sizer {
+		visibility: hidden;
+	}
+	/* headlines break at a width tied to their own size, so they wrap the
+	   same way (3 lines) at every screen size */
+	.mhd-statement .mhd-title {
+		max-width: 6.5em;
+	}
+	/* desktop: no reserved height, the buttons follow the subhead directly.
+	   Line breaks are tied to the type size (em widths), so every desktop
+	   size breaks the same way: headlines 3 lines, subheads ~2. */
+	@media (min-width: 900px) {
+		.mhd-sizer {
+			display: none;
+		}
+		.mhd-statement .mhd-sub {
+			max-width: 26em;
+		}
+	}
+	.mhd-live {
+		align-self: start;
+	}
+
+	/* ---- the statement --------------------------------------------------- */
+	.mhd-title {
+		margin: 0;
+		/* the design system's display face (src/styles/global.css) */
+		font-family: var(--font-display);
+		font-size: clamp(2.9rem, 6.6vw, 6.75rem);
+		font-weight: 600;
+		line-height: 1.02;
+		letter-spacing: -0.035em;
+		color: var(--ink);
+		text-wrap: balance;
+		/* The underline sits behind every letter of the headline (z-index -1
+		   inside this isolated stacking context). Each letter carries an
+		   outline in the page color, painted under its fill, so where a
+		   letter crosses the line the line breaks cleanly around it; on the
+		   bare page the outline is invisible. */
+		isolation: isolate;
+		-webkit-text-stroke: 0.045em var(--paper);
+		paint-order: stroke fill;
+		/* the outline follows the paper's ease so it stays invisible */
+		transition: -webkit-text-stroke-color 900ms ease;
+	}
+
+	.mhd-word-wrap {
+		position: relative;
+		display: inline-block;
+	}
+
+	.mhd-word {
+		display: inline-block;
+	}
+
+	/* The underline (public/many-hats/brush-underline.webp, generated by
+	   scripts/brush-underline.py): a marker stroke used as a mask, so it
+	   takes the hat's color; behind the letters, which knock it out. */
+	.mhd-brush {
+		position: absolute;
+		z-index: -1;
+		/* just under the baseline, between the lines (the word box ends ~0.25em
+		   below the baseline) */
+		left: -3%;
+		bottom: -0.17em;
+		width: 106%;
+		height: 0.6em;
+		pointer-events: none;
+		background-color: color-mix(in oklab, var(--cap) 72%, #8d8f96);
+		-webkit-mask: url("/many-hats/brush-underline.webp") 0 0 / 100% 100% no-repeat;
+		mask: url("/many-hats/brush-underline.webp") 0 0 / 100% 100% no-repeat;
+	}
+
+	.mhd-rest {
+		color: var(--text);
+	}
+
+	/* ---- support ---------------------------------------------------------- */
+	/* the subhead: one plain sentence, like the live hero's */
+	.mhd-sub {
+		max-width: 34rem;
+		/* one fixed gap under every headline */
+		margin: 1.5rem 0 0;
+		font-size: clamp(1.05rem, 1.3vw, 1.22rem);
+		line-height: 1.55;
+		color: var(--muted);
+		text-wrap: pretty;
+	}
+
+	/* Let's talk + Work overview, as on the live hero */
+	.mhd-actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem 1.75rem;
+		/* fixed, like the headline-to-subhead gap */
+		margin-top: 2rem;
+	}
+
+	.mhd-overview {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.7rem 0;
+		color: var(--text);
+		font-size: 0.76rem;
+		font-weight: 750;
+		letter-spacing: 0.11em;
+		text-decoration: none;
+		text-transform: uppercase;
+		transition: color 160ms ease;
+	}
+	.mhd-overview:hover {
+		color: var(--ink);
+	}
+	.mhd-overview:focus-visible {
+		outline: 2px solid var(--ink);
+		outline-offset: 4px;
+	}
+
+	.mhd-cta {
+		display: inline-flex;
+		align-items: center;
+		padding: 1rem 2.4rem;
+		border: 0;
+		border-radius: 999px;
+		cursor: pointer;
+		font-family: inherit;
+		background: var(--ink);
+		color: #fff;
+		font-size: 1.05rem;
+		font-weight: 550;
+		text-decoration: none;
+		transition:
+			background-color 600ms ease,
+			transform 220ms var(--spring),
+			box-shadow 220ms ease;
+	}
+	.mhd-cta:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 10px 24px -12px var(--ink);
+	}
+	.mhd-cta:focus-visible {
+		outline: 2px solid var(--ink);
+		outline-offset: 3px;
+	}
+
+	/* ---- the photograph ----------------------------------------------------
+	   The stage is the 1254 canvas, drawn wider than the column (--sw), with
+	   the head (canvas x 680) at 55% across and the crown (canvas y 116) just
+	   below the column top. The column ends at the hands (canvas y ~1170). */
+	.mhd-figure {
+		grid-area: figure;
+		position: relative;
+		z-index: 2; /* flying hats pass over the statement */
+		container-type: inline-size;
+		--sw: min(150cqi, 100svh);
+		--top: clamp(0.5rem, 3vh, 2rem);
+		align-self: end;
+		height: calc(var(--top) + (1170 - 116) / 1254 * var(--sw));
+		/* clip the bottom edge only, so hats can fly in from above and the side */
+		clip-path: inset(-100vh -100vw 0 -100vw);
+	}
+
+	.mhd-figure :global(.mhd-stage) {
+		top: calc(var(--top) - 116 / 1254 * var(--sw));
+		left: calc(55cqi - 680 / 1254 * var(--sw));
+		width: var(--sw);
+	}
+
+	/* ---- the dock: floating glass over the photograph ----------------------- */
+	.mhd-dock {
+		position: absolute;
+		right: max(1rem, 9cqi);
+		bottom: clamp(1.25rem, 7%, 3.5rem);
+		z-index: 4;
+		display: grid;
+		justify-items: center;
+		gap: 0.2rem;
+		padding: 0.6rem 0.7rem 0.65rem;
+		border: 1px solid rgb(255 255 255 / 0.55);
+		border-radius: 1.6rem;
+		background: rgb(28 32 44 / 0.3);
+		box-shadow:
+			0 18px 40px -22px rgb(10 12 20 / 0.6),
+			inset 0 1px 0 rgb(255 255 255 / 0.25);
+		color: #fff;
+		-webkit-backdrop-filter: blur(16px) saturate(1.5);
+		backdrop-filter: blur(16px) saturate(1.5);
+	}
+
+	.mhd-dock-label {
+		margin: 0;
+		font-size: 0.82rem;
+		font-weight: 500;
+		letter-spacing: 0.01em;
+		opacity: 0.92;
+	}
+	.mhd-touch {
+		display: none;
+	}
+	/* "Swipe" only where a touchscreen is the main input (phones, tablets);
+	   mouse and trackpad devices, touch laptops included, say "Change" */
+	@media (hover: none) and (pointer: coarse) {
+		.mhd-touch {
+			display: inline;
+		}
+		.mhd-pointer {
+			display: none;
+		}
+	}
+
+	.mhd-dock-row {
+		display: flex;
+		align-items: center;
+		gap: 0.15rem;
+	}
+
+	.mhd-arrow {
+		display: grid;
+		place-items: center;
+		width: 2.4rem;
+		height: 2.4rem;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background: transparent;
+		color: inherit;
+		cursor: pointer;
+		transition: background-color 160ms ease, transform 220ms var(--spring);
+	}
+	.mhd-arrow:hover {
+		background: rgb(255 255 255 / 0.14);
+	}
+	.mhd-arrow:active {
+		transform: scale(0.9);
+	}
+	.mhd-arrow svg {
+		width: 1.45rem;
+		height: 1.45rem;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 1.8;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.mhd-dots {
+		display: flex;
+		align-items: center;
+	}
+
+	.mhd-dot {
+		display: grid;
+		place-items: center;
+		width: 2.15rem;
+		height: 2.4rem;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		color: inherit;
+		cursor: pointer;
+	}
+
+	/* every dot is the same 2rem circle, scaled: a small solid dot when
+	   inactive, the full ring (pause / play) when active */
+	.mhd-dot-core {
+		position: relative;
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 50%;
+		background: rgb(255 255 255 / 0.82);
+		transform: scale(0.3);
+		transition:
+			transform 520ms var(--spring),
+			background-color 260ms ease;
+	}
+	.mhd-dot:hover .mhd-dot-core {
+		transform: scale(0.42);
+	}
+	.mhd-dot[aria-current="true"] .mhd-dot-core,
+	.mhd-dot[aria-current="true"]:hover .mhd-dot-core {
+		background: rgb(255 255 255 / 0.12);
+		transform: scale(1);
+	}
+	.mhd-dot:focus-visible {
+		outline: none;
+	}
+	.mhd-dot:focus-visible .mhd-dot-core {
+		box-shadow: 0 0 0 2px #fff;
+	}
+
+	.mhd-ring {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		transform: rotate(-90deg);
+		opacity: 0;
+		transition: opacity 200ms ease;
+	}
+	.mhd-ring circle {
+		fill: none;
+		stroke: #fff;
+		stroke-width: 1.6;
+	}
+	.mhd-ring-track {
+		opacity: 0.4;
+	}
+	.mhd-ring-fill {
+		stroke-dasharray: 1;
+		stroke-dashoffset: 1;
+		stroke-linecap: round;
+	}
+	.mhd-dot[aria-current="true"] .mhd-ring {
+		opacity: 1;
+	}
+	/* paused: the ring is a full circle */
+	.mhd:global(.is-paused) .mhd-ring-fill {
+		stroke-dashoffset: 0;
+	}
+
+	.mhd-icon {
+		position: absolute;
+		width: 1.05rem;
+		height: 1.05rem;
+		fill: none;
+		stroke: #fff;
+		stroke-width: 2.2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		opacity: 0;
+		transition: opacity 200ms ease;
+	}
+	.mhd-icon-play {
+		fill: #fff;
+		stroke-width: 1.2;
+	}
+	.mhd-dot[aria-current="true"] .mhd-icon-pause {
+		opacity: 1;
+	}
+	.mhd:global(.is-paused) .mhd-dot[aria-current="true"] .mhd-icon-pause {
+		opacity: 0;
+	}
+	.mhd:global(.is-paused) .mhd-dot[aria-current="true"] .mhd-icon-play {
+		opacity: 1;
+	}
+
+	/* ---- phones ------------------------------------------------------------ */
+	@media (max-width: 899px) {
+		.mhd-inner {
+			grid-template-columns: minmax(0, 1fr);
+			grid-template-areas:
+				"statement"
+				"figure"
+				"support";
+			grid-template-rows: auto auto auto;
+			min-height: 0;
+			padding: calc(var(--nav-clear) + 1.5rem) var(--gutter) 0;
+		}
+		.mhd-figure {
+			/* 135% keeps phones on the 1000px portrait (a small first paint) */
+			--sw: 135cqi;
+			--top: 1.25rem;
+			margin: 0 calc(-1 * var(--gutter));
+		}
+		.mhd-dock {
+			right: auto;
+			left: 50%;
+			bottom: 1rem;
+			translate: -50% 0;
+		}
+		.mhd-support {
+			padding: 0.25rem 0 2.75rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.mhd-dot-core,
+		.mhd-cta {
+			transition: none;
+		}
+	}
+</style>

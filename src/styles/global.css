@@ -1,6 +1,43 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ---- Typography tokens ------------------------------------------------------
+   The site's fonts are defined here and only here. Components use the tokens
+   (`var(--font-display)` in CSS, `font-display` in Tailwind), never a family
+   name, so typefaces cannot drift page by page. Documented in the style guide
+   (StyleGuide.astro, "Typography").
+
+   Display: Newsreader SemiBold (600 is the only weight shipped), self-hosted
+   from public/fonts/newsreader/. Large serif headlines, e.g. the home hero.
+   Body/UI: the system sans stack set on <body> in Layout.astro. */
+@font-face {
+	font-family: "Newsreader";
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+	src: url("/fonts/newsreader/Newsreader-SemiBold-latin.woff2") format("woff2");
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+		U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+		U+FEFF, U+FFFD;
+}
+
+/* Georgia Bold scaled to Newsreader's width and line metrics, shown until
+   Newsreader loads, so headlines do not reflow (no layout shift) on swap. */
+@font-face {
+	font-family: "Newsreader Fallback";
+	font-weight: 600;
+	src: local("Georgia Bold"), local("Georgia-Bold"), local("Georgia");
+	size-adjust: 91.8%;
+	ascent-override: 80.6%;
+	descent-override: 28.3%;
+	line-gap-override: 0%;
+}
+
+@theme static {
+	--font-display: "Newsreader", "Newsreader Fallback", Georgia, "Times New Roman", serif;
+}
+
 @theme {
 	--animate-shake: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 	--animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;

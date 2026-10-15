@@ -1,0 +1,162 @@
+---
+/**
+ * The Many Hats portrait stage: every layer the hat swap needs, on one
+ * 1254 × 1254 canvas, driven by `createHatStage` (scripts/many-hats/
+ * hat-stage.ts). Cap crops and overlays are placed by their recorded boxes
+ * in %, so they register exactly at every size; the parent positions and
+ * sizes the stage itself (pass `class`).
+ */
+import {
+	hatAssets,
+	hatDeskPortrait,
+	hatDeskPoseBoxes,
+	hatDeskShade,
+	HAT_DESK,
+	hatPortrait as closePortrait,
+	hatPoseBoxes as closePoseBoxes,
+	hatRoles,
+	poseStyle,
+	type HatFraming,
+} from "../../data/many-hats-roles";
+
+interface Props {
+	framing?: HatFraming;
+	/** `sizes` for the portraits, matching the stage's rendered width */
+	sizes: string;
+	/** the page's hero: load the portrait at once, at high priority */
+	priority?: boolean;
+	class?: string;
+}
+
+const { framing = "desk", sizes, priority = false, class: className } = Astro.props;
+const desk = framing === "desk";
+const portrait = desk ? hatDeskPortrait : closePortrait;
+const boxes = desk ? hatDeskPoseBoxes : closePoseBoxes;
+const first = hatAssets(hatRoles[0].id, framing);
+const flights = [
+	{ set: "exit", pose: "C" },
+	{ set: "exit", pose: "D" },
+	{ set: "exit", pose: "E" },
+	{ set: "entry", pose: "A" },
+	{ set: "entry", pose: "B" },
+	{ set: "entry", pose: "C" },
+] as const;
+---
+
+<div
+	class:list={["hat-stage", className]}
+	data-hat-stage
+	data-sizes={sizes}
+	data-boxes={JSON.stringify(boxes)}
+	data-head-scale={desk ? HAT_DESK.scale : 1}
+>
+	<!-- hat-off frame: loads only once the section is on screen -->
+	<img
+		class="hat-layer hat-bare"
+		data-hat-bare
+		data-srcset={portrait.bareSrcset}
+		data-src={portrait.bare}
+		sizes={sizes}
+		alt=""
+		aria-hidden="true"
+		width={portrait.width}
+		height={portrait.height}
+		decoding="async"
+	/>
+	<img
+		class="hat-overlay"
+		data-hat-hair
+		data-src={portrait.hair.src}
+		style={poseStyle(portrait.hair.box)}
+		alt=""
+		aria-hidden="true"
+		decoding="async"
+	/>
+	{
+		desk && (
+			<div class="hat-shade-clip" data-hat-shade-clip>
+				<img
+					class="hat-overlay"
+					data-hat-shade
+					data-src={hatDeskShade.src}
+					style={poseStyle(hatDeskShade.box)}
+					alt=""
+					aria-hidden="true"
+					decoding="async"
+				/>
+			</div>
+		)
+	}
+	<img
+		class="hat-layer"
+		data-hat-worn
+		src={first.worn}
+		srcset={first.wornSrcset}
+		sizes={sizes}
+		alt={portrait.alt}
+		width={portrait.width}
+		height={portrait.height}
+		loading={priority ? "eager" : "lazy"}
+		fetchpriority={priority ? "high" : "auto"}
+		decoding="async"
+	/>
+	{
+		flights.map(({ set, pose }) => (
+			<img
+				class="hat-sprite"
+				data-hat-flight={set}
+				data-pose={pose}
+				style={poseStyle(boxes[pose])}
+				alt=""
+				aria-hidden="true"
+				decoding="async"
+			/>
+		))
+	}
+</div>
+
+<style>
+	.hat-stage {
+		position: absolute;
+		aspect-ratio: 1;
+		pointer-events: none;
+	}
+
+	.hat-layer {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	/* shown only while the hat is off */
+	.hat-bare,
+	.hat-overlay {
+		opacity: 0;
+	}
+
+	.hat-overlay {
+		position: absolute;
+		height: auto;
+	}
+
+	/* the brim's shadow, clipped to the head's silhouette (the mask is set
+	   once the hat-off frame loads) */
+	.hat-shade-clip {
+		position: absolute;
+		inset: 0;
+		-webkit-mask: var(--mask, none) 0 0 / 100% 100% no-repeat;
+		mask: var(--mask, none) 0 0 / 100% 100% no-repeat;
+	}
+
+	.hat-sprite {
+		position: absolute;
+		z-index: 3;
+		height: auto;
+		opacity: 0;
+	}
+
+	.hat-stage:global(.is-flying) .hat-sprite {
+		will-change: transform, opacity;
+	}
+</style>
