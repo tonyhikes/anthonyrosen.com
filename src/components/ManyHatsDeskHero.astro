@@ -164,40 +164,58 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 				root.style.removeProperty("--fig-sw");
 				root.style.removeProperty("--fig-rise");
 				root.style.removeProperty("--fig-h");
+				// keep the photo near the text: his shoulder (canvas x ~330)
+				// a fixed-ish gap past the text, never further right than the
+				// column would put it
+				root.style.removeProperty("--stage-x");
+				root.classList.remove("mhd-pulled");
+				const stage = fig.querySelector(".mhd-stage");
+				const k = stage.offsetWidth / 1254;
+				const text = Math.max(
+					root.querySelector(".mhd-live .mhd-title").getBoundingClientRect().right,
+					root.querySelector(".mhd-live .mhd-sub").getBoundingClientRect().right
+				);
+				const gap = Math.min(144, Math.max(56, innerWidth * 0.08));
+				const box = fig.getBoundingClientRect();
+				const current = stage.getBoundingClientRect().left - box.left;
+				const near = text + gap - 330 * k - box.left;
+				const pulled = near < current;
+				root.classList.toggle("mhd-pulled", pulled);
+				if (pulled) root.style.setProperty("--stage-x", Math.round(near) + "px");
 				return;
 			}
 			root.style.removeProperty("--fig-sw");
-			const sw = fig.clientWidth * 1.35; // the stage, as in the CSS
-			const tall = (w) => 20 + ((1050 - 116) / 1254) * w; // photo cut at mid-torso
-			const natural = tall(sw);
-			const room = () => screen - (fig.getBoundingClientRect().top + window.scrollY);
-			// first choice: the buttons right under the subhead, with the
-			// photo below them keeping most of its height (and the dock)
-			root.classList.add("mhd-acts-up");
 			root.style.removeProperty("--fig-rise");
-			let up = room();
-			if (up >= natural * 0.85) {
-				root.style.setProperty("--fig-h", Math.round(Math.min(natural, up)) + "px");
-				return;
+			root.style.removeProperty("--stage-x");
+			root.classList.remove("mhd-pulled");
+			root.classList.add("mhd-acts-up");
+			const sw0 = fig.clientWidth * 1.35; // the stage, as in the CSS
+			const top0 = fig.getBoundingClientRect().top; // before any rise
+			const acts = actions.getBoundingClientRect().bottom;
+			const lift = parseFloat(getComputedStyle(actions).marginTop) + actions.offsetHeight;
+			const dock = root.querySelector(".mhd-dock").offsetHeight + 16; // + its 1rem inset
+			// Canvas rows: crown 116, chin ~560, the jacket reaches the
+			// buttons' column at ~580; the photo is cut at mid-torso (1050).
+			const layout = (sw) => {
+				const k = sw / 1254;
+				// rise beside the buttons, but keep them clear of the shoulders
+				const rise = Math.max(0, Math.min(lift, top0 + 20 + (580 - 116) * k - acts - 8));
+				const top = top0 - rise;
+				const room = screen - (top + window.scrollY);
+				// the dock must sit below the chin, never over the face
+				const faceClear = room - dock >= 20 + (560 - 116) * k + 12;
+				return { rise, room, faceClear, tall: 20 + (1050 - 116) * k };
+			};
+			// the largest photo (down to 70%) that keeps the face clear
+			let sw = sw0;
+			let l = layout(sw);
+			while (!l.faceClear && sw > sw0 * 0.7) {
+				sw = Math.max(sw0 * 0.7, sw - sw0 * 0.02);
+				l = layout(sw);
 			}
-			// else the photo rises beside the buttons too, as long as they
-			// stay above its shoulders (canvas y ~560)
-			const rise = parseFloat(getComputedStyle(actions).marginTop) + actions.offsetHeight;
-			const figTop = fig.getBoundingClientRect().top - rise;
-			const clear = 20 + ((560 - 116) / 1254) * sw;
-			if (actions.getBoundingClientRect().bottom - figTop <= clear) {
-				root.style.setProperty("--fig-rise", Math.round(rise) + "px");
-				up = room();
-				if (up >= natural * 0.85) {
-					root.style.setProperty("--fig-h", Math.round(Math.min(natural, up)) + "px");
-					return;
-				}
-			}
-			// else drawn smaller to fit (down to 85% of its size), and
-			// below that, cut shorter: the buttons stay on the first screen
-			const fitted = ((up - 20) * 1254) / (1050 - 116);
-			root.style.setProperty("--fig-sw", Math.floor(Math.max(fitted, sw * 0.85)) + "px");
-			root.style.setProperty("--fig-h", Math.round(up) + "px");
+			if (sw < sw0) root.style.setProperty("--fig-sw", Math.floor(sw) + "px");
+			if (l.rise) root.style.setProperty("--fig-rise", Math.round(l.rise) + "px");
+			root.style.setProperty("--fig-h", Math.round(Math.min(l.tall, l.room)) + "px");
 		};
 		fit();
 		let frame = 0;
@@ -542,7 +560,10 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 		grid-template-rows: auto auto 1fr;
 		column-gap: clamp(1rem, 3vw, 3rem);
 		min-height: min(100svh, 60rem);
-		padding: calc(var(--nav-clear) + clamp(1rem, 6vh, 4.5rem)) 0 0 var(--gutter);
+		/* past the nav's 85rem container, the text lines up with its logo
+		   (and the photo follows the text, see --stage-x) */
+		padding: calc(var(--nav-clear) + clamp(1rem, 6vh, 4.5rem)) 0 0
+			max(var(--gutter), (100% - 85rem) / 2 + 2rem);
 	}
 
 	.mhd-statement {
@@ -748,7 +769,9 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 		   column, so in a narrow column the stage is smaller: anchored at
 		   the bottom it still reaches the edge, with spare room above. */
 		top: calc(100% - 1170 / 1254 * var(--sw));
-		left: calc(55cqi - 680 / 1254 * var(--sw));
+		/* --stage-x (fit script) pulls it toward the text on wide or short
+		   windows, so the gap between them never keeps growing */
+		left: var(--stage-x, calc(55cqi - 680 / 1254 * var(--sw)));
 		width: var(--sw);
 	}
 
@@ -771,6 +794,13 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 		color: #fff;
 		-webkit-backdrop-filter: blur(16px) saturate(1.5);
 		backdrop-filter: blur(16px) saturate(1.5);
+	}
+
+	/* with the photo pulled toward the text, the dock stays under his head */
+	.mhd.mhd-pulled .mhd-dock {
+		right: auto;
+		left: calc(var(--stage-x) + 680 / 1254 * var(--sw));
+		translate: -50% 0;
 	}
 
 	.mhd-dock-label {
@@ -1006,6 +1036,23 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 		/* --fig-rise (fit script): the photo also rises beside the buttons */
 		.mhd.mhd-acts-up .mhd-actions {
 			margin-top: 1.25rem;
+		}
+	}
+
+	/* ---- short phones (SE-size): tighter type and a label-less dock, so
+	   the face stays clear of the dock with the buttons on screen ---- */
+	@media (max-width: 639px) and (max-aspect-ratio: 6/5) and (max-height: 600px) {
+		.mhd-title {
+			font-size: clamp(2.1rem, 9.5vw, 2.4rem);
+		}
+		.mhd-sub {
+			margin-top: 0.75rem;
+		}
+		.mhd.mhd-acts-up .mhd-actions {
+			margin-top: 1rem;
+		}
+		.mhd-dock-label {
+			display: none;
 		}
 	}
 
