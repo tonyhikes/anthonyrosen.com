@@ -725,6 +725,9 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 		grid-area: figure;
 		position: relative;
 		z-index: 2; /* flying hats pass over the statement */
+		/* on phones it rises beside the buttons: let taps pass through to
+		   them (only the dock below takes input) */
+		pointer-events: none;
 		container-type: inline-size;
 		/* no taller than the window under the nav, so the dock is always
 		   on the first screen */
@@ -754,6 +757,7 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 
 	/* ---- the dock: floating glass over the photograph ----------------------- */
 	.mhd-dock {
+		pointer-events: auto;
 		position: absolute;
 		right: max(1rem, 9cqi);
 		bottom: clamp(1.25rem, 7%, 3.5rem);
