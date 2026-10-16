@@ -21,7 +21,10 @@ interface Props {
 const { priority = false } = Astro.props;
 const first = hatRoles[0];
 // keep in step with --sw below
-const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
+// phones and portrait tablets stack; landscape-ish windows from 640px wide
+// (and any clearly landscape window, like a phone held sideways) sit side
+// by side like desktop (keep in step with the media queries below)
+const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-width: 899px) and (max-aspect-ratio: 5/6) 135vw, min(78vw, 100vh)";
 ---
 
 {
@@ -47,11 +50,13 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 		<!-- The statement. Each block stacks invisible copies of every role
 		     beneath the live one, so it is always as tall as its longest
 		     role: nothing below it moves when the hat changes. -->
-		<!-- Headline, subhead and buttons stack at fixed gaps on desktop
-		     (the copy is written to a steady 3 + ~2 lines, so they do not
-		     jump). On phones the photo follows the subhead, so invisible
-		     copies of every role reserve the tallest block there and the
-		     photo never moves; spare room falls under the subhead. -->
+		<!-- Headline, subhead and buttons at fixed gaps on desktop (the copy
+		     is written to a steady 3 + ~2 lines, so they do not jump). On
+		     phones the buttons follow the subhead too (fit script), and the
+		     photo and its hat dock fill the rest of the first screen;
+		     without JS the buttons follow the photo. Invisible
+		     copies of every headline + subhead reserve the tallest, so the
+		     photo never moves. -->
 		<div class="mhd-statement">
 			<div class="mhd-slot">
 				{
@@ -136,6 +141,78 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 	<p class="mhd-sr" aria-live="polite" data-mhd-status></p>
 	<script is:inline type="application/json" data-hat-roles set:html={serializeHatRoles("desk")} />
 </section>
+<script is:inline>
+	// Stacked layout (phones, portrait tablets): the buttons sit right under
+	// the subhead and the photo takes the rest of the first screen (rising
+	// beside the buttons when they clear its shoulders, then drawn a little
+	// smaller, then cut shorter), so the buttons and hat dock stay in view.
+	// Side by side: CSS does it all. Runs before first paint (so nothing
+	// jumps), then on resize/rotation and as the text settles.
+	(() => {
+		const root = document.currentScript.previousElementSibling;
+		const fig = root.querySelector(".mhd-figure");
+		const actions = root.querySelector(".mhd-actions");
+		const mobile = window.matchMedia("(max-width: 639px) and (max-aspect-ratio: 6/5), (max-width: 899px) and (max-aspect-ratio: 5/6)");
+		const probe = document.createElement("div");
+		probe.style.cssText = "position:absolute;visibility:hidden;height:100svh;width:0";
+		const fit = () => {
+			root.appendChild(probe);
+			const screen = probe.offsetHeight;
+			probe.remove();
+			if (!mobile.matches) {
+				root.classList.remove("mhd-acts-up");
+				root.style.removeProperty("--fig-sw");
+				root.style.removeProperty("--fig-rise");
+				root.style.removeProperty("--fig-h");
+				return;
+			}
+			root.style.removeProperty("--fig-sw");
+			const sw = fig.clientWidth * 1.35; // the stage, as in the CSS
+			const tall = (w) => 20 + ((1050 - 116) / 1254) * w; // photo cut at mid-torso
+			const natural = tall(sw);
+			const room = () => screen - (fig.getBoundingClientRect().top + window.scrollY);
+			// first choice: the buttons right under the subhead, with the
+			// photo below them keeping most of its height (and the dock)
+			root.classList.add("mhd-acts-up");
+			root.style.removeProperty("--fig-rise");
+			let up = room();
+			if (up >= natural * 0.85) {
+				root.style.setProperty("--fig-h", Math.round(Math.min(natural, up)) + "px");
+				return;
+			}
+			// else the photo rises beside the buttons too, as long as they
+			// stay above its shoulders (canvas y ~560)
+			const rise = parseFloat(getComputedStyle(actions).marginTop) + actions.offsetHeight;
+			const figTop = fig.getBoundingClientRect().top - rise;
+			const clear = 20 + ((560 - 116) / 1254) * sw;
+			if (actions.getBoundingClientRect().bottom - figTop <= clear) {
+				root.style.setProperty("--fig-rise", Math.round(rise) + "px");
+				up = room();
+				if (up >= natural * 0.85) {
+					root.style.setProperty("--fig-h", Math.round(Math.min(natural, up)) + "px");
+					return;
+				}
+			}
+			// else drawn smaller to fit (down to 85% of its size), and
+			// below that, cut shorter: the buttons stay on the first screen
+			const fitted = ((up - 20) * 1254) / (1050 - 116);
+			root.style.setProperty("--fig-sw", Math.floor(Math.max(fitted, sw * 0.85)) + "px");
+			root.style.setProperty("--fig-h", Math.round(up) + "px");
+		};
+		fit();
+		let frame = 0;
+		const refit = () => {
+			cancelAnimationFrame(frame);
+			frame = requestAnimationFrame(fit);
+		};
+		addEventListener("resize", refit);
+		// the text block's size settles as styles and the display font load
+		if ("ResizeObserver" in window) {
+			new ResizeObserver(refit).observe(root.querySelector(".mhd-statement"));
+		}
+		document.fonts?.ready.then(refit);
+	})();
+</script>
 
 <script>
 	import { mount, readRoles, reducedMotion, type ClientHatRole } from "../scripts/many-hats/shared";
@@ -465,7 +542,7 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 		grid-template-rows: auto auto 1fr;
 		column-gap: clamp(1rem, 3vw, 3rem);
 		min-height: min(100svh, 60rem);
-		padding: calc(var(--nav-clear) + clamp(2rem, 6vh, 4.5rem)) 0 0 var(--gutter);
+		padding: calc(var(--nav-clear) + clamp(1rem, 6vh, 4.5rem)) 0 0 var(--gutter);
 	}
 
 	.mhd-statement {
@@ -479,7 +556,7 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 		grid-area: support;
 		position: relative;
 		z-index: 1;
-		padding-bottom: clamp(2.5rem, 8vh, 5rem);
+		padding-bottom: clamp(1.5rem, 8vh, 5rem);
 	}
 
 	/* stacked copies: the live text over invisible copies of every role;
@@ -501,7 +578,7 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 	/* desktop: no reserved height, the buttons follow the subhead directly.
 	   Line breaks are tied to the type size (em widths), so every desktop
 	   size breaks the same way: headlines 3 lines, subheads ~2. */
-	@media (min-width: 900px) {
+	@media (min-width: 900px), (min-width: 640px) and (min-aspect-ratio: 501/600), (min-aspect-ratio: 601/500) {
 		.mhd-sizer {
 			display: none;
 		}
@@ -518,7 +595,10 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 		margin: 0;
 		/* the design system's display face (src/styles/global.css) */
 		font-family: var(--font-display);
-		font-size: clamp(2.9rem, 6.6vw, 6.75rem);
+		/* scales with the window's height too, so short desktop windows keep
+		   the headline, subhead and buttons on the first screen */
+		/* the floor gives way on very short windows, so the buttons fit */
+		font-size: clamp(min(2.9rem, 9svh), min(6.6vw, 12.5svh), 6.75rem);
 		font-weight: 600;
 		line-height: 1.02;
 		letter-spacing: -0.035em;
@@ -572,7 +652,7 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 	.mhd-sub {
 		max-width: 34rem;
 		/* one fixed gap under every headline */
-		margin: 1.5rem 0 0;
+		margin: min(1.5rem, 3svh) 0 0;
 		font-size: clamp(1.05rem, 1.3vw, 1.22rem);
 		line-height: 1.55;
 		color: var(--muted);
@@ -586,7 +666,7 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 		align-items: center;
 		gap: 0.75rem 1.75rem;
 		/* fixed, like the headline-to-subhead gap */
-		margin-top: 2rem;
+		margin-top: min(2rem, 4svh);
 	}
 
 	.mhd-overview {
@@ -648,7 +728,13 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 		container-type: inline-size;
 		/* the page still scrolls and zooms; sideways swipes change hats */
 		touch-action: pan-y pinch-zoom;
-		--sw: min(150cqi, 100svh);
+		/* no taller than the window under the nav, so the dock is always
+		   on the first screen */
+		--sw: min(
+			150cqi,
+			100svh,
+			(100svh - var(--nav-clear) - clamp(1rem, 6vh, 4.5rem) - var(--top)) * 1254 / 1054
+		);
 		--top: clamp(0.5rem, 3vh, 2rem);
 		align-self: end;
 		height: calc(var(--top) + (1170 - 116) / 1254 * var(--sw));
@@ -657,7 +743,11 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 	}
 
 	.mhd-figure :global(.mhd-stage) {
-		top: calc(var(--top) - 116 / 1254 * var(--sw));
+		/* hands (canvas y 1170) on the column's bottom edge. The column's
+		   height reads --sw against the window, the stage against the
+		   column, so in a narrow column the stage is smaller: anchored at
+		   the bottom it still reaches the edge, with spare room above. */
+		top: calc(100% - 1170 / 1254 * var(--sw));
 		left: calc(55cqi - 680 / 1254 * var(--sw));
 		width: var(--sw);
 	}
@@ -843,7 +933,7 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 	}
 
 	/* ---- phones ------------------------------------------------------------ */
-	@media (max-width: 899px) {
+	@media (max-width: 639px) and (max-aspect-ratio: 6/5), (max-width: 899px) and (max-aspect-ratio: 5/6) {
 		.mhd-inner {
 			grid-template-columns: minmax(0, 1fr);
 			grid-template-areas:
@@ -852,13 +942,45 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 				"support";
 			grid-template-rows: auto auto auto;
 			min-height: 0;
-			padding: calc(var(--nav-clear) + 1.5rem) var(--gutter) 0;
+			padding: calc(var(--nav-clear) + 1rem) var(--gutter) 0;
+		}
+		.mhd-title {
+			font-size: clamp(2.5rem, 11vw, 2.9rem);
+		}
+		.mhd-sub {
+			margin-top: 1rem;
+			font-size: 1rem;
+			line-height: 1.5;
+		}
+		/* the subhead keeps to the left so the photo can rise beside it */
+		.mhd-statement .mhd-sub {
+			max-width: 52%;
 		}
 		.mhd-figure {
 			/* 135% keeps phones on the 1000px portrait (a small first paint) */
-			--sw: 135cqi;
+			/* --fig-sw: a little smaller, set by the fit script to keep
+			   the buttons under the subhead on shorter screens */
+			--sw: var(--fig-sw, 135cqi);
 			--top: 1.25rem;
 			margin: 0 calc(-1 * var(--gutter));
+			/* The head sits right of center and the photo rises 6.5rem into
+			   the subhead's block, beside the (narrowed) subhead, so the photo
+			   gets more height. Cropped at mid-torso (canvas y ~1050), and
+			   never taller than the screen left under it (~13rem), so the hat
+			   dock is in the first screen even on short phones. */
+			margin-top: calc(-7rem - var(--fig-rise, 0px));
+			/* --fig-h is set by the fit script under the section (the
+			   buttons are either fully on the first screen or fully below
+			   it); this fallback is used before it runs or without JS */
+			height: var(
+				--fig-h,
+				min(calc(var(--top) + (1050 - 116) / 1254 * var(--sw)), calc(100svh - 14rem))
+			);
+		}
+		.mhd-figure :global(.mhd-stage) {
+			/* hung from the top: the bottom is cut to fit the screen */
+			top: calc(var(--top) - 116 / 1254 * var(--sw));
+			left: calc(75cqi - 680 / 1254 * var(--sw));
 		}
 		.mhd-dock {
 			right: auto;
@@ -867,7 +989,46 @@ const stageSizes = "(max-width: 899px) 135vw, min(78vw, 100vh)";
 			translate: -50% 0;
 		}
 		.mhd-support {
-			padding: 0.25rem 0 2.75rem;
+			padding: 0 0 2.75rem;
+		}
+		/* when the first screen has room (fit script): the buttons right
+		   under the subhead, beside the photo's rising top, as on desktop */
+		.mhd.mhd-acts-up .mhd-inner {
+			grid-template-areas:
+				"statement"
+				"support"
+				"figure";
+		}
+		.mhd.mhd-acts-up .mhd-support {
+			max-width: 52%;
+			padding: 0;
+		}
+		/* --fig-rise (fit script): the photo also rises beside the buttons */
+		.mhd.mhd-acts-up .mhd-actions {
+			margin-top: 1.25rem;
+		}
+	}
+
+	/* ---- very short windows (a phone held sideways) ---------------------
+	   Tighter type and buttons, so the buttons and dock still fit. */
+	@media (max-height: 440px) and (min-aspect-ratio: 501/600) {
+		.mhd-title {
+			font-size: min(2.9rem, 8svh);
+			/* balance splits these small sizes oddly ("that / drives growth.") */
+			text-wrap: wrap;
+		}
+		.mhd-sub {
+			font-size: 0.95rem;
+			line-height: 1.4;
+		}
+		.mhd-actions {
+			gap: 0.25rem 1.25rem;
+		}
+		.mhd-cta {
+			padding: 0.7rem 1.8rem;
+		}
+		.mhd-overview {
+			padding: 0.4rem 0;
 		}
 	}
 
