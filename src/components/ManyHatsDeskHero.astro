@@ -98,7 +98,7 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 
 			<nav class="mhd-dock" aria-label="Choose a hat">
 				<p class="mhd-dock-label" aria-hidden="true">
-					<span class="mhd-touch">Swipe hats</span><span class="mhd-pointer">Change hats</span>
+					Change hats
 				</p>
 				<div class="mhd-dock-row">
 					<button type="button" class="mhd-arrow" data-mhd-prev aria-label="Previous hat">
@@ -250,7 +250,6 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 		const hat = createHatStage(root);
 		const $ = <T extends Element>(selector: string) => root.querySelector<T>(selector) as T;
 
-		const figure = $<HTMLElement>("[data-mhd-figure]");
 		const word = $<HTMLElement>("[data-mhd-word]");
 		const blocks = [$<HTMLElement>(".mhd-statement"), $<HTMLElement>(".mhd-support")];
 		const rest = $<HTMLElement>("[data-mhd-rest]");
@@ -449,26 +448,6 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 		const step = (by: number) => void show((active + by + roles.length) % roles.length);
 		$<HTMLButtonElement>("[data-mhd-prev]").addEventListener("click", () => step(-1));
 		$<HTMLButtonElement>("[data-mhd-next]").addEventListener("click", () => step(1));
-
-		// Swipe the photo (touch only: phones, tablets, touch laptops). The
-		// photo's CSS lets the browser own vertical scrolling and pinch-zoom
-		// only (touch-action), so a sideways swipe reaches us instead of being
-		// cancelled as a scroll.
-		let touchStart: { x: number; y: number } | null = null;
-		figure.addEventListener("pointercancel", () => {
-			touchStart = null;
-		});
-		figure.addEventListener("pointerdown", (event) => {
-			if (event.pointerType === "touch") touchStart = { x: event.clientX, y: event.clientY };
-		});
-		figure.addEventListener("pointerup", (event) => {
-			if (!touchStart) return;
-			const dx = event.clientX - touchStart.x;
-			const dy = event.clientY - touchStart.y;
-			touchStart = null;
-			if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
-			step(dx < 0 ? 1 : -1);
-		});
 
 		// keyboard users get a hold while focus is inside the section
 		root.addEventListener("focusin", (event) => {
@@ -747,8 +726,6 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 		position: relative;
 		z-index: 2; /* flying hats pass over the statement */
 		container-type: inline-size;
-		/* the page still scrolls and zooms; sideways swipes change hats */
-		touch-action: pan-y pinch-zoom;
 		/* no taller than the window under the nav, so the dock is always
 		   on the first screen */
 		--sw: min(
@@ -810,20 +787,6 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 		letter-spacing: 0.01em;
 		opacity: 0.92;
 	}
-	.mhd-touch {
-		display: none;
-	}
-	/* "Swipe" only where a touchscreen is the main input (phones, tablets);
-	   mouse and trackpad devices, touch laptops included, say "Change" */
-	@media (hover: none) and (pointer: coarse) {
-		.mhd-touch {
-			display: inline;
-		}
-		.mhd-pointer {
-			display: none;
-		}
-	}
-
 	.mhd-dock-row {
 		display: flex;
 		align-items: center;
