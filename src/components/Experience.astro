@@ -1,21 +1,18 @@
 ---
 const experiences = [
 	{
-		period: "2021 - 2025",
 		title: "Product & Marketing Manager",
 		company: "ACR Electronics, Inc.",
 		description:
 			"Managed marketing for Bivy (satellite comms). Oversaw FCC/CE regulatory compliance, localization for 20+ countries, and reduced production costs by 8%.",
 	},
 	{
-		period: "2019 - 2021",
 		title: "Proposal & Marketing Coordinator",
 		company: "Kepro Healthcare CM & QIO",
 		description:
 			"Directed creative production for 30+ healthcare proposals. Managed global localization for Pfizer campaigns across 88 countries.",
 	},
 	{
-		period: "2008 - 2018",
 		title: "Senior Content Specialist",
 		company: "AAAS (Science Magazine)",
 		description:
@@ -28,7 +25,7 @@ const experiences = [
 	id="experience"
 	class="bg-slate-50 py-24 transition-colors duration-300 dark:bg-[#0B1120]"
 >
-	<div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+	<div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
 		<h2
 			class="mb-20 text-center text-4xl font-bold tracking-tight text-slate-900 md:text-5xl dark:text-white"
 		>
@@ -38,7 +35,7 @@ const experiences = [
 		<div class="relative">
 			<!-- Vertical Line -->
 			<div
-				class="absolute top-2 bottom-2 left-[19px] w-px bg-slate-200 md:left-1/4 dark:bg-slate-800"
+				class="absolute top-2 bottom-2 left-[19px] w-px bg-slate-200 dark:bg-slate-800"
 			>
 			</div>
 
@@ -46,21 +43,14 @@ const experiences = [
 				{
 					experiences.map((exp, index) => (
 						<div
-							class="group experience-item relative flex cursor-pointer flex-col md:flex-row"
+							class="group experience-item relative cursor-pointer"
 							data-index={index}
 						>
-							{/* Date (Left side on desktop) */}
-							<div class="mb-2 flex items-start pt-1 md:mb-0 md:w-1/4 md:justify-end md:pr-16">
-								<span class="pl-12 font-mono text-lg font-medium tracking-tight text-slate-600 transition-colors group-hover:text-slate-700 md:pl-0 dark:text-slate-400 dark:group-hover:text-slate-300">
-									{exp.period}
-								</span>
-							</div>
-
 							{/* Dot */}
-							<div class="absolute left-[13px] z-10 mt-2.5 h-3 w-3 rounded-full border-2 border-slate-50 bg-slate-300 transition-all duration-300 group-hover:scale-125 group-hover:bg-blue-500 group-hover:shadow-[0_0_10px_rgba(59,130,246,0.5)] md:left-[calc(25%-6px)] dark:border-[#0B1120] dark:bg-slate-700" />
+							<div class="absolute left-[13px] z-10 mt-2.5 h-3 w-3 rounded-full border-2 border-slate-50 bg-slate-300 transition-all duration-300 group-hover:scale-125 group-hover:bg-blue-500 group-hover:shadow-[0_0_10px_rgba(59,130,246,0.5)] dark:border-[#0B1120] dark:bg-slate-700" />
 
-							{/* Content (Right side) */}
-							<div class="pl-12 md:w-3/4 md:pl-16">
+							{/* Content */}
+							<div class="pl-12 md:pl-16">
 								<div class="flex flex-col items-start">
 									<h3 class="text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-blue-600 md:text-2xl dark:text-white dark:group-hover:text-blue-400">
 										{exp.title}
