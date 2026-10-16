@@ -41,7 +41,7 @@ npm run astro -- --help  # Get help with Astro CLI
 This is a **single-page application** with client-side view switching (not Astro's built-in routing). All content lives on one page (`/`) and switches views via hash URLs:
 
 - `/` or `/#home` - Home view (ManyHatsDeskHero + ImpactCharts + Experience)
-- `/#resume` - Resume view
+- `/#resume` - no view: opens the contact dialog as a resume request (Resume links in the nav, footer and metrics do the same)
 - `/#portfolio` - Portfolio view
 - `/#styleguide` - Style guide view
 - `/#colophon` - Colophon view
@@ -106,7 +106,7 @@ The hat flies off and the next one lands (WAAPI, compositor-only transforms/opac
 
 **Virtual pageviews:** Each view switch tracks as a pageview with custom path/title.
 
-**Job-search events:** `contact_click`, `resume_download`, `linkedin_click`, and `portfolio_open` are sent to GA4 and PostHog by `JobSearchAnalytics.astro`.
+**Job-search events:** `contact_click`, `resume_request`, `linkedin_click`, and `portfolio_open` are sent to GA4 and PostHog by `JobSearchAnalytics.astro`.
 
 ### Dark Mode
 
@@ -132,7 +132,6 @@ src/
 │   ├── ManyHats.astro          # Preserved experiment; not currently mounted
 │   ├── ImpactCharts.astro      # Data visualization component
 │   ├── Experience.astro        # Work experience timeline
-│   ├── Resume.astro            # Resume view
 │   ├── Portfolio.astro         # Portfolio view
 │   ├── StyleGuide.astro        # Design system documentation
 │   ├── Colophon.astro          # Site credits

@@ -104,4 +104,23 @@ test("contact endpoint spam guards", async (t) => {
 			assert.equal(idempotencyKeys[0], idempotencyKeys[1]);
 		}
 	);
+
+	await t.test("labels resume requests in the email", async () => {
+		process.env.RESEND_API_KEY = "re_test";
+		const sent: { subject: string; text: string }[] = [];
+		globalThis.fetch = async (_input, init) => {
+			sent.push(JSON.parse(String(init?.body)));
+			return new Response(JSON.stringify({ id: "email_test" }), {
+				status: 200,
+			});
+		};
+
+		const response = await contactHandler.fetch(
+			makeRequest(normalFields({ resume_request: "yes" }))
+		);
+
+		assert.equal(response.status, 200);
+		assert.equal(sent[0].subject, "Resume request from A Real Person");
+		assert.match(sent[0].text, /Wants your resume: yes/);
+	});
 });

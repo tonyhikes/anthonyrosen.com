@@ -33,11 +33,11 @@ const viewHref = (view: string) =>
 					data-target="portfolio">Portfolio</a
 				>
 
-				<!-- Resume Link triggers View Change -->
+				<!-- Resume opens the contact dialog with a resume request -->
 				<a
 					href={viewHref("resume")}
-					class="nav-link text-sm font-medium text-slate-600 transition-colors hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400"
-					data-target="resume">Resume</a
+					class="text-sm font-medium text-slate-600 transition-colors hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400"
+					data-contact-dialog-open="resume">Resume</a
 				>
 
 				<a
@@ -139,8 +139,8 @@ const viewHref = (view: string) =>
 			>
 			<a
 				href={viewHref("resume")}
-				class="nav-link block rounded-md px-3 py-2 text-base font-medium text-slate-700 hover:bg-gray-50 hover:text-blue-600 dark:text-slate-200 dark:hover:bg-slate-800"
-				data-target="resume">Resume</a
+				class="block rounded-md px-3 py-2 text-base font-medium text-slate-700 hover:bg-gray-50 hover:text-blue-600 dark:text-slate-200 dark:hover:bg-slate-800"
+				data-contact-dialog-open="resume">Resume</a
 			>
 			<a
 				href="#contact"
@@ -238,6 +238,14 @@ const viewHref = (view: string) =>
 			"aria-expanded",
 			String(!menu?.classList.contains("hidden"))
 		);
+	});
+
+	// The menu's dialog links (Resume) close it too
+	menu?.querySelectorAll("[data-contact-dialog-open]").forEach((link) => {
+		link.addEventListener("click", () => {
+			menu.classList.add("hidden");
+			btn?.setAttribute("aria-expanded", "false");
+		});
 	});
 
 	// Close mobile menu when clicking outside

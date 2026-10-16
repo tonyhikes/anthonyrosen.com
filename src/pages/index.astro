@@ -3,7 +3,6 @@ import Layout from "../layouts/Layout.astro";
 import ManyHatsDeskHero from "../components/ManyHatsDeskHero.astro";
 import Experience from "../components/Experience.astro";
 import ImpactCharts from "../components/ImpactCharts.astro";
-import Resume from "../components/Resume.astro";
 import Portfolio from "../components/Portfolio.astro";
 import StyleGuide from "../components/StyleGuide.astro";
 import Colophon from "../components/Colophon.astro";
@@ -17,8 +16,6 @@ import Colophon from "../components/Colophon.astro";
 			<Experience />
 		</main>
 	</div>
-
-	<Resume />
 	<Portfolio />
 	<StyleGuide />
 	<Colophon />
@@ -43,7 +40,6 @@ import Colophon from "../components/Colophon.astro";
 		// Map view IDs to readable page titles and paths
 		const viewMeta: Record<string, { title: string; path: string }> = {
 			home: { title: "Home", path: "/" },
-			resume: { title: "Resume", path: "/resume" },
 			portfolio: { title: "Portfolio", path: "/portfolio" },
 			styleguide: { title: "Style Guide", path: "/styleguide" },
 			colophon: { title: "Colophon", path: "/colophon" },
@@ -76,14 +72,12 @@ import Colophon from "../components/Colophon.astro";
 
 	function navigateTo(viewId: string) {
 		const homeView = document.getElementById("home-view");
-		const resumeView = document.getElementById("resume-view");
 		const portfolioView = document.getElementById("portfolio-view");
 		const styleGuideView = document.getElementById("styleguide-view");
 		const colophonView = document.getElementById("colophon-view");
 
 		const views = [
 			homeView,
-			resumeView,
 			portfolioView,
 			styleGuideView,
 			colophonView,
@@ -118,12 +112,7 @@ import Colophon from "../components/Colophon.astro";
 		}
 
 		// Show the target view
-		if (viewId === "resume" && resumeView) {
-			resumeView.classList.remove("hidden");
-			resumeView.classList.add("block");
-			resetScroll();
-			trackPageView("resume");
-		} else if (viewId === "portfolio" && portfolioView) {
+		if (viewId === "portfolio" && portfolioView) {
 			portfolioView.classList.remove("hidden");
 			portfolioView.classList.add("block");
 			resetScroll();
@@ -147,7 +136,7 @@ import Colophon from "../components/Colophon.astro";
 		}
 	}
 
-	const mainViews = new Set(["resume", "portfolio", "styleguide", "colophon"]);
+	const mainViews = new Set(["portfolio", "styleguide", "colophon"]);
 	const portfolioSectionShortLinks = new Set([
 		"publishing",
 		"marketing",

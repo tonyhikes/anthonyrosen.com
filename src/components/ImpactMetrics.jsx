@@ -428,19 +428,14 @@ const ImpactMetrics = () => {
 				))}
 			</div>
 
-			{/* Resume Link */}
+			{/* Resume request (opens the contact dialog) */}
 			<div className="mt-10 text-center sm:mt-12">
 				<a
 					href="#resume"
-					onClick={(e) => {
-						e.preventDefault();
-						window.dispatchEvent(
-							new CustomEvent("view-change", { detail: "resume" })
-						);
-					}}
+					data-contact-dialog-open="resume"
 					className="inline-flex items-center gap-2 border-b border-transparent pb-0.5 text-sm font-semibold text-slate-600 transition-colors hover:border-slate-900 hover:text-slate-900 dark:text-slate-400 dark:hover:border-white dark:hover:text-white"
 				>
-					View full resume <ArrowUpRight size={14} />
+					Request a resume <ArrowUpRight size={14} />
 				</a>
 			</div>
 		</div>

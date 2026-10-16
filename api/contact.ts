@@ -129,6 +129,7 @@ export default {
 		const name = cleanSingleLine(formData.get("name"), 80);
 		const email = cleanSingleLine(formData.get("email"), 120).toLowerCase();
 		const message = cleanMessage(formData.get("message"), 2000);
+		const wantsResume = formData.get("resume_request") === "yes";
 
 		if (!name || !emailPattern.test(email) || message.length < 10) {
 			return json(
@@ -158,9 +159,11 @@ export default {
 			name,
 			email,
 			message,
+			wantsResume ? "resume" : "",
 			from,
 			to
 		);
+		const heading = wantsResume ? "Resume request" : "New website inquiry";
 
 		const resendResponse = await fetch("https://api.resend.com/emails", {
 			method: "POST",
@@ -174,9 +177,11 @@ export default {
 				from,
 				to: [to],
 				reply_to: email,
-				subject: `Website inquiry from ${name}`,
-				text: `New website inquiry\n\nName: ${name}\nEmail: ${email}\n\n${message}`,
-				html: `<h2>New website inquiry</h2><p><strong>Name:</strong> ${safeName}<br /><strong>Email:</strong> ${safeEmail}</p><p>${safeMessage}</p>`,
+				subject: wantsResume
+					? `Resume request from ${name}`
+					: `Website inquiry from ${name}`,
+				text: `${heading}\n\nName: ${name}\nEmail: ${email}${wantsResume ? "\nWants your resume: yes" : ""}\n\n${message}`,
+				html: `<h2>${heading}</h2><p><strong>Name:</strong> ${safeName}<br /><strong>Email:</strong> ${safeEmail}${wantsResume ? "<br /><strong>Wants your resume:</strong> yes" : ""}</p><p>${safeMessage}</p>`,
 			}),
 		});
 

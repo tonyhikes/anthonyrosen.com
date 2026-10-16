@@ -93,13 +93,11 @@ const {
 					display: block;
 				}
 			}
-			html[data-initial-view="resume"] #home-view,
 			html[data-initial-view="portfolio"] #home-view,
 			html[data-initial-view="styleguide"] #home-view,
 			html[data-initial-view="colophon"] #home-view {
 				display: none !important;
 			}
-			html[data-initial-view="resume"] #resume-view,
 			html[data-initial-view="portfolio"] #portfolio-view,
 			html[data-initial-view="styleguide"] #styleguide-view,
 			html[data-initial-view="colophon"] #colophon-view {
@@ -122,7 +120,7 @@ const {
 		<script is:inline>
 			const initialHashView = window.location.hash.replace("#", "");
 			if (
-				["resume", "portfolio", "styleguide", "colophon"].includes(
+				["portfolio", "styleguide", "colophon"].includes(
 					initialHashView
 				)
 			) {

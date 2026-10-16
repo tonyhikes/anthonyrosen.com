@@ -35,7 +35,6 @@
 	function getLinkLocation(link: HTMLAnchorElement) {
 		if (link.closest("[data-many-hats-hero]")) return "hero";
 		if (link.closest("#contact-dialog")) return "contact_dialog";
-		if (link.closest("#resume-view")) return "resume";
 		if (link.closest("#portfolio-view")) return "portfolio";
 		if (link.closest("footer")) return "footer";
 		if (link.closest("nav")) return "navigation";
@@ -122,17 +121,28 @@
 		});
 
 		window.addEventListener("contact-form-sent", (event) => {
-			const detail = (event as CustomEvent<{ link_location?: string }>).detail;
+			const detail = (
+				event as CustomEvent<{ link_location?: string; resume_request?: boolean }>
+			).detail;
 			sendJobSearchEvent("contact_form_submit", {
 				contact_method: "form",
 				link_location: detail?.link_location || "page",
+				resume_request: Boolean(detail?.resume_request),
 			});
+			if (detail?.resume_request) {
+				sendJobSearchEvent("resume_request", {
+					link_location: detail?.link_location || "page",
+				});
+			}
 		});
 
 		window.addEventListener("contact-dialog-opened", (event) => {
-			const detail = (event as CustomEvent<{ link_location?: string }>).detail;
+			const detail = (
+				event as CustomEvent<{ link_location?: string; request?: string }>
+			).detail;
 			sendJobSearchEvent("contact_dialog_open", {
 				link_location: detail?.link_location || "page",
+				request: detail?.request || "contact",
 			});
 		});
 

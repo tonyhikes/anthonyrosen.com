@@ -209,6 +209,16 @@ const contactEndpoint = "/api/contact";
 							/>
 						</div>
 
+						<label class="contact-form-check">
+							<input
+								type="checkbox"
+								name="resume_request"
+								value="yes"
+								data-resume-request
+							/>
+							<span>Send me Anthony’s resume</span>
+						</label>
+
 						<div class="contact-form-field">
 							<label for="contact-message">What can I help with?</label>
 							<textarea
@@ -598,29 +608,55 @@ const contactEndpoint = "/api/contact";
 		let lastTrigger: HTMLElement | null = null;
 		let closeTimer = 0;
 
-		function openDialog(trigger: HTMLElement) {
+		function openDialog(trigger: HTMLElement | null) {
 			lastTrigger = trigger;
+			// "resume" openers (nav, footer, metrics) go straight to the note
+			// form with the resume request already checked
+			const resume = trigger?.dataset.contactDialogOpen === "resume";
+			const resumeBox = dialog.querySelector<HTMLInputElement>(
+				"[data-resume-request]"
+			);
+			if (resumeBox) resumeBox.checked = resume;
 			if (!dialog.open) dialog.showModal();
 			window.dispatchEvent(
 				new CustomEvent("contact-dialog-opened", {
 					detail: {
-						link_location: trigger.closest("[data-many-hats-hero]")
+						link_location: trigger?.closest("[data-many-hats-hero]")
 							? "hero"
-							: trigger.closest("nav")
+							: trigger?.closest("nav")
 								? "navigation"
-								: "page",
+								: trigger?.closest("footer")
+									? "footer"
+									: "page",
+						request: resume ? "resume" : "contact",
 					},
 				})
 			);
 			const tabsRoot = document.getElementById("contact-dialog-connect-tabs");
-			if (tabsRoot) activateContactTab(tabsRoot, "schedule");
+			if (tabsRoot) activateContactTab(tabsRoot, resume ? "form" : "schedule");
+			if (resume) {
+				dialog.querySelector<HTMLInputElement>("#contact-name")?.focus();
+			}
 		}
+
+		// old /#resume links open the resume request
+		function openFromHash() {
+			if (window.location.hash.toLowerCase() !== "#resume") return;
+			history.replaceState(
+				null,
+				"",
+				`${window.location.pathname}${window.location.search}`
+			);
+			openDialog(document.querySelector<HTMLElement>("[data-contact-dialog-open='resume']"));
+		}
+		openFromHash();
+		window.addEventListener("hashchange", openFromHash);
 
 		function finishClose() {
 			window.clearTimeout(closeTimer);
 			dialog.classList.remove("is-closing");
 			if (dialog.open) dialog.close();
-			lastTrigger?.focus();
+			lastTrigger?.focus({ preventScroll: true });
 		}
 
 		function closeDialog() {
@@ -778,6 +814,9 @@ const contactEndpoint = "/api/contact";
 				if (!endpoint || !submitButton || !submitLabel) return;
 				if (!form.reportValidity()) return;
 
+				const wantsResume = Boolean(
+					form.querySelector<HTMLInputElement>("[data-resume-request]")?.checked
+				);
 				submitButton.disabled = true;
 				submitLabel.textContent = "Sending…";
 				if (formStatus) formStatus.textContent = "Sending your message.";
@@ -805,6 +844,7 @@ const contactEndpoint = "/api/contact";
 						new CustomEvent("contact-form-sent", {
 							detail: {
 								link_location: form.dataset.formLocation || "page",
+								resume_request: wantsResume,
 							},
 						})
 					);
@@ -1268,6 +1308,31 @@ const contactEndpoint = "/api/contact";
 	.contact-form-field input:user-invalid,
 	.contact-form-field textarea:user-invalid {
 		border-color: #b42318;
+	}
+
+	.contact-form-check {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		cursor: pointer;
+		font:
+			600 0.88rem/1.4 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.contact-form-check input {
+		width: 1.15rem;
+		height: 1.15rem;
+		margin: 0;
+		flex: none;
+		accent-color: #315b89;
+		cursor: pointer;
+	}
+
+	.contact-form-check input:focus-visible {
+		outline: 2px solid #315b89;
+		outline-offset: 2px;
 	}
 
 	.contact-form-honeypot {
