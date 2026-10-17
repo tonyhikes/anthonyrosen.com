@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Always reserve the scrollbar's space: the page streams in shorter than
+   the window, and a scrollbar appearing mid-load would shift everything */
+html {
+	scrollbar-gutter: stable;
+}
+
 /* ---- Typography tokens ------------------------------------------------------
    The site's fonts are defined here and only here. Components use the tokens
    (`var(--font-display)` in CSS, `font-display` in Tailwind), never a family

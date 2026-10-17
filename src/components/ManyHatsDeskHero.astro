@@ -138,6 +138,7 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 		</div>
 	</div>
 
+	<noscript><style>.mhd .mhd-inner { visibility: visible !important; }</style></noscript>
 	<p class="mhd-sr" aria-live="polite" data-mhd-status></p>
 	<script is:inline type="application/json" data-hat-roles set:html={serializeHatRoles("desk")} />
 </section>
@@ -218,6 +219,7 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 			root.style.setProperty("--fig-h", Math.round(Math.min(l.tall, l.room)) + "px");
 		};
 		fit();
+		root.dataset.fit = ""; // placed: show it (see .mhd-inner)
 		let frame = 0;
 		const refit = () => {
 			cancelAnimationFrame(frame);
@@ -529,6 +531,14 @@ const stageSizes = "(max-width: 639px) and (max-aspect-ratio: 6/5) 135vw, (max-w
 	   Desktop: statement and support stack on the left; the photograph
 	   fills the right column and bleeds off the right and bottom edges.
 	   Phones: statement, then the photograph (with the dock), then support. */
+	/* Hidden until the fit script under the section has placed the photo
+	   and buttons: if the browser paints mid-download, before the script
+	   runs, nothing then jumps (layout shift). The script runs as soon as
+	   the section has arrived; without JS the <noscript> style shows it. */
+	.mhd:not([data-fit]) .mhd-inner {
+		visibility: hidden;
+	}
+
 	.mhd-inner {
 		display: grid;
 		grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
