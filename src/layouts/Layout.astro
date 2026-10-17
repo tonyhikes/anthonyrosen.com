@@ -13,11 +13,13 @@ import ContactDialog from "../components/ContactDialog.astro";
 interface Props {
 	title: string;
 	description?: string;
+	noindex?: boolean;
 }
 
 const {
 	title,
 	description = "Anthony Rosen - Marketing & Creative Project Manager. Specialized in product marketing, satellite communications, and creative team leadership.",
+	noindex = false,
 } = Astro.props;
 ---
 
@@ -27,7 +29,7 @@ const {
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<title>{title}</title>
-		<SEO title={title} description={description} />
+		<SEO title={title} description={description} noindex={noindex} />
 		<link
 			rel="icon"
 			type="image/png"

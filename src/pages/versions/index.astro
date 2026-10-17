@@ -1,0 +1,121 @@
+---
+// The /versions gallery: a noindexed index of the homepage designs this site
+// has shipped over time, so past versions stay easy to preview. The current
+// live design is listed first and links to the real homepage; earlier designs
+// link to their archived, reconstructed previews.
+import Layout from "../../layouts/Layout.astro";
+
+const versions = [
+	{
+		name: "Many Hats Desk",
+		status: "live",
+		era: "2025 – present",
+		href: "/",
+		thumb: "/version-thumbs/many-hats-desk.png",
+		blurb:
+			"The current homepage: a statement whose role word, underline and color switch with each hat, beside Anthony at his desk and a glass hat dock.",
+	},
+	{
+		name: "Hi, I'm Anthony",
+		status: "archived",
+		era: "earlier 2025",
+		href: "/versions/hi-im-anthony",
+		thumb: "/version-thumbs/hi-im-anthony.png",
+		blurb:
+			"A quiet serif greeting with a waving hand — “Hi. I’m Anthony.” — that ran for a while before the desk hero.",
+	},
+	{
+		name: "Stone Slam",
+		status: "archived",
+		era: "2024 – early 2025",
+		href: "/versions/stone-slam",
+		thumb: "/version-thumbs/stone-slam.png",
+		blurb:
+			"The “Tired of the fluff?” hero with a fixed 3D cotton-ball scene and a headline that slams into place as you scroll.",
+	},
+];
+---
+
+<Layout title="Homepage versions | Anthony Rosen" noindex={true}>
+	<main class="mx-auto max-w-6xl px-4 pt-28 pb-24 sm:px-6 lg:px-8">
+		<header class="mb-12 max-w-2xl">
+			<p
+				class="mb-3 text-xs font-bold tracking-widest text-blue-600 uppercase dark:text-blue-400"
+			>
+				Design archive
+			</p>
+			<h1
+				class="mb-4 text-4xl font-black tracking-tight text-slate-900 md:text-5xl dark:text-white"
+			>
+				Homepage versions
+			</h1>
+			<p class="text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+				Every homepage design this site has shipped, kept around so each one
+				stays a click away. The live design is first; the rest are archived
+				previews reconstructed from their original code.
+			</p>
+		</header>
+
+		<ul class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+			{
+				versions.map((v) => (
+					<li>
+						<a
+							href={v.href}
+							class="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-700"
+						>
+							<div class="relative aspect-[16/10] overflow-hidden bg-slate-100 dark:bg-slate-900">
+								<img
+									src={v.thumb}
+									alt={`Preview of the ${v.name} homepage`}
+									loading="lazy"
+									class="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+								/>
+								<span
+									class:list={[
+										"absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-bold tracking-wide uppercase shadow-sm",
+										v.status === "live"
+											? "bg-emerald-500 text-white"
+											: "bg-slate-900/80 text-white backdrop-blur",
+									]}
+								>
+									{v.status === "live" ? "Live" : "Archived"}
+								</span>
+							</div>
+							<div class="flex flex-1 flex-col p-6">
+								<div class="mb-2 flex items-baseline justify-between gap-3">
+									<h2 class="text-lg font-bold text-slate-900 dark:text-white">
+										{v.name}
+									</h2>
+									<span class="shrink-0 text-xs font-medium text-slate-400 dark:text-slate-500">
+										{v.era}
+									</span>
+								</div>
+								<p class="mb-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+									{v.blurb}
+								</p>
+								<span class="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400">
+									{v.status === "live" ? "Visit live site" : "Preview version"}
+									<svg
+										class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.5"
+										viewBox="0 0 24 24"
+										aria-hidden="true"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											d="M17 8l4 4m0 0l-4 4m4-4H3"
+										/>
+									</svg>
+								</span>
+							</div>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</main>
+</Layout>

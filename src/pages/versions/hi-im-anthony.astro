@@ -1,0 +1,36 @@
+---
+// Archived homepage version: "Hi, I'm Anthony" — the simple serif greeting
+// hero (waving hand) that ran between the Stone Slam and the current Many Hats
+// desk hero. Reconstructed from the live state at commit d454cf1^. Noindexed
+// preview, linked only from /versions. Not the live site.
+import Layout from "../../layouts/Layout.astro";
+import HiImAnthonyHero from "../../components/versions/HiImAnthonyHero.astro";
+import ImpactCharts from "../../components/ImpactCharts.astro";
+import Experience from "../../components/Experience.astro";
+import VersionBadge from "../../components/versions/VersionBadge.astro";
+---
+
+<Layout
+	title="Hi, I'm Anthony (archived version) | Anthony Rosen"
+	noindex={true}
+>
+	<VersionBadge label="Archived version — Hi, I'm Anthony" />
+
+	<div id="home-view" class="block">
+		<main class="content-layer relative z-30 bg-white dark:bg-slate-900">
+			<HiImAnthonyHero />
+			<ImpactCharts />
+			<Experience />
+		</main>
+	</div>
+</Layout>
+
+<script>
+	// This archived page has no SPA view-switching; forward the shared Navbar's
+	// view-change events to the live site instead.
+	window.addEventListener("view-change", (e: Event) => {
+		const viewId = (e as CustomEvent).detail;
+		if (viewId === "contact") return; // ContactDialog handles its own event
+		window.location.href = viewId === "home" ? "/" : `/#${viewId}`;
+	});
+</script>

@@ -14,7 +14,13 @@ export default defineConfig({
         plugins: [tailwindcss()],
     },
 
-    integrations: [react(), sitemap()],
+    integrations: [
+        react(),
+        sitemap({
+            // Version previews are noindexed drafts; keep them out of the sitemap.
+            filter: (page) => !page.includes("/versions"),
+        }),
+    ],
 
     // Performance optimizations
     build: {

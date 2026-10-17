@@ -1,0 +1,72 @@
+---
+// Archived homepage version: "Stone Slam" — the "Tired of the fluff?" hero
+// with the fixed 3D cotton-ball scene and the slam entrance animation.
+// Reconstructed from the live state at commit c2edaf5^. Noindexed preview,
+// linked only from /versions. Not the live site.
+import Layout from "../../layouts/Layout.astro";
+import ThreeScene from "../../components/versions/stone-slam/ThreeScene.astro";
+import Hero from "../../components/versions/stone-slam/Hero.astro";
+import SlamSection from "../../components/versions/stone-slam/SlamSection.astro";
+import ImpactCharts from "../../components/ImpactCharts.astro";
+import Experience from "../../components/Experience.astro";
+import VersionBadge from "../../components/versions/VersionBadge.astro";
+---
+
+<Layout
+	title="Stone Slam (archived version) | Anthony Rosen"
+	noindex={true}
+>
+	<VersionBadge label="Archived version — Stone Slam" />
+
+	<ThreeScene />
+	<div id="home-view" class="block">
+		<Hero />
+		<main
+			class="content-layer relative z-10 bg-white shadow-2xl dark:bg-slate-900"
+		>
+			<SlamSection />
+			<ImpactCharts />
+			<Experience />
+		</main>
+	</div>
+</Layout>
+
+<style>
+	.content-layer {
+		position: relative;
+		z-index: 10;
+		margin-top: 100vh; /* Push content down to reveal the fixed hero */
+	}
+</style>
+
+<!-- Slam animation styles that this archived version relied on (they no
+     longer live in the site's global stylesheet). -->
+<style is:global>
+	.slam-text {
+		text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+	}
+
+	@keyframes slam {
+		0% {
+			transform: scale(8);
+			opacity: 0;
+		}
+		40% {
+			opacity: 1;
+		}
+		100% {
+			transform: scale(1);
+			opacity: 1;
+		}
+	}
+</style>
+
+<script>
+	// This archived page has no SPA view-switching; forward the shared Navbar's
+	// view-change events to the live site instead.
+	window.addEventListener("view-change", (e: Event) => {
+		const viewId = (e as CustomEvent).detail;
+		if (viewId === "contact") return; // ContactDialog handles its own event
+		window.location.href = viewId === "home" ? "/" : `/#${viewId}`;
+	});
+</script>

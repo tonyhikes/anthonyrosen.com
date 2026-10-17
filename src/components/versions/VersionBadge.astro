@@ -1,0 +1,74 @@
+---
+// A small fixed pill shown on archived version previews: marks the page as an
+// archived design and links back to the /versions gallery. Kept visually quiet
+// so it doesn't disrupt the design it sits on top of.
+interface Props {
+	label: string;
+}
+const { label } = Astro.props;
+---
+
+<a
+	href="/versions"
+	class="version-badge"
+	aria-label={`${label}. Back to all versions.`}
+>
+	<span class="version-badge-dot" aria-hidden="true"></span>
+	<span class="version-badge-text">{label}</span>
+	<span class="version-badge-back">← All versions</span>
+</a>
+
+<style>
+	.version-badge {
+		position: fixed;
+		bottom: 1rem;
+		left: 1rem;
+		z-index: 70;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.9rem;
+		border-radius: 999px;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		background: rgba(15, 23, 42, 0.86);
+		backdrop-filter: blur(8px);
+		color: #fff;
+		font-family: "Inter", system-ui, sans-serif;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.01em;
+		text-decoration: none;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+		transition:
+			transform 160ms ease,
+			background-color 160ms ease;
+	}
+
+	.version-badge:hover {
+		transform: translateY(-2px);
+		background: rgba(15, 23, 42, 0.96);
+	}
+
+	.version-badge-dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 999px;
+		background: #fbbf24;
+		flex: none;
+	}
+
+	.version-badge-back {
+		padding-left: 0.6rem;
+		margin-left: 0.1rem;
+		border-left: 1px solid rgba(255, 255, 255, 0.22);
+		color: #cbd5e1;
+		font-weight: 500;
+		white-space: nowrap;
+	}
+
+	@media (max-width: 520px) {
+		.version-badge-text {
+			display: none;
+		}
+	}
+</style>
