@@ -1,0 +1,51 @@
+---
+
+---
+
+<!-- Leadfeeder (Dealfront) Web Visitors Tracker - starts once analytics consent is granted -->
+<script is:inline>
+	/* eslint-disable */
+	(() => {
+		const CONSENT_KEY = "cookie-consent";
+		let loaded = false;
+
+		function loadLeadfeeder() {
+			if (loaded) return;
+			loaded = true;
+
+			// Keep this loader identical to the Leadfeeder/Dealfront dashboard snippet.
+			(function (ss, ex) {
+				window.ldfdr =
+					window.ldfdr ||
+					function () {
+						(ldfdr._q = ldfdr._q || []).push([].slice.call(arguments));
+					};
+				(function (d, s) {
+					var fs = d.getElementsByTagName(s)[0];
+					function ce(src) {
+						var cs = d.createElement(s);
+						cs.src = src;
+						cs.async = 1;
+						fs.parentNode.insertBefore(cs, fs);
+					}
+					ce(
+						"https://sc.lfeeder.com/lftracker_v1_" +
+							ss +
+							(ex ? "_" + ex : "") +
+							".js"
+					);
+				})(document, "script");
+			})("ywVkO4XXkNx4Z6Bj");
+		}
+
+		if (localStorage.getItem(CONSENT_KEY) === "accepted") {
+			loadLeadfeeder();
+		}
+
+		window.addEventListener("cookie-consent-updated", (event) => {
+			if (event && event.detail === "accepted") {
+				loadLeadfeeder();
+			}
+		});
+	})();
+</script>

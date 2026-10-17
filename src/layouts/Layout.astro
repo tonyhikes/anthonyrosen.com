@@ -7,17 +7,20 @@ import PostHog from "../components/PostHog.astro";
 import SEO from "../components/SEO.astro";
 import LinkedInTag from "../components/LinkedInTag.astro";
 import RB2B from "../components/RB2B.astro";
+import Leadfeeder from "../components/Leadfeeder.astro";
 import JobSearchAnalytics from "../components/JobSearchAnalytics.astro";
 import ContactDialog from "../components/ContactDialog.astro";
 
 interface Props {
 	title: string;
 	description?: string;
+	noindex?: boolean;
 }
 
 const {
 	title,
 	description = "Anthony Rosen - Marketing & Creative Project Manager. Specialized in product marketing, satellite communications, and creative team leadership.",
+	noindex = false,
 } = Astro.props;
 ---
 
@@ -27,7 +30,7 @@ const {
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<title>{title}</title>
-		<SEO title={title} description={description} />
+		<SEO title={title} description={description} noindex={noindex} />
 		<link
 			rel="icon"
 			type="image/png"
@@ -248,6 +251,7 @@ const {
 		<PostHog />
 		<LinkedInTag />
 		<RB2B />
+		<Leadfeeder />
 		<JobSearchAnalytics />
 	</head>
 	<body
