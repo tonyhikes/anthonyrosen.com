@@ -12,7 +12,7 @@ Tony Rosen's portfolio website - a single-page application built with Astro, fea
 - **Styling:** Tailwind CSS 4 (with Preline UI plugin)
 - **Animations:** Lightweight CSS and browser-native animations
 - **Smooth Scroll:** Lenis
-- **Analytics:** PostHog, Google Analytics 4, LinkedIn Insight Tag, RB2B
+- **Analytics:** PostHog, Google Analytics 4, LinkedIn Insight Tag, RB2B, Leadfeeder (Dealfront)
 - **Performance:** Deferred analytics and interaction-first loading
 
 ## Commands
@@ -105,12 +105,17 @@ The hat flies off and the next one lands (WAAPI, compositor-only transforms/opac
 
 ### Analytics Integration
 
-**Four tracking services** (loaded only after analytics consent):
+**Five tracking services** (loaded only after analytics consent):
 
 1. **Google Analytics 4** (`G-7LRLJTJG4L`)
 2. **PostHog** (configured in `PostHog.astro`)
 3. **LinkedIn Insight Tag** (`LinkedInTag.astro`)
-4. **RB2B** (B2B visitor identification, `RB2B.astro`)
+4. **RB2B** (company-level visitor identification, `RB2B.astro`)
+5. **Leadfeeder / Dealfront** (company-level visitor identification, `Leadfeeder.astro`)
+
+RB2B and Leadfeeder both do company-level visitor identification and run
+side by side intentionally, so their free tiers can be compared; either can be
+removed on its own by dropping its component from `Layout.astro`.
 
 **Virtual pageviews:** Each view switch tracks as a pageview with custom path/title.
 
@@ -147,7 +152,8 @@ src/
 │   ├── CookieBanner.astro      # GDPR cookie consent
 │   ├── PostHog.astro           # PostHog analytics init
 │   ├── LinkedInTag.astro       # LinkedIn Insight Tag
-│   ├── RB2B.astro              # RB2B tracking script
+│   ├── RB2B.astro              # RB2B visitor identification script
+│   ├── Leadfeeder.astro        # Leadfeeder/Dealfront visitor identification script
 │   ├── JobSearchAnalytics.astro # GA4/PostHog job-search events
 │   └── SEO.astro               # Meta tags component
 ├── layouts/
