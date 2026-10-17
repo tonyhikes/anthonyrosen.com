@@ -5,6 +5,13 @@
 // link to their archived, reconstructed previews.
 import Layout from "../../layouts/Layout.astro";
 
+// Keep the versions archive OUT of the production (live) site. It still builds
+// in local dev and in Vercel preview deployments, so it stays easy to preview,
+// but is never served from anthonyrosen.com.
+if (process.env.VERCEL_ENV === "production") {
+	return new Response(null, { status: 404 });
+}
+
 const versions = [
 	{
 		name: "Many Hats Desk",

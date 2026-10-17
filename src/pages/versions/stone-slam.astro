@@ -10,6 +10,12 @@ import SlamSection from "../../components/versions/stone-slam/SlamSection.astro"
 import ImpactCharts from "../../components/ImpactCharts.astro";
 import Experience from "../../components/Experience.astro";
 import VersionBadge from "../../components/versions/VersionBadge.astro";
+
+// Excluded from the production (live) site; still builds in dev and in Vercel
+// preview deployments. See /versions index for the rationale.
+if (process.env.VERCEL_ENV === "production") {
+	return new Response(null, { status: 404 });
+}
 ---
 
 <Layout
