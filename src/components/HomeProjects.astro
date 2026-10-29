@@ -1,0 +1,133 @@
+---
+// Projects on the homepage. One project for now (Alzheimer's for Amateurs).
+---
+
+<section
+	aria-labelledby="projects-heading"
+	class="bg-slate-50 pt-24 pb-28 transition-colors duration-300 md:pt-28 md:pb-32 dark:bg-[#0B1120]"
+>
+	<div class="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
+		<div class="mb-12 md:mb-14">
+			<p
+				class="mb-2.5 text-[13px] font-semibold tracking-[0.1em] text-slate-600 uppercase dark:text-slate-400"
+			>
+				Projects
+			</p>
+			<h2
+				id="projects-heading"
+				class="font-display text-4xl leading-tight text-slate-900 md:text-[44px] dark:text-white"
+			>
+				What I’m building now
+			</h2>
+		</div>
+
+		<article
+			class="rounded-lg border border-[#cfdcd2] bg-[#e5ede7] px-6 py-10 sm:px-10 md:px-[88px] md:py-[72px] dark:border-[#234231] dark:bg-[#234231]/25"
+		>
+			<p class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[17px] text-[#1f3d2f] dark:text-[#cfe0d3]">
+				Research, in plain language
+				<span class="live-tag">
+					<span class="live-dot" aria-hidden="true"></span>
+					Live
+				</span>
+			</p>
+			<h3
+				class="font-display mt-2 text-[40px] leading-[1.08] tracking-[-0.02em] text-slate-900 sm:text-5xl md:text-[64px] dark:text-white"
+			>
+				Alzheimer’s for Amateurs
+			</h3>
+			<p class="mt-5 max-w-[34em] text-lg leading-relaxed text-slate-700 md:text-[21px] dark:text-slate-300">
+				Exploring Alzheimer’s research with curiosity, care, and a commitment to
+				making complex ideas easier to understand.
+			</p>
+			<a
+				href="https://alzamateurs.com"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="mt-8 inline-flex min-h-11 items-center gap-6 text-lg font-semibold text-black md:text-xl dark:text-white"
+			>
+				<span class="border-b-2 border-current pb-1">Visit alzamateurs.com</span>
+				<span class="border-b-2 border-current text-[22px] leading-none font-normal" aria-hidden="true">↗</span>
+				<span class="sr-only">(opens in a new tab)</span>
+			</a>
+		</article>
+	</div>
+</section>
+
+<style>
+	/* A quiet "on air" tag in the Product hat greens (cap #234231, ink #1f3d2f,
+	   tint #e5ede7): the dot sends out a soft ring every few seconds. */
+	.live-tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		padding: 0.2rem 0.6rem 0.2rem 0.5rem;
+		border: 1px solid #cfdcd2;
+		border-radius: 0.375rem;
+		background: #fff;
+		color: #1f3d2f;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		animation: live-breathe 2.8s ease-in-out infinite;
+	}
+
+	.live-dot {
+		position: relative;
+		width: 0.45rem;
+		height: 0.45rem;
+		border-radius: 999px;
+		background: #234231;
+	}
+
+	.live-dot::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		background: #234231;
+		animation: live-ring 2.8s ease-out infinite;
+	}
+
+	@keyframes live-ring {
+		0% {
+			transform: scale(1);
+			opacity: 0.45;
+		}
+		70%,
+		100% {
+			transform: scale(2.6);
+			opacity: 0;
+		}
+	}
+
+	@keyframes live-breathe {
+		0%,
+		100% {
+			border-color: #cfdcd2;
+		}
+		50% {
+			border-color: #8fae98;
+		}
+	}
+
+	:global(.dark) .live-tag {
+		border-color: #234231;
+		background: rgb(35 66 49 / 0.4);
+		color: #cfe0d3;
+		animation: none;
+	}
+
+	:global(.dark) .live-dot,
+	:global(.dark) .live-dot::after {
+		background: #8fae98;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.live-tag,
+		.live-dot::after {
+			animation: none;
+		}
+	}
+</style>
