@@ -349,32 +349,30 @@ const contactEndpoint = "/api/contact";
 				&copy; <span id="year"></span> Anthony Rosen.
 			</p>
 
-			<div class="footer-versions">
-				<a href="/versions" class="footer-versions-label">
-					Homepage versions
-				</a>
-				<ul class="footer-versions-list">
+			<a
+				href="/versions"
+				class="footer-versions"
+				aria-label="See all homepage versions"
+			>
+				<span class="footer-versions-label">Homepage versions</span>
+				<span class="footer-versions-list">
 					{
 						siteVersionsByNumber.map((v) => (
-							<li>
-								<a
-									href={v.href}
-									class:list={[
-										"footer-version",
-										v.status === "live" && "is-current",
-									]}
-									title={`${v.name}${v.status === "live" ? " (current)" : ""}`}
-								>
-									v{v.version}
-									{v.status === "live" && (
-										<span class="footer-version-current">current</span>
-									)}
-								</a>
-							</li>
+							<span
+								class:list={[
+									"footer-version",
+									v.status === "live" && "is-current",
+								]}
+							>
+								v{v.version}
+								{v.status === "live" && (
+									<span class="footer-version-current">current</span>
+								)}
+							</span>
 						))
 					}
-				</ul>
-			</div>
+				</span>
+			</a>
 		</div>
 	</div>
 </footer>
@@ -1077,6 +1075,8 @@ const contactEndpoint = "/api/contact";
 		gap: 0.6rem 1rem;
 		padding-top: 1.25rem;
 		border-top: 1px solid #1e293b;
+		color: inherit;
+		text-decoration: none;
 	}
 
 	.footer-versions-label {
@@ -1091,7 +1091,7 @@ const contactEndpoint = "/api/contact";
 		transition: color 150ms ease;
 	}
 
-	.footer-versions-label:hover {
+	.footer-versions:hover .footer-versions-label {
 		color: #93c5fd;
 	}
 
@@ -1124,9 +1124,8 @@ const contactEndpoint = "/api/contact";
 			background 150ms ease;
 	}
 
-	.footer-version:hover {
-		color: #bfdbfe;
-		border-color: rgba(147, 197, 253, 0.45);
+	.footer-versions:hover .footer-version {
+		border-color: rgba(147, 197, 253, 0.4);
 	}
 
 	.footer-version.is-current {
