@@ -66,8 +66,9 @@ Past homepage designs are kept as previewable archives so they stay one click aw
 - **Gallery:** `/versions` lists each design (the live one plus archived previews) with thumbnails from `public/version-thumbs/`.
 - **Archived previews:** `/versions/stone-slam` (the "Tired of the fluff?" hero with the 3D cotton-ball scene and slam animation) and `/versions/hi-im-anthony` (the simple serif greeting hero). Each is reconstructed from the version that was live at a specific commit.
 - **Self-contained components:** version-specific components live under `src/components/versions/` (e.g. `stone-slam/` holds that era's `Hero`, `ThreeScene`, `SlamSection`, fallback and worker). The stone slam preview is why `three` is a dependency; it is bundled only on that route, not the live site. `SlamSection` loads anime.js from a CDN at runtime.
-- **Kept off the live site:** every `/versions` page is `noindex`, excluded from the sitemap (filter in `astro.config.mjs`), and returns 404 in production via a `VERCEL_ENV === "production"` guard, so Astro omits it from the production build. The pages still build in local dev and Vercel preview deployments, so they remain easy to preview.
-- Adding a version: drop its component(s) under `src/components/versions/`, add a `src/pages/versions/<slug>.astro` route (with the production guard and a `VersionBadge`), and add an entry to the `versions` array in `src/pages/versions/index.astro`.
+- **Live but noindexed:** the `/versions` pages deploy with the rest of the site, but every one sets `noindex` (so it stays out of search) and is excluded from the sitemap (filter in `astro.config.mjs`). The gallery is linked from the footer's "Site info" column.
+- **Switcher:** archived previews hide the site navbar (`Layout` `hideNav`) and render `VersionSwitcher.astro` as a fixed header, to jump between versions (including back to the live site) or to the gallery. The version list lives in `src/data/site-versions.ts`, shared by the gallery and the switcher.
+- Adding a version: drop its component(s) under `src/components/versions/`, add a `src/pages/versions/<slug>.astro` route (`noindex`, `hideNav`, and `<VersionSwitcher current="<key>" />`), and add an entry to `src/data/site-versions.ts`.
 
 ### Performance Optimizations
 
@@ -160,7 +161,7 @@ src/
 │   └── Layout.astro            # Main layout (includes Lenis, theme, analytics)
 ├── pages/
 │   ├── index.astro             # Main SPA page (all views)
-│   ├── versions/               # /versions archive (noindexed; off the production build)
+│   ├── versions/               # /versions archive (live but noindexed)
 │   └── privacy.astro           # Privacy policy page
 ├── styles/
 │   └── global.css              # Shared styles and Lenis styles

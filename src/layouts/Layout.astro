@@ -15,12 +15,14 @@ interface Props {
 	title: string;
 	description?: string;
 	noindex?: boolean;
+	hideNav?: boolean;
 }
 
 const {
 	title,
 	description = "Anthony Rosen - Marketing & Creative Project Manager. Specialized in product marketing, satellite communications, and creative team leadership.",
 	noindex = false,
+	hideNav = false,
 } = Astro.props;
 ---
 
@@ -257,7 +259,7 @@ const {
 	<body
 		class="bg-slate-900 text-gray-900 transition-colors duration-300 selection:bg-blue-500 selection:text-white dark:text-white"
 	>
-		<Navbar />
+		{!hideNav && <Navbar />}
 		<slot />
 		<Footer />
 		<ContactDialog />

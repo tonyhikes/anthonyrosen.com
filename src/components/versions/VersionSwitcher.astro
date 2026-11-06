@@ -1,0 +1,220 @@
+---
+// Header bar shown on archived version previews. Marks the page as an archived
+// design and lets you jump between versions (including back to the live site)
+// or to the full gallery. Replaces the site navbar on those pages.
+import { siteVersions } from "../../data/site-versions";
+
+interface Props {
+	/** `key` of the version being viewed (from site-versions.ts). */
+	current: string;
+}
+const { current } = Astro.props;
+const active = siteVersions.find((v) => v.key === current);
+---
+
+<header class="version-switcher">
+	<div class="version-switcher-inner">
+		<a href="/versions" class="vs-brand" aria-label="Back to all versions">
+			<span class="vs-dot" aria-hidden="true"></span>
+			<span class="vs-eyebrow">Archived version</span>
+			{active && <span class="vs-name">{active.name}</span>}
+		</a>
+
+		<div class="vs-controls">
+			<label class="vs-select-label" for="vs-select">Viewing</label>
+			<div class="vs-select-wrap">
+				<select id="vs-select" class="vs-select" data-version-switcher>
+					{
+						siteVersions.map((v) => (
+							<option value={v.href} selected={v.key === current}>
+								{v.name}
+								{v.status === "live" ? " — live site" : ""}
+							</option>
+						))
+					}
+				</select>
+				<svg
+					class="vs-chevron"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					aria-hidden="true"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M6 9l6 6 6-6"></path>
+				</svg>
+			</div>
+			<a href="/versions" class="vs-all">All versions</a>
+		</div>
+	</div>
+</header>
+
+<script>
+	function initVersionSwitcher() {
+		const sel = document.querySelector<HTMLSelectElement>(
+			"[data-version-switcher]"
+		);
+		if (!sel || sel.dataset.ready === "true") return;
+		sel.dataset.ready = "true";
+		sel.addEventListener("change", () => {
+			if (sel.value) window.location.href = sel.value;
+		});
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initVersionSwitcher, {
+			once: true,
+		});
+	} else {
+		initVersionSwitcher();
+	}
+	document.addEventListener("astro:page-load", initVersionSwitcher);
+</script>
+
+<style>
+	.version-switcher {
+		position: fixed;
+		inset: 0 0 auto 0;
+		z-index: 80;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+		background: rgba(15, 23, 42, 0.92);
+		backdrop-filter: blur(10px);
+		color: #fff;
+		font-family: Inter, system-ui, sans-serif;
+	}
+
+	.version-switcher-inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		width: min(100%, 85rem);
+		margin: 0 auto;
+		padding: 0.6rem 1rem;
+	}
+
+	.vs-brand {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		min-width: 0;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.vs-dot {
+		align-self: center;
+		width: 0.5rem;
+		height: 0.5rem;
+		flex: none;
+		border-radius: 999px;
+		background: #fbbf24;
+	}
+
+	.vs-eyebrow {
+		flex: none;
+		font-size: 0.68rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: #cbd5e1;
+	}
+
+	.vs-name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: 0.85rem;
+		font-weight: 700;
+	}
+
+	.vs-controls {
+		display: flex;
+		flex: none;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.vs-select-label {
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: #94a3b8;
+	}
+
+	.vs-select-wrap {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+	}
+
+	.vs-select {
+		appearance: none;
+		-webkit-appearance: none;
+		padding: 0.45rem 2rem 0.45rem 0.85rem;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.07);
+		color: #fff;
+		font-family: inherit;
+		font-size: 0.82rem;
+		font-weight: 650;
+		cursor: pointer;
+		transition:
+			border-color 150ms ease,
+			background 150ms ease;
+	}
+
+	.vs-select:hover {
+		border-color: rgba(147, 197, 253, 0.65);
+		background: rgba(147, 197, 253, 0.12);
+	}
+
+	.vs-select:focus-visible {
+		outline: 3px solid #60a5fa;
+		outline-offset: 2px;
+	}
+
+	/* Dropdown options render in the OS menu, so force readable colors. */
+	.vs-select option {
+		color: #0f172a;
+		background: #fff;
+	}
+
+	.vs-chevron {
+		position: absolute;
+		right: 0.7rem;
+		width: 0.85rem;
+		height: 0.85rem;
+		pointer-events: none;
+		color: #cbd5e1;
+	}
+
+	.vs-all {
+		flex: none;
+		color: #93c5fd;
+		font-size: 0.8rem;
+		font-weight: 650;
+		text-decoration: none;
+		white-space: nowrap;
+	}
+
+	.vs-all:hover {
+		color: #bfdbfe;
+		text-decoration: underline;
+	}
+
+	@media (max-width: 560px) {
+		.vs-name,
+		.vs-select-label {
+			display: none;
+		}
+		.vs-controls {
+			gap: 0.6rem;
+		}
+	}
+</style>

@@ -9,20 +9,15 @@ import Hero from "../../components/versions/stone-slam/Hero.astro";
 import SlamSection from "../../components/versions/stone-slam/SlamSection.astro";
 import ImpactCharts from "../../components/ImpactCharts.astro";
 import Experience from "../../components/Experience.astro";
-import VersionBadge from "../../components/versions/VersionBadge.astro";
-
-// Excluded from the production (live) site; still builds in dev and in Vercel
-// preview deployments. See /versions index for the rationale.
-if (process.env.VERCEL_ENV === "production") {
-	return new Response(null, { status: 404 });
-}
+import VersionSwitcher from "../../components/versions/VersionSwitcher.astro";
 ---
 
 <Layout
 	title="Stone Slam (archived version) | Anthony Rosen"
 	noindex={true}
+	hideNav={true}
 >
-	<VersionBadge label="Archived version — Stone Slam" />
+	<VersionSwitcher current="stone-slam" />
 
 	<ThreeScene />
 	<div id="home-view" class="block">
