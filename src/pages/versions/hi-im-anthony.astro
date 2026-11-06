@@ -7,20 +7,15 @@ import Layout from "../../layouts/Layout.astro";
 import HiImAnthonyHero from "../../components/versions/HiImAnthonyHero.astro";
 import ImpactCharts from "../../components/ImpactCharts.astro";
 import Experience from "../../components/Experience.astro";
-import VersionBadge from "../../components/versions/VersionBadge.astro";
-
-// Excluded from the production (live) site; still builds in dev and in Vercel
-// preview deployments. See /versions index for the rationale.
-if (process.env.VERCEL_ENV === "production") {
-	return new Response(null, { status: 404 });
-}
+import VersionSwitcher from "../../components/versions/VersionSwitcher.astro";
 ---
 
 <Layout
 	title="Hi, I'm Anthony (archived version) | Anthony Rosen"
 	noindex={true}
+	hideNav={true}
 >
-	<VersionBadge label="Archived version — Hi, I'm Anthony" />
+	<VersionSwitcher current="hi-im-anthony" />
 
 	<div id="home-view" class="block">
 		<main class="content-layer relative z-30 bg-white dark:bg-slate-900">

@@ -9,6 +9,7 @@ import {
 	Phone,
 	Send,
 } from "lucide-react";
+import { siteVersionsByNumber } from "../data/site-versions";
 
 const email = "anthonyrosen@gmail.com";
 const phoneDisplay = "612-281-2280";
@@ -341,9 +342,37 @@ const contactEndpoint = "/api/contact";
 						<button class="footer-link" data-target="colophon">Colophon</button>
 					</li>
 					<li><a href="/privacy">Privacy Policy</a></li>
-					<li class="footer-copyright">
-						&copy; <span id="year"></span> Anthony Rosen.
-					</li>
+				</ul>
+			</div>
+
+			<p class="footer-copyright">
+				&copy; <span id="year"></span> Anthony Rosen.
+			</p>
+
+			<div class="footer-versions">
+				<a href="/versions" class="footer-versions-label">
+					Homepage versions
+				</a>
+				<ul class="footer-versions-list">
+					{
+						siteVersionsByNumber.map((v) => (
+							<li>
+								<a
+									href={v.href}
+									class:list={[
+										"footer-version",
+										v.status === "live" && "is-current",
+									]}
+									title={`${v.name}${v.status === "live" ? " (current)" : ""}`}
+								>
+									v{v.version}
+									{v.status === "live" && (
+										<span class="footer-version-current">current</span>
+									)}
+								</a>
+							</li>
+						))
+					}
 				</ul>
 			</div>
 		</div>
@@ -1009,8 +1038,7 @@ const contactEndpoint = "/api/contact";
 		list-style: none;
 	}
 
-	.footer-column :is(a, button),
-	.footer-copyright {
+	.footer-column :is(a, button) {
 		padding: 0;
 		border: 0;
 		background: none;
@@ -1029,8 +1057,90 @@ const contactEndpoint = "/api/contact";
 	}
 
 	.footer-copyright {
-		cursor: default;
+		grid-column: 1;
+		align-self: start;
+		margin: 0;
+		padding-top: 1.25rem;
+		border-top: 1px solid #1e293b;
 		color: #94a3b8;
+		font:
+			0.8rem/1.35 Inter,
+			system-ui,
+			sans-serif;
+	}
+
+	.footer-versions {
+		grid-column: 2 / -1;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem 1rem;
+		padding-top: 1.25rem;
+		border-top: 1px solid #1e293b;
+	}
+
+	.footer-versions-label {
+		color: #64748b;
+		font:
+			700 0.68rem/1 Inter,
+			system-ui,
+			sans-serif;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		text-decoration: none;
+		transition: color 150ms ease;
+	}
+
+	.footer-versions-label:hover {
+		color: #93c5fd;
+	}
+
+	.footer-versions-list {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.45rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.footer-version {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.22rem 0.6rem;
+		border: 1px solid #27354a;
+		border-radius: 999px;
+		color: #94a3b8;
+		font:
+			650 0.72rem/1 Inter,
+			system-ui,
+			sans-serif;
+		text-decoration: none;
+		transition:
+			color 150ms ease,
+			border-color 150ms ease,
+			background 150ms ease;
+	}
+
+	.footer-version:hover {
+		color: #bfdbfe;
+		border-color: rgba(147, 197, 253, 0.45);
+	}
+
+	.footer-version.is-current {
+		border-color: rgba(147, 197, 253, 0.4);
+		background: rgba(147, 197, 253, 0.1);
+		color: #e2e8f0;
+	}
+
+	.footer-version-current {
+		font-size: 0.58rem;
+		font-weight: 800;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: #93c5fd;
 	}
 
 	.site-footer :is(a, button, input, textarea):focus-visible {
@@ -1058,6 +1168,14 @@ const contactEndpoint = "/api/contact";
 		}
 
 		.footer-brand {
+			grid-column: 1 / -1;
+		}
+
+		.footer-copyright {
+			grid-column: 1 / -1;
+		}
+
+		.footer-versions {
 			grid-column: 1 / -1;
 		}
 	}

@@ -4,43 +4,7 @@
 // live design is listed first and links to the real homepage; earlier designs
 // link to their archived, reconstructed previews.
 import Layout from "../../layouts/Layout.astro";
-
-// Keep the versions archive OUT of the production (live) site. It still builds
-// in local dev and in Vercel preview deployments, so it stays easy to preview,
-// but is never served from anthonyrosen.com.
-if (process.env.VERCEL_ENV === "production") {
-	return new Response(null, { status: 404 });
-}
-
-const versions = [
-	{
-		name: "Many Hats Desk",
-		status: "live",
-		era: "2025 – present",
-		href: "/",
-		thumb: "/version-thumbs/many-hats-desk.png",
-		blurb:
-			"The current homepage: a statement whose role word, underline and color switch with each hat, beside Anthony at his desk and a glass hat dock.",
-	},
-	{
-		name: "Hi, I'm Anthony",
-		status: "archived",
-		era: "earlier 2025",
-		href: "/versions/hi-im-anthony",
-		thumb: "/version-thumbs/hi-im-anthony.png",
-		blurb:
-			"A quiet serif greeting with a waving hand — “Hi. I’m Anthony.” — that ran for a while before the desk hero.",
-	},
-	{
-		name: "Stone Slam",
-		status: "archived",
-		era: "2024 – early 2025",
-		href: "/versions/stone-slam",
-		thumb: "/version-thumbs/stone-slam.png",
-		blurb:
-			"The “Tired of the fluff?” hero with a fixed 3D cotton-ball scene and a headline that slams into place as you scroll.",
-	},
-];
+import { siteVersions as versions } from "../../data/site-versions";
 ---
 
 <Layout title="Homepage versions | Anthony Rosen" noindex={true}>
@@ -91,11 +55,14 @@ const versions = [
 							</div>
 							<div class="flex flex-1 flex-col p-6">
 								<div class="mb-2 flex items-baseline justify-between gap-3">
-									<h2 class="text-lg font-bold text-slate-900 dark:text-white">
+									<h2 class="flex items-baseline gap-2 text-lg font-bold text-slate-900 dark:text-white">
+										<span class="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-extrabold tracking-wide text-slate-500 dark:bg-slate-700 dark:text-slate-300">
+											v{v.version}
+										</span>
 										{v.name}
 									</h2>
 									<span class="shrink-0 text-xs font-medium text-slate-400 dark:text-slate-500">
-										{v.era}
+										{v.status === "live" ? "Current" : v.era}
 									</span>
 								</div>
 								<p class="mb-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
