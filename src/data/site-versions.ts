@@ -6,6 +6,8 @@
 export type SiteVersion = {
 	/** Stable key used to mark the current version in the switcher. */
 	key: string;
+	/** Chronological version number: v1 is the oldest, the highest is current. */
+	version: number;
 	name: string;
 	status: "live" | "archived";
 	era: string;
@@ -14,9 +16,12 @@ export type SiteVersion = {
 	blurb: string;
 };
 
+// Listed newest-first (the live design first) for the gallery; `version` gives
+// the chronological number (v1 = oldest).
 export const siteVersions: SiteVersion[] = [
 	{
 		key: "many-hats-desk",
+		version: 3,
 		name: "Many Hats Desk",
 		status: "live",
 		era: "2025 – present",
@@ -27,6 +32,7 @@ export const siteVersions: SiteVersion[] = [
 	},
 	{
 		key: "hi-im-anthony",
+		version: 2,
 		name: "Hi, I'm Anthony",
 		status: "archived",
 		era: "earlier 2025",
@@ -37,6 +43,7 @@ export const siteVersions: SiteVersion[] = [
 	},
 	{
 		key: "stone-slam",
+		version: 1,
 		name: "Stone Slam",
 		status: "archived",
 		era: "2024 – early 2025",
@@ -46,3 +53,8 @@ export const siteVersions: SiteVersion[] = [
 			"The “Tired of the fluff?” hero with a fixed 3D cotton-ball scene and a headline that slams into place as you scroll.",
 	},
 ];
+
+/** Versions oldest → newest (v1, v2, …), for timeline-style lists. */
+export const siteVersionsByNumber: SiteVersion[] = [...siteVersions].sort(
+	(a, b) => a.version - b.version
+);

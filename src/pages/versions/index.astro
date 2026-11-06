@@ -55,11 +55,14 @@ import { siteVersions as versions } from "../../data/site-versions";
 							</div>
 							<div class="flex flex-1 flex-col p-6">
 								<div class="mb-2 flex items-baseline justify-between gap-3">
-									<h2 class="text-lg font-bold text-slate-900 dark:text-white">
+									<h2 class="flex items-baseline gap-2 text-lg font-bold text-slate-900 dark:text-white">
+										<span class="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-extrabold tracking-wide text-slate-500 dark:bg-slate-700 dark:text-slate-300">
+											v{v.version}
+										</span>
 										{v.name}
 									</h2>
 									<span class="shrink-0 text-xs font-medium text-slate-400 dark:text-slate-500">
-										{v.era}
+										{v.status === "live" ? "Current" : v.era}
 									</span>
 								</div>
 								<p class="mb-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
