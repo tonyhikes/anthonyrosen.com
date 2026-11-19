@@ -11,16 +11,16 @@ import { siteVersions as versions } from "../../data/site-versions";
 	<main class="mx-auto max-w-6xl px-4 pt-28 pb-24 sm:px-6 lg:px-8">
 		<header class="mb-12 max-w-2xl">
 			<p
-				class="mb-3 text-xs font-bold tracking-widest text-blue-600 uppercase dark:text-blue-400"
+				class="mb-3 text-xs font-bold tracking-widest text-blue-400 uppercase"
 			>
 				Design archive
 			</p>
 			<h1
-				class="mb-4 text-4xl font-black tracking-tight text-slate-900 md:text-5xl dark:text-white"
+				class="mb-4 text-4xl font-black tracking-tight text-white md:text-5xl"
 			>
 				Homepage versions
 			</h1>
-			<p class="text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+			<p class="text-lg leading-relaxed text-slate-300">
 				Every homepage design this site has shipped, kept around so each one
 				stays a click away. The live design is first; the rest are archived
 				previews reconstructed from their original code.
@@ -46,7 +46,7 @@ import { siteVersions as versions } from "../../data/site-versions";
 									class:list={[
 										"absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-bold tracking-wide uppercase shadow-sm",
 										v.status === "live"
-											? "bg-emerald-500 text-white"
+											? "bg-emerald-700 text-white"
 											: "bg-slate-900/80 text-white backdrop-blur",
 									]}
 								>
@@ -56,12 +56,12 @@ import { siteVersions as versions } from "../../data/site-versions";
 							<div class="flex flex-1 flex-col p-6">
 								<div class="mb-2 flex items-baseline justify-between gap-3">
 									<h2 class="flex items-baseline gap-2 text-lg font-bold text-slate-900 dark:text-white">
-										<span class="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-extrabold tracking-wide text-slate-500 dark:bg-slate-700 dark:text-slate-300">
+										<span class="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-extrabold tracking-wide text-slate-600 dark:bg-slate-700 dark:text-slate-300">
 											v{v.version}
 										</span>
 										{v.name}
 									</h2>
-									<span class="shrink-0 text-xs font-medium text-slate-400 dark:text-slate-500">
+									<span class="shrink-0 text-xs font-medium text-slate-500 dark:text-slate-400">
 										{v.status === "live" ? "Current" : v.era}
 									</span>
 								</div>
