@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
-const samples = [
+const samples: { title: string; href: string; role?: string }[] = [
 	{
 		title: "Newsletter: Alzheimer's for Amateurs",
 		href: "https://newsletter.alzamateurs.com/p/the-brains-cleanup-crew-is-becoming",
@@ -23,6 +23,41 @@ const samples = [
 		title: "Video post",
 		href: "https://www.instagram.com/reel/DFstRNmvY7p/?utm_source=ig_web_button_share_sheet&stkn=MzRlODBiNWFlZA==",
 	},
+	{
+		title: "Video: Animated explainer",
+		href: "https://www.youtube.com/watch?v=TJ4bDq5koCA",
+		role: "Wrote the script, edited, built the animations, and hired the voice artist.",
+	},
+	{
+		title: "Video: On-location shoot",
+		href: "https://www.youtube.com/watch?v=soiWN_O5cGE",
+		role: "Planned the shoot: scripts, logistics, and location.",
+	},
+	{
+		title: "Video: 3D product visualization",
+		href: "https://www.youtube.com/watch?v=ynfIxBByr5o",
+		role: "Directed the 3D product visualization and wrote the storyboard.",
+	},
+	{
+		title: "Video: Product launch and ad campaign",
+		href: "https://www.youtube.com/watch?v=t1SF230evEE",
+		role: "Planned the shoot and logistics, managed the video editor, and ran the launch and ad campaign.",
+	},
+	{
+		title: "Video: On-location shoot",
+		href: "https://www.youtube.com/watch?v=s-rOd9A_b70",
+		role: "Planned the shoot: scripts, logistics, and location.",
+	},
+	{
+		title: "Video: Low-budget product explainer",
+		href: "https://www.youtube.com/watch?v=SFT6xyyUnPo",
+		role: "New product explainer on a very low budget. Wrote the script, produced the main and feature animations, edited, and cast the voice actor.",
+	},
+	{
+		title: "Website: Bivy marketing site",
+		href: "https://bivystick.com/case-study/motocross-legend-ricky-carmichael-relies-on-acr-bivy-stick-for-seamless-communication-and-tracking-during-epic-summer-adventure-ride/",
+		role: "Built the customer-focused marketing site from scratch: case studies, product pages, blog, and landing pages.",
+	},
 ];
 ---
 
@@ -33,7 +68,7 @@ const samples = [
 	<main class="work-samples" id="main-content">
 		<div class="samples-inner">
 			<header class="samples-header">
-				<h1>Writing, social &amp; video samples</h1>
+				<h1>Writing, social, video &amp; web samples</h1>
 			</header>
 			<ul class="samples-list" aria-label="Work samples">
 				{
@@ -46,6 +81,7 @@ const samples = [
 								rel="noopener noreferrer"
 							>
 								<h2>{sample.title}</h2>
+								{sample.role && <p class="sample-role">{sample.role}</p>}
 								<span class="sample-url">{sample.href}</span>
 								<span class="sr-only"> (opens in a new tab)</span>
 							</a>
@@ -100,6 +136,15 @@ const samples = [
 		font-size: 1.125rem;
 		font-weight: 650;
 		line-height: 1.5;
+	}
+	.sample-role {
+		margin: 0 0 0.4rem;
+		color: #475569;
+		font-size: 0.9375rem;
+		line-height: 1.6;
+	}
+	:global(.dark) .sample-role {
+		color: #94a3b8;
 	}
 	.sample-url {
 		color: #1d4ed8;
