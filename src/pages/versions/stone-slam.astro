@@ -62,6 +62,58 @@ import VersionSwitcher from "../../components/versions/VersionSwitcher.astro";
 	}
 </style>
 
+<!-- Lenis styles this version relied on (formerly in the global stylesheet). -->
+<style is:global>
+	html.lenis,
+	html.lenis body {
+		height: auto;
+	}
+
+	.lenis.lenis-smooth {
+		scroll-behavior: auto !important;
+	}
+
+	.lenis.lenis-smooth [data-lenis-prevent] {
+		overscroll-behavior: contain;
+	}
+
+	.lenis.lenis-stopped {
+		overflow: hidden;
+	}
+</style>
+
+<script>
+	// Lenis smooth scrolling. The live site no longer loads it, but this
+	// version's slam depends on it: SlamSection locks scrolling through
+	// window.lenis while the slam plays. It starts immediately (the live
+	// version deferred it for Lighthouse) so the lock is ready before the
+	// first scroll.
+	import Lenis from "lenis";
+
+	const lenis = new Lenis();
+	window.lenis = lenis;
+
+	let rafId: number | null = null;
+	const raf = (time: number) => {
+		lenis.raf(time);
+		rafId = requestAnimationFrame(raf);
+	};
+	const startLoop = () => {
+		if (rafId === null) rafId = requestAnimationFrame(raf);
+	};
+	startLoop();
+
+	// Pause while the tab is hidden to save CPU
+	document.addEventListener("visibilitychange", () => {
+		if (document.hidden) {
+			if (rafId !== null) cancelAnimationFrame(rafId);
+			rafId = null;
+		} else {
+			startLoop();
+		}
+	});
+</script>
+
 <script>
 	// This archived page has no SPA view-switching; forward the shared Navbar's
 	// view-change events to the live site instead.
